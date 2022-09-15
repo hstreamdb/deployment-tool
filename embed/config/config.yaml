@@ -1,0 +1,103 @@
+ global:
+  # # Username to login via SSH
+  user: "root"
+  # # The path of SSH identity file
+  # key_path: "~/.ssh/hstream-aliyun.pem"
+  # # SSH service monitor port
+  ssh_port: 22
+  # # Replication factors of store meta data
+  # meta_replica: 3
+  # # HStore config file path in local host
+  # hstore_config_file: ""
+  # # Global container configuration
+  # container_config:
+    # cpu_limit: 200
+    # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true
+
+hserver:
+  # # The ip address of the HServer
+  - host: 10.1.0.10
+    # # HServer docker image
+    # image: "hstreamdb/hstream"
+    # # HServer configuration
+    # server_config:
+      # # HServer log level
+      # server_log_level: info
+      # # HStore log level
+      # store_log_level: error
+      # # Specific server compression algorithm
+      # compression: lz4
+    # # HServer container configuration
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+    # local_config_path: $PWD/server.yaml
+    # remote_config_path: "/home/deploy/hserver"
+  - host: 10.1.0.11
+    # # HServer docker image
+    # image: "hstreamdb/hstream"
+    # # HServer configuration
+    # server_config:
+      # # HServer log level
+      # server_log_level: info
+      # # HStore log level
+      # store_log_level: error
+      # # Specific server compression algorithm
+      # compression: lz4
+    # # HServer container configuration
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+    # local_config_path: $PWD/server.yaml
+    # remote_config_path: "/home/deploy/hserver"
+
+hstore:
+  - host: 10.1.0.10
+    # image: "hstreamdb/hstream"
+    # remote_config_path: "/home/deploy/hstore"
+    # data_dir: "/home/deploy/data/store"
+    # disk: 1
+    # shards: 2
+    # role: "Both" # [Storage|Sequencer|Both]
+    enable_admin: true
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+  - host: 10.1.0.11
+    # image: "hstreamdb/hstream"
+    # remote_config_path: "/home/deploy/hstore"
+    # data_dir: "/home/deploy/data/store"
+    # disk: 1
+    # shards: 2
+    # role: "Both" # [Storage|Sequencer|Both]
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+  - host: 10.1.0.12
+    # image: "hstreamdb/hstream"
+    # remote_config_path: "/home/deploy/hstore"
+    # data_dir: "/home/deploy/data/store"
+    # disk: 1
+    # shards: 2
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+
+meta_store:
+  - host: 10.1.0.13
+    # image: "zookeeper:3.6"
+    # data_dir: "/home/deploy/data/meta"
+    # local_config_path: $PWD/logdevice.conf
+    # remote_config_path: "/home/deploy/hstore"
+  - host: 10.1.0.14
+    # image: "zookeeper:3.6"
+    # data_dir: "/home/deploy/data/meta"
+    # local_config_path: $PWD/logdevice.conf
+    # remote_config_path: "/home/deploy/hstore"
+

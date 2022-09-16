@@ -7,90 +7,6 @@ import (
 	"testing"
 )
 
-func TestParseConfig(t *testing.T) {
-	t.Parallel()
-	config := ComponentsSpec{}
-	err := yaml.Unmarshal([]byte(`
-global:
-  user: "root"
-  key_path: "~/.ssh/test.pem"
-  ssh_port: 22
-  container_config:
-    disable_restart: true
-    remove_when_exit: true
-  #    cpu_limit: 200
-  #    memory_limit: 8G
-
-hserver:
-  - host: 10.1.0.10
-    image: "hstreamdb/hstream"
-    server_config:
-      server_log_level: info
-      store_log_level: error
-#    local_config_path: $PWD/server.yaml
-#    remote_config_path: "/home/deploy/hserver"
-#    cpu_limit: 200
-#    memory_limit: 8G
-  - host: 10.1.0.11
-    image: "hstreamdb/hstream"
-#    local_config_path: $PWD/server.yaml
-#    remote_config_path: "/home/deploy/hserver"
-#    cpu_limit: 200
-#    memory_limit: 8G
-
-hstore:
-  - host: 10.1.0.10
-    image: "hstreamdb/hstream"
-    local_config_path: $PWD/logdevice.conf
-    remote_config_path: "/home/deploy/hstore"
-    data_dir: "/home/deploy/data/store"
-    disk: 1
-    shards: 2
-    role: "Both" # [Storage|Sequencer|Both]
-    enable_admin: true
-    container_config:
-      cpu_limit: 200
-      memory_limit: 8G
-  - host: 10.1.0.11
-    image: "hstreamdb/hstream"
-    local_config_path: $PWD/logdevice.conf
-    remote_config_path: "/home/deploy/hstore"
-    data_dir: "/home/deploy/data/store"
-    disk: 1
-    shards: 2
-    role: "Both" # [Storage|Sequencer|Both]
-    container_config:
-      cpu_limit: 200
-      memory_limit: 8G
-  - host: 10.1.0.12
-    image: "hstreamdb/hstream"
-    local_config_path: $PWD/logdevice.conf
-    remote_config_path: "/home/deploy/hstore"
-    data_dir: "/home/deploy/data/store"
-    disk: 1
-    shards: 2
-    container_config:
-      cpu_limit: 200
-      memory_limit: 8G
-
-hadmin:
-  - host: 10.1.0.11
-    image: "hstreamdb/hstream"
-    meta_replica: 3
-    embed: true
-
-meta_store:
-  - host: 10.1.0.13
-    image: "zookeeper:3.6"
-    data_dir: "/home/deploy/data/meta"
-    local_config_path: $PWD/logdevice.conf
-    remote_config_path: "/home/deploy/hstore"
-`), &config)
-	assert.NilError(t, err)
-
-	t.Logf("%+v\n", config)
-}
-
 func TestGetContainerCfg(t *testing.T) {
 	t.Parallel()
 	config := ComponentsSpec{}
@@ -166,5 +82,61 @@ func TestMergeContainerCfg(t *testing.T) {
 			get := MergeContainerCfg(tc.lhs, tc.rhs)
 			assert.Equal(t, get, tc.want)
 		})
+	}
+}
+
+func TestUpdateComponentSpecWithGlobal(t *testing.T) {
+	t.Parallel()
+	globalCfg := GlobalCfg{
+		User:                "root",
+		KeyPath:             "aaa",
+		SSHPort:             22,
+		MetaReplica:         3,
+		MetaStoreConfigPath: "meta_store_config_path",
+		HStoreConfigPath:    "store_config_path",
+		HServerConfigPath:   "server_config_path",
+		ContainerCfg: ContainerCfg{
+			Cpu:            "200",
+			Memory:         "8G",
+			RemoveWhenExit: true,
+			DisableRestart: true,
+		},
+	}
+
+	cmpSpec := &ComponentsSpec{
+		HServer: []HServerSpec{
+			{
+				Host:    "127.0.0.1",
+				Image:   "hstreamdb/hstream:v0.8.4",
+				SSHPort: 21,
+				ContainerCfg: ContainerCfg{
+					Cpu: "100",
+				},
+			},
+			{
+				Host:    "127.0.0.2",
+				Address: "127.1.1.1",
+				ContainerCfg: ContainerCfg{
+					Cpu:            "300",
+					Memory:         "10G",
+					RemoveWhenExit: false,
+					DisableRestart: false,
+				},
+			},
+		},
+		HStore: []HStoreSpec{
+			{
+				DataDir: "abc",
+			},
+		},
+	}
+
+	err := updateComponentSpecWithGlobal(globalCfg, cmpSpec)
+	assert.NilError(t, err)
+	for _, server := range cmpSpec.HServer {
+		fmt.Printf("%+v\n", server)
+	}
+	for _, store := range cmpSpec.HStore {
+		fmt.Printf("%+v\n", store)
 	}
 }

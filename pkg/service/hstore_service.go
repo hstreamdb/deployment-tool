@@ -47,14 +47,10 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{h.spec.DataDir, h.spec.DataDir},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.StoreDefaultContainerName, mountPoints...)
-	image := h.spec.Image
-	if image == "" {
-		image = spec.StoreDefaultImage
-	}
-	args = append(args, []string{image, spec.StoreDefaultBinPath}...)
-	configPath := globalCtx.HStoreConfigInMetaStore
-	if len(h.spec.RemoteCfgPath) != 0 {
-		configPath = h.spec.RemoteCfgPath
+	args = append(args, []string{h.spec.Image, spec.StoreDefaultBinPath}...)
+	configPath := h.spec.RemoteCfgPath
+	if len(globalCtx.HStoreConfigInMetaStore) != 0 {
+		configPath = globalCtx.HStoreConfigInMetaStore
 	}
 	args = append(args, fmt.Sprintf("--config-path %s", configPath))
 	args = append(args, fmt.Sprintf("--name ld_%d", h.storeId))
@@ -152,19 +148,25 @@ func (h *HStore) Bootstrap(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
+func (h *HStore) AdminStoreCmd(globalCtx *GlobalCtx, cmd string) *executor.ExecuteCtx {
+	args := []string{"docker exec -t"}
+	args = append(args, h.ContainerName, "hadmin store")
+	args = append(args, fmt.Sprintf("--port %d", DefaultAdminApiPort))
+	args = append(args, cmd)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HStore) AdminServerCmd(globalCtx *GlobalCtx, host string, cmd string) *executor.ExecuteCtx {
+	args := []string{"docker exec -t"}
+	args = append(args, h.ContainerName, "hadmin server")
+	args = append(args, "--host", host, cmd)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
 func (h *HStore) IsAdmin() bool {
 	return h.spec.EnableAdmin
 }
 
 func (h *HStore) getDirs() (string, string) {
-	var remoteCfgPath = spec.StoreDefaultCfgDir
-	if len(h.spec.RemoteCfgPath) != 0 {
-		remoteCfgPath = h.spec.RemoteCfgPath
-	}
-
-	var dataDir = spec.StoreDefaultDataDir
-	if len(h.spec.DataDir) != 0 {
-		dataDir = h.spec.DataDir
-	}
-	return remoteCfgPath, dataDir
+	return h.spec.RemoteCfgPath, h.spec.DataDir
 }

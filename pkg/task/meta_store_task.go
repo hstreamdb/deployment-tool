@@ -29,7 +29,7 @@ func (s *InitMetaStoreEnv) Run(executor ext.Executor) error {
 		go func(svc *service.MetaStore) {
 			defer wg.Done()
 			executorCtx := svc.InitEnv(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
 			if err != nil {
 				mutex.Lock()
@@ -65,7 +65,7 @@ func (s *SyncMetaStoreConfig) Run(executor ext.Executor) error {
 				fmt.Printf("skip %s\n", s)
 				return
 			}
-			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SSHPort)
 			for _, position := range transferCtx.Position {
 				if err := executor.Transfer(target, position.LocalDir, position.RemoteDir); err != nil {
 					mutex.Lock()
@@ -104,7 +104,7 @@ func (s *StartMetaStoreCluster) Run(executor ext.Executor) error {
 		go func(svc *service.MetaStore) {
 			defer wg.Done()
 			executorCtx := svc.Deploy(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
 			if err != nil {
 				mutex.Lock()
@@ -130,7 +130,7 @@ func (w *WaitMetaStoreReady) String() string {
 func (w *WaitMetaStoreReady) Run(executor ext.Executor) error {
 	for _, metaStore := range w.service {
 		executorCtx := metaStore.CheckReady(w.ctx)
-		target := fmt.Sprintf("%s:%d", executorCtx.Target, w.ctx.SshPort)
+		target := fmt.Sprintf("%s:%d", executorCtx.Target, w.ctx.SSHPort)
 		res, err := executor.Execute(target, executorCtx.Cmd)
 		if err != nil {
 			return fmt.Errorf("%s-%s", err.Error(), res)
@@ -152,7 +152,7 @@ func (m *MetaStoreStoreValue) String() string {
 func (m *MetaStoreStoreValue) Run(executor ext.Executor) error {
 	service := m.service[0]
 	executorCtx := service.StoreValue(m.Key, m.Value)
-	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SshPort)
+	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {
 		return fmt.Errorf("%s-%s", err.Error(), res)
@@ -172,7 +172,7 @@ func (m *MetaStoreGetValue) String() string {
 func (m *MetaStoreGetValue) Run(executor ext.Executor) error {
 	service := m.service[0]
 	executorCtx := service.GetValue(m.Key)
-	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SshPort)
+	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {
 		return fmt.Errorf("%s-%s", err.Error(), res)
@@ -198,7 +198,7 @@ func (r *RemoveMetaStore) Run(executor ext.Executor) error {
 		go func(svc *service.MetaStore) {
 			defer wg.Done()
 			executorCtx := svc.Remove(r.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
 			if err != nil {
 				mutex.Lock()

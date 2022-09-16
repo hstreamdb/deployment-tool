@@ -29,7 +29,7 @@ func (s *InitStoreEnv) Run(executor ext.Executor) error {
 		go func(svc *service.HStore) {
 			defer wg.Done()
 			executorCtx := svc.InitEnv(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
 			if err != nil {
 				mutex.Lock()
@@ -65,7 +65,7 @@ func (s *SyncStoreConfig) Run(executor ext.Executor) error {
 				fmt.Printf("skip %s\n", s)
 				return
 			}
-			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SSHPort)
 			for _, position := range transferCtx.Position {
 				if err := executor.Transfer(target, position.LocalDir, position.RemoteDir); err != nil {
 					mutex.Lock()
@@ -104,7 +104,7 @@ func (s *StartStoreCluster) Run(executor ext.Executor) error {
 		go func(svc *service.HStore) {
 			defer wg.Done()
 			executorCtx := svc.Deploy(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
 			if err != nil {
 				mutex.Lock()
@@ -130,7 +130,7 @@ func (w *WaitStoreReady) String() string {
 func (w *WaitStoreReady) Run(executor ext.Executor) error {
 	for _, store := range w.service {
 		executorCtx := store.CheckReady(w.ctx)
-		target := fmt.Sprintf("%s:%d", executorCtx.Target, w.ctx.SshPort)
+		target := fmt.Sprintf("%s:%d", executorCtx.Target, w.ctx.SSHPort)
 		res, err := executor.Execute(target, executorCtx.Cmd)
 		if err != nil {
 			return fmt.Errorf("%s-%s", err.Error(), res)
@@ -157,7 +157,7 @@ func (b *BootStrap) Run(executor ext.Executor) error {
 	}
 
 	executorCtx := adminStore.Bootstrap(b.ctx)
-	target := fmt.Sprintf("%s:%d", executorCtx.Target, b.ctx.SshPort)
+	target := fmt.Sprintf("%s:%d", executorCtx.Target, b.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {
 		return fmt.Errorf("%s-%s", err.Error(), res)
@@ -182,7 +182,7 @@ func (r *RemoveStore) Run(executor ext.Executor) error {
 		go func(svc *service.HStore) {
 			defer wg.Done()
 			executorCtx := svc.Remove(r.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
 			if err != nil {
 				mutex.Lock()
@@ -214,7 +214,7 @@ func (m *MountDisk) Run(executor ext.Executor) error {
 		go func(svc *service.HStore) {
 			defer wg.Done()
 			executorCtx := svc.MountDisk()
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SshPort)
+			target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
 			if err != nil {
 				mutex.Lock()

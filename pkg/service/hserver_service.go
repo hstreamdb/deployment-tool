@@ -34,23 +34,15 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		mountPoints []spec.MountPoints
 		configPath  string
 	)
-	if len(h.spec.LocalCfgPath) != 0 {
+	if len(globalCtx.LocalHServerConfigFile) != 0 {
 		configPath, _ = h.getDirs()
 		mountPoints = append(mountPoints, spec.MountPoints{Local: configPath, Remote: spec.ServerBinConfigPath})
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.ServerDefaultContainerName, mountPoints...)
-	image := h.spec.Image
-	if image == "" {
-		image = spec.ServerDefaultImage
-	}
-	args = append(args, []string{image, spec.ServerDefaultBinPath}...)
+	args = append(args, []string{h.spec.Image, spec.ServerDefaultBinPath}...)
 	args = append(args, fmt.Sprintf("--host %s", h.spec.Host))
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
-	address := h.spec.Address
-	if len(address) == 0 {
-		address = h.spec.Host
-	}
-	args = append(args, fmt.Sprintf("--address %s", address))
+	args = append(args, fmt.Sprintf("--address %s", h.spec.Address))
 	args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
 	args = append(args, "--seed-nodes", globalCtx.SeedNodes)
 	if len(configPath) != 0 {
@@ -87,8 +79,8 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	position := []executor.Position{
 		{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)},
 	}
-	if len(h.spec.LocalCfgPath) != 0 {
-		position = append(position, executor.Position{LocalDir: h.spec.LocalCfgPath, RemoteDir: cfgDir})
+	if len(globalCtx.LocalHServerConfigFile) != 0 {
+		position = append(position, executor.Position{LocalDir: globalCtx.LocalHServerConfigFile, RemoteDir: cfgDir})
 	}
 
 	return &executor.TransferCtx{
@@ -112,12 +104,10 @@ func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (m *HServer) getDirs() (string, string) {
-	if len(m.spec.RemoteCfgPath) == 0 {
-		m.spec.RemoteCfgPath = spec.ServerDefaultConfigPath
-	}
-	if len(m.spec.DataDir) == 0 {
-		m.spec.DataDir = spec.ServerDefaultDataDir
-	}
-	return m.spec.RemoteCfgPath, m.spec.DataDir
+func (h *HServer) GetHost() string {
+	return h.spec.Host
+}
+
+func (h *HServer) getDirs() (string, string) {
+	return h.spec.RemoteCfgPath, h.spec.DataDir
 }

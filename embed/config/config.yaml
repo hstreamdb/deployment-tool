@@ -1,4 +1,4 @@
- global:
+global:
   # # Username to login via SSH
   user: "root"
   # # The path of SSH identity file

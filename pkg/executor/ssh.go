@@ -11,8 +11,6 @@ import (
 )
 
 type SSHExecutor struct {
-	//Host     string
-	//Port     int
 	User         string
 	Password     string
 	IdentityFile string
@@ -22,20 +20,7 @@ type SSHExecutor struct {
 }
 
 func NewSSHExecutor(user, password, keyPath string) *SSHExecutor {
-	//sshCfg, err := newSSHConfig(user, password, keyPath)
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	//address := fmt.Sprintf("%s:%d", host, globalCfg.SshPort)
-	//client, err := ssh.Dial("tcp", address, sshCfg)
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	return &SSHExecutor{
-		//Host:     host,
-		//Port:     globalCfg.SshPort,
 		User:         user,
 		Password:     password,
 		IdentityFile: keyPath,
@@ -149,7 +134,6 @@ func (s *SSHExecutor) newClient(address string) (*ssh.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create ssh client for address %s error: %s", address, err.Error())
 	}
-	fmt.Printf("create ssh client to %s\n", address)
 	s.clients[address] = client
 	return client, nil
 }

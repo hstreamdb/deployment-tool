@@ -26,9 +26,9 @@ func MergeContainerCfg(lhs, rhs ContainerCfg) ContainerCfg {
 	if rhs.RemoveWhenExit {
 		lhs.RemoveWhenExit = rhs.RemoveWhenExit
 	}
-	// the default value of DisableRestart is true, when rhs.DisableRestart == false,
+	// the default value of DisableRestart is false, when rhs.DisableRestart == true,
 	// update lhs with rhs
-	if !rhs.DisableRestart {
+	if rhs.DisableRestart {
 		lhs.DisableRestart = rhs.DisableRestart
 	}
 	return lhs

@@ -21,7 +21,7 @@ type GlobalCtx struct {
 	//spec spec.GlobalCfg
 	User          string
 	KeyPath       string
-	SshPort       int
+	SSHPort       int
 	MetaReplica   int
 	RemoteCfgPath string
 	DataDir       string
@@ -33,9 +33,13 @@ type GlobalCtx struct {
 	MetaStoreUrls string
 	// for zk: use zkUrl
 	HStoreConfigInMetaStore string
+	// the origin meta store config file in local
+	LocalMetaStoreConfigFile string
 	// the origin store config file in local
 	LocalHStoreConfigFile string
-	HadminAddress         []string
+	// the origin server config file in local
+	LocalHServerConfigFile string
+	HadminAddress          []string
 }
 
 func newGlobalCtx(c spec.ComponentsSpec) (*GlobalCtx, error) {
@@ -46,38 +50,33 @@ func newGlobalCtx(c spec.ComponentsSpec) (*GlobalCtx, error) {
 	metaStoreUrl := c.GetMetaStoreUrl()
 
 	admins := make([]string, 0, len(c.HStore))
-	forbidMetaStoreCfgPath := false
 	for _, v := range c.HStore {
 		if v.EnableAdmin {
 			admins = append(admins, fmt.Sprintf("%s:%d", v.Host, v.AdminPort))
-		}
-		if len(v.RemoteCfgPath) != 0 {
-			forbidMetaStoreCfgPath = true
 		}
 	}
 	if len(admins) == 0 {
 		return nil, fmt.Errorf("need at least one hadmin node")
 	}
 	cfgInMetaStore := ""
-	if !forbidMetaStoreCfgPath {
+	if !c.Global.DisableStoreNetworkCfgPath {
 		cfgInMetaStore = "zk:" + metaStoreUrl + spec.DefaultStoreConfigPath
 	}
 
 	return &GlobalCtx{
-		//spec:             c.Global,
-		User:        c.Global.User,
-		KeyPath:     c.Global.KeyPath,
-		SshPort:     c.Global.SshPort,
-		MetaReplica: c.Global.MetaReplica,
-		//RemoteCfgPath: c.Global.RemoteCfgPath,
-		//DataDir:       c.Global.DataDir,
+		User:         c.Global.User,
+		KeyPath:      c.Global.KeyPath,
+		SSHPort:      c.Global.SSHPort,
+		MetaReplica:  c.Global.MetaReplica,
 		containerCfg: c.Global.ContainerCfg,
 
-		Hosts:                   hosts,
-		MetaStoreUrls:           metaStoreUrl,
-		HStoreConfigInMetaStore: cfgInMetaStore,
-		LocalHStoreConfigFile:   c.Global.HStoreConfigPath,
-		HadminAddress:           admins,
+		Hosts:                    hosts,
+		MetaStoreUrls:            metaStoreUrl,
+		HStoreConfigInMetaStore:  cfgInMetaStore,
+		LocalMetaStoreConfigFile: c.Global.MetaStoreConfigPath,
+		LocalHStoreConfigFile:    c.Global.HStoreConfigPath,
+		LocalHServerConfigFile:   c.Global.HServerConfigPath,
+		HadminAddress:            admins,
 	}, nil
 }
 

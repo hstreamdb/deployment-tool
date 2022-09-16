@@ -19,6 +19,10 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 		return err
 	}
 
+	if err := CheckClusterStatus(executor, services); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -161,5 +165,58 @@ func RemoveHServerCluster(executor ext.Executor, services *service.Services) err
 	}
 
 	fmt.Println("Remove server cluster success")
+	return nil
+}
+
+type ClusterCtx struct {
+	ctx            *service.GlobalCtx
+	serverServices []*service.HServer
+	storeServices  []*service.HStore
+}
+
+type CheckClusterStats struct {
+	ClusterCtx
+}
+
+func (c *CheckClusterStats) String() string {
+	return "Task: check cluster status"
+}
+
+func (c *CheckClusterStats) Run(executor ext.Executor) error {
+	var adminStore *service.HStore
+	for _, store := range c.storeServices {
+		if store.IsAdmin() {
+			adminStore = store
+			break
+		}
+	}
+
+	executorCtx := adminStore.AdminStoreCmd(c.ctx, "status")
+	target := fmt.Sprintf("%s:%d", executorCtx.Target, c.ctx.SSHPort)
+	res, err := executor.Execute(target, executorCtx.Cmd)
+	if err != nil {
+		return fmt.Errorf("%s-%s", err.Error(), res)
+	}
+	fmt.Printf("=== HStore Status ===\n%s\n", res)
+
+	executorCtx = adminStore.AdminServerCmd(c.ctx, c.serverServices[0].GetHost(), "status")
+	res, err = executor.Execute(target, executorCtx.Cmd)
+	if err != nil {
+		return fmt.Errorf("%s-%s", err.Error(), res)
+	}
+	fmt.Printf("=== HServer Status ===\n%s\n", res)
+	return nil
+}
+
+func CheckClusterStatus(executor ext.Executor, services *service.Services) error {
+	clusterCtx := ClusterCtx{
+		ctx:            services.Global,
+		serverServices: services.HServer,
+		storeServices:  services.HStore,
+	}
+	task := &CheckClusterStats{clusterCtx}
+	if err := task.Run(executor); err != nil {
+		return err
+	}
 	return nil
 }

@@ -38,11 +38,7 @@ func (m *MetaStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, spec.MetaStoreDefaultContainerName, mountPoints...)
 	args = append(args, zkEnvArgs(m.metaStoreId, globalCtx.MetaStoreUrls)...)
-	image := m.spec.Image
-	if image == "" {
-		image = spec.MetaStoreDefaultImage
-	}
-	args = append(args, image)
+	args = append(args, m.spec.Image)
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -56,9 +52,6 @@ func zkEnvArgs(idx uint32, metaStoreUrls string) []string {
 		panic(err)
 	}
 	urls := reg.Split(metaStoreUrls, -1)
-
-	//urls := strings.Split(metaStoreUrls, ":2181,")
-	fmt.Printf("url: %+v\n", urls)
 	zkUrls := make([]string, 0, len(urls))
 	for i, url := range urls {
 		if url == "" {
@@ -71,9 +64,8 @@ func zkEnvArgs(idx uint32, metaStoreUrls string) []string {
 		// according to https://hub.docker.com/_/zookeeper, ZOO_MY_ID must between 1 and 255
 		zkUrls = append(zkUrls, fmt.Sprintf("server.%d=%s:2888:3888;2181", i+1, url))
 	}
-	fmt.Printf("zkurls: %+v\n", zkUrls)
-	zooServers := strings.Join(zkUrls, " ")
 
+	zooServers := strings.Join(zkUrls, " ")
 	return []string{
 		fmt.Sprintf("-e ZOO_MY_ID=%d", idx),
 		fmt.Sprintf("-e ZOO_SERVERS=\"%s\"", zooServers),
@@ -101,8 +93,8 @@ func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	position := []executor.Position{
 		{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)},
 	}
-	if len(m.spec.LocalCfgPath) != 0 {
-		position = append(position, executor.Position{LocalDir: m.spec.LocalCfgPath, RemoteDir: cfgDir})
+	if len(globalCtx.LocalHServerConfigFile) != 0 {
+		position = append(position, executor.Position{LocalDir: globalCtx.LocalHServerConfigFile, RemoteDir: cfgDir})
 	}
 
 	return &executor.TransferCtx{
@@ -141,11 +133,5 @@ func (m *MetaStore) GetValue(key string) *executor.ExecuteCtx {
 }
 
 func (m *MetaStore) getDirs() (string, string) {
-	if len(m.spec.RemoteCfgPath) == 0 {
-		m.spec.RemoteCfgPath = spec.MetaStoreDefaultCfgDir
-	}
-	if len(m.spec.DataDir) == 0 {
-		m.spec.DataDir = spec.MetaStoreDefaultDataDir
-	}
 	return m.spec.RemoteCfgPath, m.spec.DataDir
 }

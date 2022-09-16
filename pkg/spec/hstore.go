@@ -8,19 +8,10 @@ const (
 	StoreDefaultDataDir       = "/hstream/data/store"
 )
 
-type Role string
-
-const (
-	BOTH      Role = "Both"
-	STORAGE   Role = "Storage"
-	SEQUENCER Role = "Sequencer"
-)
-
 type HStoreSpec struct {
-	Host    string `yaml:"host"`
-	Image   string `yaml:"image"`
-	SshPort int    `yaml:"ssh_port" default:"22"`
-	//LocalCfgPath  string       `yaml:"local_config_path"`
+	Host          string       `yaml:"host"`
+	Image         string       `yaml:"image"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	DataDir       string       `yaml:"data_dir"`
 	Role          string       `yaml:"role" default:"Both"`
@@ -28,6 +19,18 @@ type HStoreSpec struct {
 	AdminPort     int          `yaml:"admin_port" default:"6440"`
 	StoreOps      StoreOps     `yaml:",inline"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (h *HStoreSpec) SetDefaultDataDir() {
+	h.DataDir = StoreDefaultDataDir
+}
+
+func (h *HStoreSpec) SetDefaultImage() {
+	h.Image = StoreDefaultImage
+}
+
+func (h *HStoreSpec) SetDefaultRemoteCfgPath() {
+	h.RemoteCfgPath = StoreDefaultCfgDir
 }
 
 type StoreOps struct {
@@ -38,7 +41,7 @@ type StoreOps struct {
 type HAdminSpec struct {
 	Host         string       `yaml:"host"`
 	Image        string       `yaml:"image"`
-	SshPort      int          `yaml:"ssh_port" default:"22"`
+	SSHPort      int          `yaml:"ssh_port" default:"22"`
 	Replica      string       `yaml:"meta_replica"`
 	Embed        bool         `yaml:"embed"`
 	ContainerCfg ContainerCfg `yaml:"container_config"`

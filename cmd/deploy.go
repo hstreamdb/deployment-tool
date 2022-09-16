@@ -80,7 +80,3 @@ func newDeploy() *cobra.Command {
 	cmd.Flags().BoolVarP(&opts.debugMode, "debug", "d", false, "Debug mode")
 	return cmd
 }
-
-func mergeSSHAuthenticationOpts(globalCtx *service.GlobalCtx, identityFile string) {
-	//if len(identityFile)
-}

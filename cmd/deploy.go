@@ -73,7 +73,7 @@ func newDeploy() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.configPath, "config", "c", "", "Cluster config path.")
+	cmd.Flags().StringVarP(&opts.configPath, "config", "c", "template/config.yaml", "Cluster config path.")
 	cmd.Flags().StringVarP(&opts.user, "user", "u", "", "User name to login via ssh.")
 	cmd.Flags().BoolVarP(&opts.usePassword, "use-password", "p", false, "Use password authentication for ssh.")
 	cmd.Flags().StringVarP(&opts.identityFile, "identity-file", "i", "", "The path of the SSH identity file.")

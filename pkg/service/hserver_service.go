@@ -40,20 +40,20 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.ServerDefaultContainerName, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.ServerDefaultBinPath}...)
-	args = append(args, fmt.Sprintf("--host %s", h.spec.Host))
+	args = append(args, "--host", h.spec.Host)
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
-	args = append(args, fmt.Sprintf("--address %s", h.spec.Address))
+	args = append(args, "--address", h.spec.Address)
 	args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
 	args = append(args, "--seed-nodes", globalCtx.SeedNodes)
 	if len(configPath) != 0 {
-		args = append(args, fmt.Sprintf("--config-path %s", configPath))
+		args = append(args, "--config-path", configPath)
 	}
-	args = append(args, fmt.Sprintf("--zkuri %s", globalCtx.MetaStoreUrls))
-	args = append(args, fmt.Sprintf("--store-config %s", globalCtx.HStoreConfigInMetaStore))
+	args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
+	args = append(args, "--store-config", globalCtx.HStoreConfigInMetaStore)
 	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
-	args = append(args, fmt.Sprintf("--store-log-level %s", h.spec.Opts.StoreLogLevel))
-	args = append(args, fmt.Sprintf("--log-level %s", h.spec.Opts.ServerLogLevel))
-	args = append(args, fmt.Sprintf("--compression %s", h.spec.Opts.Compression))
+	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
+	args = append(args, "--log-level", h.spec.Opts.ServerLogLevel)
+	args = append(args, "--compression", h.spec.Opts.Compression)
 	admin := globalCtx.HadminAddress[0]
 	adminInfo := strings.Split(admin, ":")
 	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %s", adminInfo[0], adminInfo[1]))

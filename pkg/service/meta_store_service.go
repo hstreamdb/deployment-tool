@@ -75,7 +75,8 @@ func zkEnvArgs(idx uint32, metaStoreUrls string) []string {
 
 func (m *MetaStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", spec.MetaStoreDefaultContainerName}
-	args = append(args, "&&", "sudo rm -rf", m.spec.DataDir)
+	args = append(args, "&&", "sudo rm -rf", m.spec.DataDir,
+		m.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

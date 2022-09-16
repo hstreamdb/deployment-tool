@@ -61,7 +61,8 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (h *HServer) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := []string{"docker rm -f", spec.ServerDefaultContainerName}
+	args := []string{"docker rm -f", spec.ServerDefaultContainerName, "&& sudo rm -rf",
+		h.spec.DataDir, h.spec.RemoteCfgPath}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

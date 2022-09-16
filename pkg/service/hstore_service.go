@@ -78,7 +78,9 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (h *HStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", spec.StoreDefaultContainerName}
-	args = append(args, "&&", "sudo rm -rf", fmt.Sprintf("%s/shard*/*", h.spec.DataDir), h.spec.DataDir)
+	args = append(args, "&&", "sudo rm -rf",
+		fmt.Sprintf("%s/shard*/*", h.spec.DataDir),
+		h.spec.DataDir, h.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

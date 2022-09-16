@@ -1,6 +1,6 @@
 module github.com/hstreamdb/dev-deploy
 
-go 1.19
+go 1.18
 
 require (
 	github.com/bramvdbogaerde/go-scp v1.2.0

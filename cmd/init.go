@@ -34,6 +34,15 @@ func newInit() *cobra.Command {
 			if err := os.MkdirAll("template/script", 0755); err != nil {
 				return fmt.Errorf("create template config path error: %s\n", err.Error())
 			}
+			if err := os.MkdirAll("template/prometheus", 0755); err != nil {
+				return fmt.Errorf("create template prometheus path error: %s\n", err.Error())
+			}
+			if err := os.MkdirAll("template/grafana/dashboards", 0755); err != nil {
+				return fmt.Errorf("create template grafana path error: %s\n", err.Error())
+			}
+			if err := os.MkdirAll("template/grafana/datasources", 0755); err != nil {
+				return fmt.Errorf("create template grafana path error: %s\n", err.Error())
+			}
 			if err := os.WriteFile("template/config.yaml", content.Bytes(), 0664); err != nil {
 				return fmt.Errorf("write config file error: %s\n", err.Error())
 			}

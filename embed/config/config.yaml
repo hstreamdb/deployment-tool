@@ -24,6 +24,26 @@ global:
     # disable_restart: true
     # remove_when_exit: true
 
+monitor:
+  # # Node exporter port
+  node_exporter_port: 9100
+  # # Node exporter image
+  # node_exporter_image: "prom/node-exporter"
+  # # Cadvisor port
+  cadvisor_port: 7000
+  # # Cadvisor image
+  # cadvisor_image: "gcr.lank8s.cn/cadvisor/cadvisor:v0.39.3"
+  # # List of nodes that don't deploy monitor.
+  # excluded_hosts: []
+  # remote_config_path: "/home/deploy/monitor"
+  # data_dir: "/home/deploy/data/monitor"
+  grafana_disable_login: true
+  # container_config:
+    # cpu_limit: 200
+    # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true
+
 hserver:
   # # The ip address of the HServer
   - host: 10.1.0.10
@@ -75,6 +95,8 @@ hstore:
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
   - host: 10.1.0.11
     # image: "hstreamdb/hstream"
     # remote_config_path: "/home/deploy/hstore"
@@ -85,6 +107,8 @@ hstore:
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
   - host: 10.1.0.12
     # image: "hstreamdb/hstream"
     # remote_config_path: "/home/deploy/hstore"
@@ -95,14 +119,51 @@ hstore:
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
 
 meta_store:
   - host: 10.1.0.13
     # image: "zookeeper:3.6"
     # data_dir: "/home/deploy/data/meta"
     # remote_config_path: "/home/deploy/hstore"
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
   - host: 10.1.0.14
     # image: "zookeeper:3.6"
     # data_dir: "/home/deploy/data/meta"
     # remote_config_path: "/home/deploy/hstore"
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
 
+prometheus:
+  - host: 10.1.0.15
+    # # Prometheus service monitor port
+    # port: 9090
+    # # Prometheus image
+    # image: "prom/prometheus"
+    # data_dir: "/home/deploy/data/prometheus"
+    # remote_config_path: "/home/deploy/prometheus"
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+
+grafana:
+  - host: 10.1.0.15
+    # port: 3000
+    # image: "grafana/grafana-oss:main"
+    # data_dir: "/home/deploy/data/grafana"
+    # remote_config_path: "/home/deploy/grafana"
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true

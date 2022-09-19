@@ -1,0 +1,54 @@
+groups:
+  - name: cluster_stats
+    rules:
+      # node stats
+      - record: cluster:node_cpu:usage_percent_1m
+        expr: (1 - sum(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) / sum(rate(node_cpu_seconds_total[1m])) by (instance)) * 100
+      - record: cluster:node_memory:used_memory_percent
+        expr: (1 - sum(node_memory_MemAvailable_bytes) by(instance) / sum(node_memory_MemTotal_bytes) by(instance)) * 100
+      - record: cluster:node_disk:disk_read_io
+        expr: sum(rate(node_disk_read_bytes_total[1m])) by (instance)
+      - record: cluster:node_disk:disk_write_io
+        expr: sum(rate(node_disk_written_bytes_total[1m])) by (instance)
+      - record: cluster:net:network_receive_io
+        expr: sum(irate(node_network_receive_bytes_total{device!~"lo | veth.* | docker.* | flannel.* | cali.* | cbr."}[1m])) by (instance)
+      - record: cluster:net:network_transmit_io
+        expr: sum(irate(node_network_transmit_bytes_total{device!~"lo | veth.* | docker.* | flannel.* | cali.* | cbr."}[1m])) by (instance)
+
+      # cluster container stats
+      - record: hstream:container_cpu:usage_percent_1m
+        expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[1m])) BY (instance, name) * 100)
+      - record: hstream:container_mem:usage_memory_bytes_1m
+        expr: (sum(container_memory_working_set_bytes{name!=""}) BY (instance, name))
+      - record: hstream:container_fs:write_bytes_1m
+        expr: sum(rate(container_fs_writes_bytes_total[1m])) BY (instance, name)
+      - record: hstream:container_fs:read_bytes_1m
+        expr: sum(rate(container_fs_read_bytes_total[1m])) BY (instance, name)
+      - record: hstream:container_net:receive_bytes_1m
+        expr: sum(rate(container_network_receive_bytes_total[1m])) by (instance, name)
+      - record: hstream:container_net:transmit_bytes_1m
+        expr: sum(rate(container_network_transmit_bytes_total[1m])) by (instance, name)
+
+      # hserver container stats
+      - record: hstream:hserver_cpu:usage_percent_1m
+        expr: hstream:container_cpu:usage_percent_1m{name="deploy_hserver"}
+      - record: hstream:hserver_mem:usage_memory_bytes_1m
+        expr: hstream:container_cpu:usage_percent_1m{name="deploy_hserver"}
+      - record: hstream:hserver_net:receive_bytes_1m
+        expr: hstream:container_net:receive_bytes_1m{name="deploy_hserver"}
+      - record: hstream:hserver_net:transmit_bytes_1m
+        expr: hstream:container_net:transmit_bytes_1m{name="deploy_hserver"}
+
+      # hstore container stats
+      - record: hstream:hstore_cpu:usage_percent_1m
+        expr: hstream:container_cpu:usage_percent_1m{name="deploy_hstore"}
+      - record: hstream:hstore_mem:usage_memory_bytes_1m
+        expr: hstream:container_cpu:usage_percent_1m{name="deploy_hstore"}
+      - record: hstream:hstore_net:receive_bytes_1m
+        expr: hstream:container_net:receive_bytes_1m{name="deploy_hstore"}
+      - record: hstream:hstore_net:transmit_bytes_1m
+        expr: hstream:container_net:transmit_bytes_1m{name="deploy_hstore"}
+      - record: hstream:hstore_fs:write_bytes_1m
+        expr: hstream:container_fs:write_bytes_1m{name="deploy_hstore"}
+      - record: hstream:hstore_fs:read_bytes_1m
+        expr: hstream:container_fs:read_bytes_1m{name="deploy_hstore"}

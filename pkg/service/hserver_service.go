@@ -38,7 +38,7 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		configPath, _ = h.getDirs()
 		mountPoints = append(mountPoints, spec.MountPoints{Local: configPath, Remote: spec.ServerBinConfigPath})
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.ServerDefaultContainerName, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.ServerDefaultContainerName, true, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.ServerDefaultBinPath}...)
 	args = append(args, "--host", h.spec.Host)
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))

@@ -39,8 +39,11 @@ type MountPoints struct {
 	Remote string
 }
 
-func GetDockerExecCmd(globalContainerSpec, serviceContainerSpec ContainerCfg, containerName string, mountPoints ...MountPoints) []string {
-	args := []string{"docker run -d", "--network host"}
+func GetDockerExecCmd(globalContainerSpec, serviceContainerSpec ContainerCfg, containerName string, hostMode bool, mountPoints ...MountPoints) []string {
+	args := []string{"docker run -d"}
+	if hostMode {
+		args = append(args, "--network host")
+	}
 	args = append(args, fmt.Sprintf("--name %s", containerName))
 	containerCfg := MergeContainerCfg(globalContainerSpec, serviceContainerSpec)
 	args = append(args, containerCfg.GetCmd())

@@ -42,11 +42,7 @@ type GlobalCtx struct {
 	HadminAddress          []string
 }
 
-func newGlobalCtx(c spec.ComponentsSpec) (*GlobalCtx, error) {
-	hosts := c.GetHosts()
-	sort.Strings(hosts)
-	hosts = slices.Compact(hosts)
-
+func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	metaStoreUrl := c.GetMetaStoreUrl()
 
 	admins := make([]string, 0, len(c.HStore))
@@ -81,13 +77,17 @@ func newGlobalCtx(c spec.ComponentsSpec) (*GlobalCtx, error) {
 }
 
 type Services struct {
-	Global    *GlobalCtx
-	HServer   []*HServer
-	HStore    []*HStore
-	MetaStore []*MetaStore
+	Global       *GlobalCtx
+	MonitorSuite []*MonitorSuite
+	HServer      []*HServer
+	HStore       []*HStore
+	MetaStore    []*MetaStore
+	Prometheus   []*Prometheus
+	Grafana      []*Grafana
 }
 
 func NewServices(c spec.ComponentsSpec) (*Services, error) {
+	fmt.Printf("MonitorSpec: %+v\n", c.Monitor)
 	seedNodes := make([]string, 0, len(c.HServer))
 	hserver := make([]*HServer, 0, len(c.HServer))
 	for idx, v := range c.HServer {
@@ -105,7 +105,29 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		metaStore = append(metaStore, NewMetaStore(uint32(idx+1), v))
 	}
 
-	globalCtx, err := newGlobalCtx(c)
+	hosts := c.GetHosts()
+	sort.Strings(hosts)
+	hosts = slices.Compact(hosts)
+	monitorSuites := make([]*MonitorSuite, 0, len(hosts))
+	excludedHosts := getMonitorHosts(c)
+	for _, host := range hosts {
+		if slices.Contains(excludedHosts, host) {
+			continue
+		}
+		monitorSuites = append(monitorSuites, NewMonitorSuite(host, c.Monitor))
+	}
+
+	proms := make([]*Prometheus, 0, len(c.Prometheus))
+	for _, v := range c.Prometheus {
+		proms = append(proms, NewPrometheus(v, monitorSuites))
+	}
+
+	grafana := make([]*Grafana, 0, len(c.Grafana))
+	for _, v := range c.Grafana {
+		grafana = append(grafana, NewGrafana(v, c.Monitor.GrafanaDisableLogin))
+	}
+
+	globalCtx, err := newGlobalCtx(c, hosts)
 	if err != nil {
 		return nil, err
 	}
@@ -124,9 +146,28 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	fmt.Printf("globalCtx: %+v\n", globalCtx)
 
 	return &Services{
-		Global:    globalCtx,
-		HServer:   hserver,
-		HStore:    hstore,
-		MetaStore: metaStore,
+		Global:       globalCtx,
+		MonitorSuite: monitorSuites,
+		HServer:      hserver,
+		HStore:       hstore,
+		MetaStore:    metaStore,
+		Prometheus:   proms,
+		Grafana:      grafana,
 	}, nil
+}
+
+func getMonitorHosts(c spec.ComponentsSpec) []string {
+	res := []string{}
+
+	for _, host := range c.Monitor.ExcludedHosts {
+		res = append(res, host)
+	}
+	for _, sp := range c.Prometheus {
+		res = append(res, sp.Host)
+	}
+	for _, sp := range c.Grafana {
+		res = append(res, sp.Host)
+	}
+	sort.Strings(res)
+	return slices.Compact(res)
 }

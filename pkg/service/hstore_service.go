@@ -46,7 +46,7 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{"/mnt", "/mnt"},
 		{h.spec.DataDir, h.spec.DataDir},
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.StoreDefaultContainerName, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.StoreDefaultContainerName, true, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.StoreDefaultBinPath}...)
 	configPath := h.spec.RemoteCfgPath
 	if len(globalCtx.HStoreConfigInMetaStore) != 0 {

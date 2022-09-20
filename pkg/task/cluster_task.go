@@ -18,8 +18,16 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	if err := SetUpHServerCluster(executor, services); err != nil {
 		return err
 	}
-
 	if err := CheckClusterStatus(executor, services); err != nil {
+		return err
+	}
+	if err := SetUpHStreamMonitorStack(executor, services); err != nil {
+		return err
+	}
+	if err := SetUpPrometheusService(executor, services); err != nil {
+		return err
+	}
+	if err := SetUpGrafanaService(executor, services); err != nil {
 		return err
 	}
 
@@ -110,7 +118,15 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	if err := RemoveHServerCluster(executor, services); err != nil {
 		return err
 	}
-
+	if err := RemoveHStreamMonitorStack(executor, services); err != nil {
+		return err
+	}
+	if err := RemovePrometheusService(executor, services); err != nil {
+		return err
+	}
+	if err := RemoveGrafanaService(executor, services); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -165,6 +181,120 @@ func RemoveHServerCluster(executor ext.Executor, services *service.Services) err
 	}
 
 	fmt.Println("Remove server cluster success")
+	return nil
+}
+
+func SetUpHStreamMonitorStack(executor ext.Executor, services *service.Services) error {
+	monitorSuiteCtx := MonitorSuiteCtx{
+		ctx:     services.Global,
+		service: services.MonitorSuite,
+	}
+
+	tasks := append([]Task{}, &InitMonitorSuiteEnv{monitorSuiteCtx})
+	tasks = append(tasks, &SyncMonitorSuiteConfig{monitorSuiteCtx})
+	tasks = append(tasks, &StartMonitorSuite{monitorSuiteCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Set up monitor stack success")
+	return nil
+}
+
+func RemoveHStreamMonitorStack(executor ext.Executor, services *service.Services) error {
+	monitorSuiteCtx := MonitorSuiteCtx{
+		ctx:     services.Global,
+		service: services.MonitorSuite,
+	}
+
+	tasks := append([]Task{}, &RemoveMonitorSuite{monitorSuiteCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Remove monitor stack success")
+	return nil
+}
+
+func SetUpPrometheusService(executor ext.Executor, services *service.Services) error {
+	prometheusCtx := PrometheusCtx{
+		ctx:     services.Global,
+		service: services.Prometheus,
+	}
+
+	tasks := append([]Task{}, &InitPrometheus{prometheusCtx})
+	tasks = append(tasks, &SyncPrometheusConfig{prometheusCtx})
+	tasks = append(tasks, &StartPrometheus{prometheusCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Set up prometheus service success")
+	return nil
+}
+
+func RemovePrometheusService(executor ext.Executor, services *service.Services) error {
+	prometheusCtx := PrometheusCtx{
+		ctx:     services.Global,
+		service: services.Prometheus,
+	}
+
+	tasks := append([]Task{}, &RemovePrometheus{prometheusCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Remove prometheus service success")
+	return nil
+}
+
+func SetUpGrafanaService(executor ext.Executor, services *service.Services) error {
+	grafanaCtx := GrafanaCtx{
+		ctx:     services.Global,
+		service: services.Grafana,
+	}
+
+	tasks := append([]Task{}, &InitGrafana{grafanaCtx})
+	tasks = append(tasks, &SyncGrafanaConfig{grafanaCtx})
+	tasks = append(tasks, &StartGrafana{grafanaCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Set up grafana service success")
+	return nil
+}
+
+func RemoveGrafanaService(executor ext.Executor, services *service.Services) error {
+	grafanaCtx := GrafanaCtx{
+		ctx:     services.Global,
+		service: services.Grafana,
+	}
+
+	tasks := append([]Task{}, &RemoveGrafana{grafanaCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Remove grafana service success")
 	return nil
 }
 

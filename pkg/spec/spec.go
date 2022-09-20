@@ -10,10 +10,13 @@ import (
 const DefaultStoreConfigPath = "/logdevice.conf"
 
 type ComponentsSpec struct {
-	Global    GlobalCfg       `yaml:"global"`
-	HServer   []HServerSpec   `yaml:"hserver"`
-	HStore    []HStoreSpec    `yaml:"hstore"`
-	MetaStore []MetaStoreSpec `yaml:"meta_store"`
+	Global     GlobalCfg        `yaml:"global"`
+	Monitor    MonitorSpec      `yaml:"monitor"`
+	HServer    []HServerSpec    `yaml:"hserver"`
+	HStore     []HStoreSpec     `yaml:"hstore"`
+	MetaStore  []MetaStoreSpec  `yaml:"meta_store"`
+	Prometheus []PrometheusSpec `yaml:"prometheus"`
+	Grafana    []GrafanaSpec    `yaml:"grafana"`
 }
 
 func (c *ComponentsSpec) GetHosts() []string {
@@ -43,10 +46,11 @@ func getHostsInner(v reflect.Value) []string {
 			}
 		}
 	case reflect.Struct:
-		host := v.FieldByName("Host").String()
-		if host != "" {
-			res = append(res, host)
+		host := v.FieldByName("Host")
+		if !host.IsValid() {
+			return res
 		}
+		res = append(res, host.String())
 	}
 	return res
 }
@@ -185,6 +189,13 @@ func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error 
 
 	if err := updateComponentSpecWithGlobal(c.Global, c); err != nil {
 		return err
+	}
+
+	if len(c.Monitor.NodeExporterImage) == 0 {
+		c.Monitor.NodeExporterImage = NodeExporterDefaultImage
+	}
+	if len(c.Monitor.CadvisorImage) == 0 {
+		c.Monitor.CadvisorImage = CadvisorDefaultImage
 	}
 
 	return nil

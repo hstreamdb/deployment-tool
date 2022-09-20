@@ -1,0 +1,90 @@
+package spec
+
+import "fmt"
+
+const (
+	NodeExporterDefaultImage         = "prom/node-exporter"
+	NodeExporterDefaultContainerName = "deploy_node_exporter"
+	CadvisorDefaultImage             = "gcr.lank8s.cn/cadvisor/cadvisor:v0.39.3"
+	CadvisorDefaultContainerName     = "deploy_cadvisor"
+	MonitorDefaultCfgDir             = "/hstream/deploy/monitor"
+	MonitorDefaultDataDir            = "/hstream/data/monitor"
+
+	PrometheusDefaultContainerName = "deploy_prom"
+	PrometheusDefaultImage         = "prom/prometheus"
+	PrometheusDefaultCfgDir        = "/hstream/deploy/prometheus"
+	PrometheusDefaultDataDir       = "/hstream/data/prometheus"
+
+	GrafanaDefaultContainerName = "deploy_grafana"
+	GrafanaDefaultImage         = "grafana/grafana-oss:main"
+	GrafanaDefaultCfgDir        = "/hstream/deploy/grafana"
+	GrafanaDefaultDataDir       = "/hstream/data/grafana"
+)
+
+type MonitorSpec struct {
+	NodeExporterImage   string       `yaml:"node_exporter_image"`
+	NodeExporterPort    int          `yaml:"node_exporter_port" default:"9100"`
+	CadvisorImage       string       `yaml:"cadvisor_image"`
+	CadvisorPort        int          `yaml:"cadvisor_port" default:"7000"`
+	ExcludedHosts       []string     `yaml:"excluded_hosts"`
+	RemoteCfgPath       string       `yaml:"remote_config_path"`
+	DataDir             string       `yaml:"data_dir"`
+	GrafanaDisableLogin bool         `yaml:"grafana_disable_login"`
+	ContainerCfg        ContainerCfg `yaml:"container_config"`
+}
+
+func (m *MonitorSpec) SetDefaultDataDir() {
+	m.DataDir = MonitorDefaultDataDir
+}
+
+func (m *MonitorSpec) SetDefaultImage() {
+	m.NodeExporterImage = NodeExporterDefaultImage
+	m.CadvisorImage = CadvisorDefaultImage
+	fmt.Printf("m.NodeExporterImage = %s, m.CadvisorImage = %s", m.NodeExporterImage, m.CadvisorImage)
+}
+
+func (m *MonitorSpec) SetDefaultRemoteCfgPath() {
+	m.RemoteCfgPath = MonitorDefaultCfgDir
+}
+
+type PrometheusSpec struct {
+	Host          string       `yaml:"host"`
+	Port          int          `yaml:"port" default:"9090"`
+	Image         string       `yaml:"image"`
+	DataDir       string       `yaml:"data_dir"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (p *PrometheusSpec) SetDefaultDataDir() {
+	p.DataDir = PrometheusDefaultDataDir
+}
+
+func (p *PrometheusSpec) SetDefaultImage() {
+	p.Image = PrometheusDefaultImage
+}
+
+func (p *PrometheusSpec) SetDefaultRemoteCfgPath() {
+	p.RemoteCfgPath = PrometheusDefaultCfgDir
+}
+
+type GrafanaSpec struct {
+	Host          string       `yaml:"host"`
+	Port          int          `yaml:"port" default:"3000"`
+	Image         string       `yaml:"image"`
+	DataDir       string       `yaml:"data_dir"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (g *GrafanaSpec) SetDefaultDataDir() {
+	g.DataDir = GrafanaDefaultDataDir
+}
+
+func (g *GrafanaSpec) SetDefaultImage() {
+	g.Image = GrafanaDefaultImage
+}
+
+func (g *GrafanaSpec) SetDefaultRemoteCfgPath() {
+	g.RemoteCfgPath = GrafanaDefaultCfgDir
+}

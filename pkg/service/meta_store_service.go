@@ -36,7 +36,7 @@ func (m *MetaStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{"/mnt", "/mnt"},
 		{m.spec.DataDir, "/data"},
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, spec.MetaStoreDefaultContainerName, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, spec.MetaStoreDefaultContainerName, true, mountPoints...)
 	args = append(args, zkEnvArgs(m.metaStoreId, globalCtx.MetaStoreUrls)...)
 	args = append(args, m.spec.Image)
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}

@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -68,4 +69,70 @@ func ScpDir(originPath, remotePath string) []executor.Position {
 		panic(fmt.Errorf("scp command error: %s", err.Error()))
 	}
 	return position
+}
+
+var (
+	// Version082 hserver version <= v0.8.2 or == 0.8.4 should
+	// start without `--seed` argument
+	Version082 = Version{0, 8, 2, false}
+	Version084 = Version{0, 8, 4, false}
+	// Version090 hserver version >= v0.9.0 need call server init
+	Version090 = Version{0, 9, 0, false}
+	// Version095 hserver version > v0.9.5 should replace argument
+	// `--zkuri` to `--metastore` when start
+	Version095 = Version{0, 9, 5, false}
+)
+
+type Version struct {
+	Major, Minor, Patch int
+	IsLatest            bool
+}
+
+func CreateVersion(ver string) Version {
+	if len(ver) == 0 || ver == "latest" {
+		return Version{IsLatest: true}
+	}
+
+	ver = strings.TrimSpace(ver)
+	ver = strings.TrimPrefix(ver, "v")
+	fragment := strings.Split(ver, ".")
+	codes := make([]int, 3)
+	for idx, c := range fragment {
+		code, _ := strconv.Atoi(c)
+		codes[idx] = code
+	}
+	return Version{
+		Major: codes[0],
+		Minor: codes[1],
+		Patch: codes[2],
+	}
+}
+
+func CompareVersion(lh, rh Version) int {
+	if lh.IsLatest && rh.IsLatest {
+		return 0
+	}
+	if lh.IsLatest {
+		return 1
+	}
+	if rh.IsLatest {
+		return -1
+	}
+	if res := compareSegment(lh.Major, rh.Major); res != 0 {
+		return res
+	}
+	if res := compareSegment(lh.Minor, rh.Minor); res != 0 {
+		return res
+	}
+	return compareSegment(lh.Patch, rh.Patch)
+}
+
+func compareSegment(l, r int) int {
+	if l < r {
+		return -1
+	}
+	if l > r {
+		return 1
+	}
+	return 0
 }

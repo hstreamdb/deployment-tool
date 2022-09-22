@@ -8,30 +8,30 @@ import (
 	"os"
 )
 
-func SetUpCluster(executor ext.Executor, services *service.Services) error {
-	if err := SetUpMetaStoreCluster(executor, services); err != nil {
-		return err
-	}
-	if err := SetUpHStoreCluster(executor, services); err != nil {
-		return err
-	}
-	if err := SetUpHServerCluster(executor, services); err != nil {
-		return err
-	}
-	if err := CheckClusterStatus(executor, services); err != nil {
-		return err
-	}
-	if err := SetUpHStreamMonitorStack(executor, services); err != nil {
-		return err
-	}
-	if err := SetUpPrometheusService(executor, services); err != nil {
-		return err
-	}
-	if err := SetUpGrafanaService(executor, services); err != nil {
-		return err
-	}
+type runCtx struct {
+	executor ext.Executor
+	services *service.Services
+	err      error
+}
 
-	return nil
+func (r *runCtx) run(f func(executor ext.Executor, services *service.Services) error) {
+	if r.err != nil {
+		return
+	}
+	r.err = f(r.executor, r.services)
+}
+
+func SetUpCluster(executor ext.Executor, services *service.Services) error {
+	ctx := runCtx{executor: executor, services: services}
+	ctx.run(SetUpMetaStoreCluster)
+	ctx.run(SetUpHStoreCluster)
+	ctx.run(SetUpHServerCluster)
+	ctx.run(CheckClusterStatus)
+	ctx.run(SetUpHStreamMonitorStack)
+	ctx.run(SetUpPrometheusService)
+	ctx.run(SetUpGrafanaService)
+
+	return ctx.err
 }
 
 func SetUpHServerCluster(executor ext.Executor, services *service.Services) error {
@@ -89,7 +89,6 @@ func SetUpMetaStoreCluster(executor ext.Executor, services *service.Services) er
 	if len(metaStoreClusterCtx.ctx.HStoreConfigInMetaStore) != 0 {
 		cfg, err := os.ReadFile(metaStoreClusterCtx.ctx.LocalHStoreConfigFile)
 		if err != nil {
-			fmt.Printf("%+v\n", err)
 			return fmt.Errorf("can't read local store config file, path: %s, err: %s\n",
 				metaStoreClusterCtx.ctx.LocalHStoreConfigFile, err.Error())
 		}
@@ -109,25 +108,14 @@ func SetUpMetaStoreCluster(executor ext.Executor, services *service.Services) er
 }
 
 func RemoveCluster(executor ext.Executor, services *service.Services) error {
-	if err := RemoveMetaStoreCluster(executor, services); err != nil {
-		return err
-	}
-	if err := RemoveHStoreCluster(executor, services); err != nil {
-		return err
-	}
-	if err := RemoveHServerCluster(executor, services); err != nil {
-		return err
-	}
-	if err := RemoveHStreamMonitorStack(executor, services); err != nil {
-		return err
-	}
-	if err := RemovePrometheusService(executor, services); err != nil {
-		return err
-	}
-	if err := RemoveGrafanaService(executor, services); err != nil {
-		return err
-	}
-	return nil
+	ctx := runCtx{executor: executor, services: services}
+	ctx.run(RemoveGrafanaService)
+	ctx.run(RemovePrometheusService)
+	ctx.run(RemoveHStreamMonitorStack)
+	ctx.run(RemoveHServerCluster)
+	ctx.run(RemoveHStoreCluster)
+	ctx.run(RemoveMetaStoreCluster)
+	return ctx.err
 }
 
 func RemoveMetaStoreCluster(executor ext.Executor, services *service.Services) error {

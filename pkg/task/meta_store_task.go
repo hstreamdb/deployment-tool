@@ -4,7 +4,6 @@ import (
 	"fmt"
 	ext "github.com/hstreamdb/dev-deploy/pkg/executor"
 	"github.com/hstreamdb/dev-deploy/pkg/service"
-	"sync"
 )
 
 type MetaStoreClusterCtx struct {
@@ -21,27 +20,7 @@ func (s *InitMetaStoreEnv) String() string {
 }
 
 func (s *InitMetaStoreEnv) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.MetaStore) {
-			defer wg.Done()
-			executorCtx := svc.InitEnv(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceInitEnv(executor, s.ctx, s.service)
 }
 
 type SyncMetaStoreConfig struct {
@@ -53,38 +32,7 @@ func (s *SyncMetaStoreConfig) String() string {
 }
 
 func (s *SyncMetaStoreConfig) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.MetaStore) {
-			defer wg.Done()
-			transferCtx := svc.SyncConfig(s.ctx)
-			if transferCtx == nil {
-				fmt.Printf("skip %s\n", s)
-				return
-			}
-			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SSHPort)
-			for _, position := range transferCtx.Position {
-				if err := executor.Transfer(target, position.LocalDir, position.RemoteDir); err != nil {
-					mutex.Lock()
-					if firstErr == nil {
-						firstErr = err
-					}
-					mutex.Unlock()
-					break
-				}
-
-				if len(position.Opts) != 0 {
-					executor.Execute(target, position.Opts)
-				}
-			}
-
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return configSync(executor, s.ctx, s.service)
 }
 
 type StartMetaStoreCluster struct {
@@ -96,27 +44,7 @@ func (s *StartMetaStoreCluster) String() string {
 }
 
 func (s *StartMetaStoreCluster) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.MetaStore) {
-			defer wg.Done()
-			executorCtx := svc.Deploy(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceDeploy(executor, s.ctx, s.service)
 }
 
 type WaitMetaStoreReady struct {
@@ -150,8 +78,8 @@ func (m *MetaStoreStoreValue) String() string {
 }
 
 func (m *MetaStoreStoreValue) Run(executor ext.Executor) error {
-	service := m.service[0]
-	executorCtx := service.StoreValue(m.Key, m.Value)
+	svc := m.service[0]
+	executorCtx := svc.StoreValue(m.Key, m.Value)
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {
@@ -170,8 +98,8 @@ func (m *MetaStoreGetValue) String() string {
 }
 
 func (m *MetaStoreGetValue) Run(executor ext.Executor) error {
-	service := m.service[0]
-	executorCtx := service.GetValue(m.Key)
+	svc := m.service[0]
+	executorCtx := svc.GetValue(m.Key)
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {
@@ -190,25 +118,5 @@ func (r *RemoveMetaStore) String() string {
 }
 
 func (r *RemoveMetaStore) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(r.service))
-	for _, svc := range r.service {
-		go func(svc *service.MetaStore) {
-			defer wg.Done()
-			executorCtx := svc.Remove(r.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceRemove(executor, r.ctx, r.service)
 }

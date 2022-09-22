@@ -5,6 +5,7 @@ import (
 	ext "github.com/hstreamdb/dev-deploy/pkg/executor"
 	"github.com/hstreamdb/dev-deploy/pkg/service"
 	"sync"
+	"sync/atomic"
 )
 
 type Task interface {
@@ -33,8 +34,9 @@ func serviceRemove[S service.Service](executor ext.Executor, ctx *service.Global
 
 func parallelRun[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S, tp basicExecuteTask) error {
 	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
 	var firstErr error
+	ep := atomic.Pointer[error]{}
+	ep.Store(&firstErr)
 	wg.Add(len(services))
 	for _, svc := range services {
 		go func(svc S) {
@@ -50,23 +52,21 @@ func parallelRun[S service.Service](executor ext.Executor, ctx *service.GlobalCt
 			}
 			target := fmt.Sprintf("%s:%d", executorCtx.Target, ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
+			if err != nil && *ep.Load() == nil {
+				e := fmt.Errorf("%s-%s", err.Error(), res)
+				ep.Store(&e)
 			}
 		}(svc)
 	}
 	wg.Wait()
-	return firstErr
+	return *ep.Load()
 }
 
 func configSync[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S) error {
 	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
 	var firstErr error
+	ep := atomic.Pointer[error]{}
+	ep.Store(&firstErr)
 	wg.Add(len(services))
 	for _, svc := range services {
 		go func(svc service.Service) {
@@ -79,11 +79,9 @@ func configSync[S service.Service](executor ext.Executor, ctx *service.GlobalCtx
 			target := fmt.Sprintf("%s:%d", transferCtx.Target, ctx.SSHPort)
 			for _, position := range transferCtx.Position {
 				if err := executor.Transfer(target, position.LocalDir, position.RemoteDir); err != nil {
-					mutex.Lock()
-					if firstErr == nil {
-						firstErr = err
+					if *ep.Load() == nil {
+						ep.Store(&err)
 					}
-					mutex.Unlock()
 					break
 				}
 
@@ -95,7 +93,7 @@ func configSync[S service.Service](executor ext.Executor, ctx *service.GlobalCtx
 		}(svc)
 	}
 	wg.Wait()
-	return firstErr
+	return *ep.Load()
 }
 
 func getServiceName(svc service.Service) string {

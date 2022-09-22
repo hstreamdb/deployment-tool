@@ -31,6 +31,7 @@ type GlobalCtx struct {
 	SeedNodes string
 	// for zk: host1:2181,host2:2181
 	MetaStoreUrls string
+	MetaStoreType spec.MetaStoreType
 	// for zk: use zkUrl
 	HStoreConfigInMetaStore string
 	// the origin meta store config file in local
@@ -43,7 +44,10 @@ type GlobalCtx struct {
 }
 
 func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
-	metaStoreUrl := c.GetMetaStoreUrl()
+	metaStoreUrl, metaStoreTp, err := c.GetMetaStoreUrl()
+	if err != nil {
+		return nil, err
+	}
 
 	admins := make([]string, 0, len(c.HStore))
 	for _, v := range c.HStore {
@@ -68,6 +72,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 
 		Hosts:                    hosts,
 		MetaStoreUrls:            metaStoreUrl,
+		MetaStoreType:            metaStoreTp,
 		HStoreConfigInMetaStore:  cfgInMetaStore,
 		LocalMetaStoreConfigFile: c.Global.MetaStoreConfigPath,
 		LocalHStoreConfigFile:    c.Global.HStoreConfigPath,

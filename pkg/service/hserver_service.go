@@ -5,6 +5,7 @@ import (
 	"github.com/hstreamdb/dev-deploy/pkg/executor"
 	"github.com/hstreamdb/dev-deploy/pkg/spec"
 	"github.com/hstreamdb/dev-deploy/pkg/template/script"
+	"github.com/hstreamdb/dev-deploy/pkg/utils"
 	"path/filepath"
 	"strings"
 )
@@ -44,11 +45,22 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
 	args = append(args, "--address", h.spec.Address)
 	args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
-	args = append(args, "--seed-nodes", globalCtx.SeedNodes)
 	if len(configPath) != 0 {
 		args = append(args, "--config-path", configPath)
 	}
-	args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
+
+	_, version := parseImage(h.spec.Image)
+	if needSeedNodes(version) {
+		args = append(args, "--seed-nodes", globalCtx.SeedNodes)
+	}
+
+	if utils.CompareVersion(version, utils.Version095) > 0 {
+		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
+		args = append(args, "--meta-store", metaStoreUrl)
+	} else {
+		args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
+	}
+
 	args = append(args, "--store-config", globalCtx.HStoreConfigInMetaStore)
 	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
 	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
@@ -90,9 +102,13 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 }
 
 func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
-	args := []string{"docker exec -t", spec.ServerDefaultContainerName}
-	args = append(args, "/usr/local/bin/hadmin", "server", "--host", h.spec.Host, "init")
-	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+	_, version := parseImage(h.spec.Image)
+	if utils.CompareVersion(version, utils.Version090) >= 0 {
+		args := []string{"docker exec -t", spec.ServerDefaultContainerName}
+		args = append(args, "/usr/local/bin/hadmin", "server", "--host", h.spec.Host, "init")
+		return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+	}
+	return nil
 }
 
 func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
@@ -111,4 +127,30 @@ func (h *HServer) GetHost() string {
 
 func (h *HServer) getDirs() (string, string) {
 	return h.spec.RemoteCfgPath, h.spec.DataDir
+}
+
+func getMetaStoreUrl(tp spec.MetaStoreType, url string) string {
+	switch tp {
+	case spec.ZK:
+		return "zk://" + url
+	case spec.RQLITE:
+		return "rq://" + url
+	case spec.Unknown:
+		return ""
+	}
+	return ""
+}
+
+func needSeedNodes(version utils.Version) bool {
+	return utils.CompareVersion(version, utils.Version082) > 0 && utils.CompareVersion(version, utils.Version084) != 0
+}
+
+func parseImage(imageStr string) (string, utils.Version) {
+	if !strings.Contains(imageStr, ":") {
+		return imageStr, utils.Version{IsLatest: true}
+	}
+
+	fragment := strings.Split(imageStr, ":")
+	image, version := fragment[0], fragment[1]
+	return image, utils.CreateVersion(version)
 }

@@ -55,20 +55,111 @@ func getHostsInner(v reflect.Value) []string {
 	return res
 }
 
-func (c *ComponentsSpec) GetMetaStoreUrl() string {
+func (c *ComponentsSpec) GetMetaStoreUrl() (string, MetaStoreType, error) {
 	hosts := []string{}
 	for _, spc := range c.MetaStore {
 		hosts = append(hosts, spc.Host)
 	}
 	if len(hosts) == 0 {
-		return ""
+		return "", Unknown, nil
 	}
 
 	// append an empty string to help strings join
 	hosts = append(hosts, "")
-	url := strings.Join(hosts, ":2181,")
+	var url string
+	tp := getMetaStoreType(c.MetaStore[0].Image)
+	switch tp {
+	case ZK:
+		url = strings.Join(hosts, ":2181,")
+	case RQLITE:
+		url = strings.Join(hosts, ":4001,")
+	case Unknown:
+		return "", Unknown, fmt.Errorf("unknown meta store type")
+	}
+
 	url = url[:len(url)-1]
-	return url
+	return url, tp, nil
+}
+
+func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	// avoid recursion unmarshal
+	type tmpSpec ComponentsSpec
+	if err := unmarshal((*tmpSpec)(c)); err != nil {
+		return err
+	}
+
+	// defaults.Set will initialize a list to an empty list, so if the default value is set first,
+	// none of the list fields in the componentsSpec will be set correctly. that's why we have to
+	// unmarshal first and then set the default value
+	if err := defaults.Set(c); err != nil {
+		return err
+	}
+
+	if err := updateComponentSpecWithGlobal(c.Global, c); err != nil {
+		return err
+	}
+
+	if len(c.Monitor.NodeExporterImage) == 0 {
+		c.Monitor.NodeExporterImage = NodeExporterDefaultImage
+	}
+	if len(c.Monitor.CadvisorImage) == 0 {
+		c.Monitor.CadvisorImage = CadvisorDefaultImage
+	}
+
+	return nil
+}
+
+type GlobalCfg struct {
+	User                       string       `yaml:"user"`
+	KeyPath                    string       `yaml:"key_path"`
+	SSHPort                    int          `yaml:"ssh_port" default:"22"`
+	MetaReplica                int          `yaml:"meta_replica" default:"3"`
+	MetaStoreConfigPath        string       `yaml:"meta_store_config_path"`
+	HStoreConfigPath           string       `yaml:"hstore_config_path"`
+	HServerConfigPath          string       `yaml:"hserver_config_path"`
+	DisableStoreNetworkCfgPath bool         `yaml:"disable_store_network_config_path"`
+	ContainerCfg               ContainerCfg `yaml:"container_config"`
+}
+
+type ContainerCfg struct {
+	Cpu            string `yaml:"cpu_limit"`
+	Memory         string `yaml:"memory_limit"`
+	RemoveWhenExit bool   `yaml:"remove_when_exit"`
+	DisableRestart bool   `yaml:"disable_restart"`
+}
+
+func (c ContainerCfg) GetCmd() string {
+	args := make([]string, 0, 4)
+	if !c.DisableRestart {
+		args = append(args, "--restart unless-stopped")
+	}
+	if c.RemoveWhenExit {
+		args = append(args, "--rm")
+	}
+	if len(c.Cpu) != 0 {
+		args = append(args, fmt.Sprintf("--cpus=%s", c.Cpu))
+	}
+	if len(c.Memory) != 0 {
+		args = append(args, fmt.Sprintf("--memory=%s", c.Memory))
+	}
+	return strings.Join(args, " ")
+}
+
+type MetaStoreType uint
+
+const (
+	ZK MetaStoreType = iota
+	RQLITE
+	Unknown
+)
+
+func getMetaStoreType(image string) MetaStoreType {
+	if strings.Contains(image, "zookeeper") {
+		return ZK
+	} else if strings.Contains(image, "rqlite") {
+		return RQLITE
+	}
+	return Unknown
 }
 
 func updateComponentSpecWithGlobal(globalCfg GlobalCfg, data interface{}) error {
@@ -171,68 +262,4 @@ func updateComponent(cfg GlobalCfg, field reflect.Value) error {
 func skipUpdate(field reflect.Value) bool {
 	tp := field.Type().Name()
 	return tp == globalCfgTypeName
-}
-
-func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	// avoid recursion unmarshal
-	type tmpSpec ComponentsSpec
-	if err := unmarshal((*tmpSpec)(c)); err != nil {
-		return err
-	}
-
-	// defaults.Set will initialize a list to an empty list, so if the default value is set first,
-	// none of the list fields in the componentsSpec will be set correctly. that's why we have to
-	// unmarshal first and then set the default value
-	if err := defaults.Set(c); err != nil {
-		return err
-	}
-
-	if err := updateComponentSpecWithGlobal(c.Global, c); err != nil {
-		return err
-	}
-
-	if len(c.Monitor.NodeExporterImage) == 0 {
-		c.Monitor.NodeExporterImage = NodeExporterDefaultImage
-	}
-	if len(c.Monitor.CadvisorImage) == 0 {
-		c.Monitor.CadvisorImage = CadvisorDefaultImage
-	}
-
-	return nil
-}
-
-type GlobalCfg struct {
-	User                       string       `yaml:"user"`
-	KeyPath                    string       `yaml:"key_path"`
-	SSHPort                    int          `yaml:"ssh_port" default:"22"`
-	MetaReplica                int          `yaml:"meta_replica" default:"3"`
-	MetaStoreConfigPath        string       `yaml:"meta_store_config_path"`
-	HStoreConfigPath           string       `yaml:"hstore_config_path"`
-	HServerConfigPath          string       `yaml:"hserver_config_path"`
-	DisableStoreNetworkCfgPath bool         `yaml:"disable_store_network_config_path"`
-	ContainerCfg               ContainerCfg `yaml:"container_config"`
-}
-
-type ContainerCfg struct {
-	Cpu            string `yaml:"cpu_limit"`
-	Memory         string `yaml:"memory_limit"`
-	RemoveWhenExit bool   `yaml:"remove_when_exit"`
-	DisableRestart bool   `yaml:"disable_restart"`
-}
-
-func (c ContainerCfg) GetCmd() string {
-	args := make([]string, 0, 4)
-	if !c.DisableRestart {
-		args = append(args, "--restart unless-stopped")
-	}
-	if c.RemoveWhenExit {
-		args = append(args, "--rm")
-	}
-	if len(c.Cpu) != 0 {
-		args = append(args, fmt.Sprintf("--cpus=%s", c.Cpu))
-	}
-	if len(c.Memory) != 0 {
-		args = append(args, fmt.Sprintf("--memory=%s", c.Memory))
-	}
-	return strings.Join(args, " ")
 }

@@ -73,7 +73,7 @@ func configSync[S service.Service](executor ext.Executor, ctx *service.GlobalCtx
 			defer wg.Done()
 			transferCtx := svc.SyncConfig(ctx)
 			if transferCtx == nil {
-				fmt.Printf("skip %s\n", getServiceName(svc))
+				fmt.Printf("skip sync config for %s\n", getServiceName(svc))
 				return
 			}
 			target := fmt.Sprintf("%s:%d", transferCtx.Target, ctx.SSHPort)
@@ -108,6 +108,8 @@ func getServiceName(svc service.Service) string {
 		return "Prometheus"
 	case *service.Grafana:
 		return "Grafana"
+	case *service.MonitorSuite:
+		return "monitor service"
 	}
 	return ""
 }

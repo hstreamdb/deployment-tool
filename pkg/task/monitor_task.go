@@ -1,10 +1,8 @@
 package task
 
 import (
-	"fmt"
 	ext "github.com/hstreamdb/dev-deploy/pkg/executor"
 	"github.com/hstreamdb/dev-deploy/pkg/service"
-	"sync"
 )
 
 type MonitorSuiteCtx struct {
@@ -21,27 +19,7 @@ func (s *InitMonitorSuiteEnv) String() string {
 }
 
 func (s *InitMonitorSuiteEnv) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.MonitorSuite) {
-			defer wg.Done()
-			executorCtx := svc.InitEnv(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceInitEnv(executor, s.ctx, s.service)
 }
 
 type SyncMonitorSuiteConfig struct {
@@ -53,38 +31,7 @@ func (s *SyncMonitorSuiteConfig) String() string {
 }
 
 func (s *SyncMonitorSuiteConfig) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.MonitorSuite) {
-			defer wg.Done()
-			transferCtx := svc.SyncConfig(s.ctx)
-			if transferCtx == nil {
-				fmt.Printf("skip %s\n", s)
-				return
-			}
-			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SSHPort)
-			for _, position := range transferCtx.Position {
-				if err := executor.Transfer(target, position.LocalDir, position.RemoteDir); err != nil {
-					mutex.Lock()
-					if firstErr == nil {
-						firstErr = err
-					}
-					mutex.Unlock()
-					break
-				}
-
-				if len(position.Opts) != 0 {
-					executor.Execute(target, position.Opts)
-				}
-			}
-
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return configSync(executor, s.ctx, s.service)
 }
 
 type StartMonitorSuite struct {
@@ -96,27 +43,7 @@ func (s *StartMonitorSuite) String() string {
 }
 
 func (s *StartMonitorSuite) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.MonitorSuite) {
-			defer wg.Done()
-			executorCtx := svc.Deploy(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceDeploy(executor, s.ctx, s.service)
 }
 
 type RemoveMonitorSuite struct {
@@ -128,27 +55,7 @@ func (r *RemoveMonitorSuite) String() string {
 }
 
 func (r *RemoveMonitorSuite) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(r.service))
-	for _, svc := range r.service {
-		go func(svc *service.MonitorSuite) {
-			defer wg.Done()
-			executorCtx := svc.Remove(r.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceRemove(executor, r.ctx, r.service)
 }
 
 // ================================================================================
@@ -167,27 +74,7 @@ func (p *InitPrometheus) String() string {
 }
 
 func (p *InitPrometheus) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(p.service))
-	for _, svc := range p.service {
-		go func(svc *service.Prometheus) {
-			defer wg.Done()
-			executorCtx := svc.InitEnv(p.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, p.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceInitEnv(executor, p.ctx, p.service)
 }
 
 type SyncPrometheusConfig struct {
@@ -199,38 +86,7 @@ func (s *SyncPrometheusConfig) String() string {
 }
 
 func (s *SyncPrometheusConfig) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.Prometheus) {
-			defer wg.Done()
-			transferCtx := svc.SyncConfig(s.ctx)
-			if transferCtx == nil {
-				fmt.Printf("skip %s\n", s)
-				return
-			}
-			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SSHPort)
-			for _, position := range transferCtx.Position {
-				if err := executor.Transfer(target, position.LocalDir, position.RemoteDir); err != nil {
-					mutex.Lock()
-					if firstErr == nil {
-						firstErr = err
-					}
-					mutex.Unlock()
-					break
-				}
-
-				if len(position.Opts) != 0 {
-					executor.Execute(target, position.Opts)
-				}
-			}
-
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return configSync(executor, s.ctx, s.service)
 }
 
 type StartPrometheus struct {
@@ -242,27 +98,7 @@ func (s *StartPrometheus) String() string {
 }
 
 func (s *StartPrometheus) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.Prometheus) {
-			defer wg.Done()
-			executorCtx := svc.Deploy(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceDeploy(executor, s.ctx, s.service)
 }
 
 type RemovePrometheus struct {
@@ -274,27 +110,7 @@ func (r *RemovePrometheus) String() string {
 }
 
 func (r *RemovePrometheus) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(r.service))
-	for _, svc := range r.service {
-		go func(svc *service.Prometheus) {
-			defer wg.Done()
-			executorCtx := svc.Remove(r.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceRemove(executor, r.ctx, r.service)
 }
 
 // ================================================================================
@@ -313,27 +129,7 @@ func (p *InitGrafana) String() string {
 }
 
 func (p *InitGrafana) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(p.service))
-	for _, svc := range p.service {
-		go func(svc *service.Grafana) {
-			defer wg.Done()
-			executorCtx := svc.InitEnv(p.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, p.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceInitEnv(executor, p.ctx, p.service)
 }
 
 type SyncGrafanaConfig struct {
@@ -345,38 +141,7 @@ func (s *SyncGrafanaConfig) String() string {
 }
 
 func (s *SyncGrafanaConfig) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.Grafana) {
-			defer wg.Done()
-			transferCtx := svc.SyncConfig(s.ctx)
-			if transferCtx == nil {
-				fmt.Printf("skip %s\n", s)
-				return
-			}
-			target := fmt.Sprintf("%s:%d", transferCtx.Target, s.ctx.SSHPort)
-			for _, position := range transferCtx.Position {
-				if err := executor.Transfer(target, position.LocalDir, position.RemoteDir); err != nil {
-					mutex.Lock()
-					if firstErr == nil {
-						firstErr = err
-					}
-					mutex.Unlock()
-					break
-				}
-
-				if len(position.Opts) != 0 {
-					executor.Execute(target, position.Opts)
-				}
-			}
-
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return configSync(executor, s.ctx, s.service)
 }
 
 type StartGrafana struct {
@@ -388,27 +153,7 @@ func (s *StartGrafana) String() string {
 }
 
 func (s *StartGrafana) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(s.service))
-	for _, svc := range s.service {
-		go func(svc *service.Grafana) {
-			defer wg.Done()
-			executorCtx := svc.Deploy(s.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceDeploy(executor, s.ctx, s.service)
 }
 
 type RemoveGrafana struct {
@@ -420,25 +165,5 @@ func (r *RemoveGrafana) String() string {
 }
 
 func (r *RemoveGrafana) Run(executor ext.Executor) error {
-	wg := sync.WaitGroup{}
-	mutex := sync.Mutex{}
-	var firstErr error
-	wg.Add(len(r.service))
-	for _, svc := range r.service {
-		go func(svc *service.Grafana) {
-			defer wg.Done()
-			executorCtx := svc.Remove(r.ctx)
-			target := fmt.Sprintf("%s:%d", executorCtx.Target, r.ctx.SSHPort)
-			res, err := executor.Execute(target, executorCtx.Cmd)
-			if err != nil {
-				mutex.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("%s-%s", err.Error(), res)
-				}
-				mutex.Unlock()
-			}
-		}(svc)
-	}
-	wg.Wait()
-	return firstErr
+	return serviceRemove(executor, r.ctx, r.service)
 }

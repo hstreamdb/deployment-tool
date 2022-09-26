@@ -136,3 +136,17 @@ func compareSegment(l, r int) int {
 	}
 	return 0
 }
+
+type DirCfg struct {
+	Path string
+	Perm fs.FileMode
+}
+
+func MakeDirs(dirs []DirCfg) error {
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir.Path, dir.Perm); err != nil {
+			return fmt.Errorf("create %s error: %s\n", dir.Path, err.Error())
+		}
+	}
+	return nil
+}

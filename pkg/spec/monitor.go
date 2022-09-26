@@ -1,7 +1,5 @@
 package spec
 
-import "fmt"
-
 const (
 	NodeExporterDefaultImage         = "prom/node-exporter"
 	NodeExporterDefaultContainerName = "deploy_node_exporter"
@@ -40,7 +38,6 @@ func (m *MonitorSpec) SetDefaultDataDir() {
 func (m *MonitorSpec) SetDefaultImage() {
 	m.NodeExporterImage = NodeExporterDefaultImage
 	m.CadvisorImage = CadvisorDefaultImage
-	fmt.Printf("m.NodeExporterImage = %s, m.CadvisorImage = %s", m.NodeExporterImage, m.CadvisorImage)
 }
 
 func (m *MonitorSpec) SetDefaultRemoteCfgPath() {

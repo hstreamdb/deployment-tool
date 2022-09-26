@@ -86,7 +86,12 @@ func configSync[S service.Service](executor ext.Executor, ctx *service.GlobalCtx
 				}
 
 				if len(position.Opts) != 0 {
-					executor.Execute(target, position.Opts)
+					if _, err := executor.Execute(target, position.Opts); err != nil {
+						if *ep.Load() == nil {
+							ep.Store(&err)
+						}
+						break
+					}
 				}
 			}
 

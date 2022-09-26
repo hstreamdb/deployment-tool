@@ -21,7 +21,7 @@ type RemoveOpts struct {
 }
 
 func newRemove() *cobra.Command {
-	opts := DeployOpts{}
+	opts := RemoveOpts{}
 	cmd := &cobra.Command{
 		Use: "remove",
 		RunE: func(cmd *cobra.Command, args []string) error {

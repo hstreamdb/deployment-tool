@@ -1,6 +1,7 @@
 PACKAGE := github.com/hstreamdb/dev-deploy
 
-export GO_BUILD=GO111MODULE=on CGO_ENABLED=0 GOOS=$(GOOS) go build -ldflags '-s -w'
+export GO111MODULE=on
+GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) go build -ldflags '-s -w -extldflags "-static"'
 
 all: dev-deploy
 

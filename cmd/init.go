@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/hstreamdb/dev-deploy/embed"
+	"github.com/hstreamdb/dev-deploy/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
@@ -31,18 +32,15 @@ func newInit() *cobra.Command {
 
 			fmt.Fprintln(cmd.OutOrStdout(), content.String())
 
-			if err := os.MkdirAll("template/script", 0755); err != nil {
-				return fmt.Errorf("create template config path error: %s\n", err.Error())
+			if err := utils.MakeDirs([]utils.DirCfg{
+				{Path: "template/script", Perm: 0755},
+				{Path: "template/prometheus", Perm: 0755},
+				{Path: "template/grafana/dashboards", Perm: 0755},
+				{Path: "template/grafana/datasources", Perm: 0755},
+			}); err != nil {
+				return err
 			}
-			if err := os.MkdirAll("template/prometheus", 0755); err != nil {
-				return fmt.Errorf("create template prometheus path error: %s\n", err.Error())
-			}
-			if err := os.MkdirAll("template/grafana/dashboards", 0755); err != nil {
-				return fmt.Errorf("create template grafana path error: %s\n", err.Error())
-			}
-			if err := os.MkdirAll("template/grafana/datasources", 0755); err != nil {
-				return fmt.Errorf("create template grafana path error: %s\n", err.Error())
-			}
+
 			if err := os.WriteFile("template/config.yaml", content.Bytes(), 0664); err != nil {
 				return fmt.Errorf("write config file error: %s\n", err.Error())
 			}

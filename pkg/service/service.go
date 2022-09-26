@@ -18,7 +18,6 @@ type Service interface {
 }
 
 type GlobalCtx struct {
-	//spec spec.GlobalCfg
 	User          string
 	KeyPath       string
 	SSHPort       int
@@ -92,7 +91,6 @@ type Services struct {
 }
 
 func NewServices(c spec.ComponentsSpec) (*Services, error) {
-	fmt.Printf("MonitorSpec: %+v\n", c.Monitor)
 	seedNodes := make([]string, 0, len(c.HServer))
 	hserver := make([]*HServer, 0, len(c.HServer))
 	for idx, v := range c.HServer {
@@ -114,7 +112,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	sort.Strings(hosts)
 	hosts = slices.Compact(hosts)
 	monitorSuites := make([]*MonitorSuite, 0, len(hosts))
-	excludedHosts := getMonitorHosts(c)
+	excludedHosts := getExcludedMonitorHosts(c)
 	for _, host := range hosts {
 		if slices.Contains(excludedHosts, host) {
 			continue
@@ -148,8 +146,6 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 
 	globalCtx.SeedNodes = strings.Join(seedNodes, ",")
 
-	fmt.Printf("globalCtx: %+v\n", globalCtx)
-
 	return &Services{
 		Global:       globalCtx,
 		MonitorSuite: monitorSuites,
@@ -161,18 +157,20 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	}, nil
 }
 
-func getMonitorHosts(c spec.ComponentsSpec) []string {
+// getExcludedMonitorHosts get the hosts of all nodes which don't need to deploy
+// a monitoring stack.
+func getExcludedMonitorHosts(c spec.ComponentsSpec) []string {
 	res := []string{}
 
 	for _, host := range c.Monitor.ExcludedHosts {
 		res = append(res, host)
 	}
-	for _, sp := range c.Prometheus {
-		res = append(res, sp.Host)
-	}
-	for _, sp := range c.Grafana {
-		res = append(res, sp.Host)
-	}
+	//for _, sp := range c.Prometheus {
+	//	res = append(res, sp.Host)
+	//}
+	//for _, sp := range c.Grafana {
+	//	res = append(res, sp.Host)
+	//}
 	sort.Strings(res)
 	return slices.Compact(res)
 }

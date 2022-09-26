@@ -33,8 +33,14 @@ func (m *MonitorSuite) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (m *MonitorSuite) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	startNodeExporter := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, m.NodeContainerName, true)
-	args := append(startNodeExporter, m.spec.NodeExporterImage, "&&")
+	nodeMountP := []spec.MountPoints{
+		{Local: "/proc", Remote: "/host/proc:ro"},
+		{Local: "/sys", Remote: "/host/sys:ro"},
+		{Local: "/", Remote: "/rootfs:ro"},
+	}
+	startNodeExporter := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, m.NodeContainerName, true, nodeMountP...)
+	args := append(startNodeExporter, m.spec.NodeExporterImage)
+	args = append(args, "--path.procfs=/host/proc", "--path.rootfs=/rootfs", "--path.sysfs=/host/sys", "&&")
 
 	cardvisorMountP := []spec.MountPoints{
 		{Local: "/", Remote: "/rootfs:ro"},

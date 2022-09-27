@@ -40,11 +40,11 @@ func (p *PrometheusConfig) GenConfig() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if err = os.WriteFile(path, content, 0755); err != nil {
+		if err = os.WriteFile(path, content, 0664); err != nil {
 			return "", err
 		}
 	}
-	return file, os.WriteFile(file, content.Bytes(), 0755)
+	return file, os.WriteFile(file, content.Bytes(), 0664)
 }
 
 type GrafanaConfig struct{}
@@ -65,7 +65,7 @@ func (g *GrafanaConfig) GenConfig() (string, error) {
 				return err
 			}
 			target := filepath.Join("template", "grafana", paths[n-2], paths[n-1])
-			if err = os.WriteFile(target, content, 0755); err != nil {
+			if err = os.WriteFile(target, content, 0664); err != nil {
 				return err
 			}
 		}

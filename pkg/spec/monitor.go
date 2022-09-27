@@ -3,7 +3,7 @@ package spec
 const (
 	NodeExporterDefaultImage         = "prom/node-exporter"
 	NodeExporterDefaultContainerName = "deploy_node_exporter"
-	CadvisorDefaultImage             = "gcr.lank8s.cn/cadvisor/cadvisor:v0.39.3"
+	CadvisorDefaultImage             = "gcr.io/cadvisor/cadvisor:v0.39.3"
 	CadvisorDefaultContainerName     = "deploy_cadvisor"
 	MonitorDefaultCfgDir             = "/hstream/deploy/monitor"
 	MonitorDefaultDataDir            = "/hstream/data/monitor"

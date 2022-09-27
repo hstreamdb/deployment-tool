@@ -3,7 +3,7 @@ package config
 import (
 	"bytes"
 	"fmt"
-	"github.com/hstreamdb/dev-deploy/embed"
+	"github.com/hstreamdb/deployment-tool/embed"
 	"io/fs"
 	"os"
 	"path/filepath"

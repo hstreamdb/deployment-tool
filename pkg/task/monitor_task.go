@@ -1,8 +1,8 @@
 package task
 
 import (
-	ext "github.com/hstreamdb/dev-deploy/pkg/executor"
-	"github.com/hstreamdb/dev-deploy/pkg/service"
+	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/service"
 )
 
 type MonitorSuiteCtx struct {

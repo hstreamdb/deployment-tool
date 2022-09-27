@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/hstreamdb/dev-deploy/embed"
-	"github.com/hstreamdb/dev-deploy/pkg/utils"
+	"github.com/hstreamdb/deployment-tool/embed"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
@@ -13,7 +13,8 @@ import (
 
 func newInit() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "init",
+		Use:   "init",
+		Short: "Init generates a configuration file template and initializes the execution environment",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fp := filepath.Join("config", "config.yaml")
 			tpl, err := embed.ReadConfig(fp)

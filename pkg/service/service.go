@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
-	"github.com/hstreamdb/dev-deploy/pkg/executor"
-	"github.com/hstreamdb/dev-deploy/pkg/spec"
-	"github.com/hstreamdb/dev-deploy/pkg/template/config"
+	"github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"golang.org/x/exp/slices"
 	"sort"
 	"strings"

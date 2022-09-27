@@ -2,9 +2,9 @@ package task
 
 import (
 	"fmt"
-	ext "github.com/hstreamdb/dev-deploy/pkg/executor"
-	"github.com/hstreamdb/dev-deploy/pkg/service"
-	"github.com/hstreamdb/dev-deploy/pkg/spec"
+	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/service"
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"os"
 )
 

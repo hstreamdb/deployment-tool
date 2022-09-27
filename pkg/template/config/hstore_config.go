@@ -30,5 +30,5 @@ func (m *HStoreConfig) GenConfig() (string, error) {
 	}
 
 	file := filepath.Join("template", "logdevice.conf")
-	return file, os.WriteFile(file, content.Bytes(), 0755)
+	return file, os.WriteFile(file, content.Bytes(), 0664)
 }

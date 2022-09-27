@@ -59,8 +59,8 @@ hserver:
       # server_log_level: info
       # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
       # store_log_level: info
-      # # Specific server compression algorithm
-      # compression: lz4, valid values: [none|lz4|lz4hc]
+      # # Specific server compression algorithm, valid values: [none|lz4|lz4hc]
+      # compression: lz4
     # # Root directory of HServer config files
     # remote_config_path: "/home/deploy/hserver"
     # # Root directory of HServer data files
@@ -80,8 +80,8 @@ hserver:
       # server_log_level: info
       # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
       # store_log_level: info
-      # # Specific server compression algorithm
-      # compression: lz4, valid values: [none|lz4|lz4hc]
+      # # Specific server compression algorithm, valid values: [none|lz4|lz4hc]
+      # compression: lz4
     # # Root directory of HServer config files
     # remote_config_path: "/home/deploy/hserver"
     # # Root directory of HServer data files

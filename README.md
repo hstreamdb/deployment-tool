@@ -30,7 +30,7 @@ Binaries are available here: https://github.com/hstreamdb/deployment-tool/releas
 ### Generate configuration template && init local environment
 
 ```shell
-hdt init
+./hdt init
 ```
 
 The current directory structure will be as follows after running the `init` command:
@@ -89,12 +89,12 @@ grafana:
 ### Set up cluster
 
 ```shell
-hdt start 
+./hdt start 
 ```
 
 ### Remove cluster
 
 ```shell
-hdt remove
+./hdt remove
 ```
 

@@ -1,4 +1,4 @@
-module github.com/hstreamdb/dev-deploy
+module github.com/hstreamdb/deployment-tool
 
 go 1.19
 

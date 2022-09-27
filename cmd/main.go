@@ -7,12 +7,9 @@ import (
 )
 
 func main() {
-	// 1. parse config -> [Instance]
-	// 2. [Instance] -> [DeployTasks]
-	// 3. deploy [DeployTasks]
-
 	var rootCmd = &cobra.Command{
-		Use: "dev-deploy",
+		Use:   "hdt",
+		Short: "Deploy HStreamDB cluster.",
 	}
 
 	rootCmd.AddCommand(

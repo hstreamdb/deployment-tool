@@ -2,10 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/hstreamdb/dev-deploy/pkg/executor"
-	"github.com/hstreamdb/dev-deploy/pkg/spec"
-	"github.com/hstreamdb/dev-deploy/pkg/template/script"
-	"github.com/hstreamdb/dev-deploy/pkg/utils"
+	"github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/template/script"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"path/filepath"
 	"strings"
 )

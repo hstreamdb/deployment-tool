@@ -92,6 +92,27 @@ hserver:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+  - host: 10.1.0.12
+      # # HServer docker image
+      # image: "hstreamdb/hstream"
+      # # HServer configuration
+      # server_config:
+      # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
+      # server_log_level: info
+      # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      # store_log_level: info
+      # # Specific server compression algorithm, valid values: [none|lz4|lz4hc]
+      # compression: lz4
+      # # Root directory of HServer config files
+      # remote_config_path: "/home/deploy/hserver"
+      # # Root directory of HServer data files
+      # data_dir: "/home/deploy/data/hserver"
+      # # HServer container configuration
+      # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true
 
 hstore:
   - host: 10.1.0.10
@@ -155,7 +176,7 @@ hstore:
       # remove_when_exit: true
 
 meta_store:
-  - host: 10.1.0.13
+  - host: 10.1.0.10
     # # Meta-store docker image
     # image: "zookeeper:3.6"
     # # Root directory of Meta-Store config files
@@ -168,7 +189,7 @@ meta_store:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
-  - host: 10.1.0.14
+  - host: 10.1.0.11
     # # Meta-store docker image
     # image: "zookeeper:3.6"
     # # Root directory of Meta-Store config files
@@ -181,6 +202,19 @@ meta_store:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+  - host: 10.1.0.12
+      # # Meta-store docker image
+      # image: "zookeeper:3.6"
+      # # Root directory of Meta-Store config files
+      # remote_config_path: "/home/deploy/metastore"
+      # # Root directory of Meta-store data files
+      # data_dir: "/home/deploy/data/metastore"
+      # # Meta-store container configuration
+      # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true
 
 prometheus:
   - host: 10.1.0.15

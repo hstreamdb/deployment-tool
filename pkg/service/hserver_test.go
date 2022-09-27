@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/hstreamdb/dev-deploy/pkg/utils"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"gotest.tools/v3/assert"
 	"testing"
 )

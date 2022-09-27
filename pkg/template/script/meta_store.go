@@ -3,7 +3,7 @@ package script
 import (
 	"bytes"
 	"fmt"
-	"github.com/hstreamdb/dev-deploy/embed"
+	"github.com/hstreamdb/deployment-tool/embed"
 	"os"
 	"path/filepath"
 	"text/template"

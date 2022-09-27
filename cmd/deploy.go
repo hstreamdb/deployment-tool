@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	ext "github.com/hstreamdb/dev-deploy/pkg/executor"
-	"github.com/hstreamdb/dev-deploy/pkg/service"
-	"github.com/hstreamdb/dev-deploy/pkg/spec"
-	"github.com/hstreamdb/dev-deploy/pkg/task"
-	"github.com/hstreamdb/dev-deploy/pkg/utils"
+	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/service"
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/task"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -27,7 +27,8 @@ type DeployOpts struct {
 func newDeploy() *cobra.Command {
 	opts := DeployOpts{}
 	cmd := &cobra.Command{
-		Use: "start",
+		Use:   "start",
+		Short: "Deploy a HStreamDB Cluster.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contant, err := os.ReadFile(opts.configPath)
 			fmt.Printf("opts: %+v\n", opts)

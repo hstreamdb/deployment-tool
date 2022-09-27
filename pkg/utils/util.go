@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"github.com/hstreamdb/dev-deploy/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 	"io/fs"

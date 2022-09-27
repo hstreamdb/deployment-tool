@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	ext "github.com/hstreamdb/dev-deploy/pkg/executor"
-	"github.com/hstreamdb/dev-deploy/pkg/service"
-	"github.com/hstreamdb/dev-deploy/pkg/spec"
-	"github.com/hstreamdb/dev-deploy/pkg/task"
-	"github.com/hstreamdb/dev-deploy/pkg/utils"
+	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/service"
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/task"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -23,7 +23,8 @@ type RemoveOpts struct {
 func newRemove() *cobra.Command {
 	opts := RemoveOpts{}
 	cmd := &cobra.Command{
-		Use: "remove",
+		Use:   "remove",
+		Short: "Remove HStreamDB cluster and all its data.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contant, err := os.ReadFile(opts.configPath)
 			fmt.Printf("opts: %+v\n", opts)
@@ -69,7 +70,7 @@ func newRemove() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.configPath, "config", "c", "", "Cluster config path.")
+	cmd.Flags().StringVarP(&opts.configPath, "config", "c", "template/config.yaml", "Cluster config path.")
 	cmd.Flags().StringVarP(&opts.user, "user", "u", "", "User name to login via ssh.")
 	cmd.Flags().BoolVarP(&opts.usePassword, "use-password", "p", false, "Use password authentication for ssh.")
 	cmd.Flags().StringVarP(&opts.identityFile, "identity-file", "i", "", "The path of the SSH identity file.")

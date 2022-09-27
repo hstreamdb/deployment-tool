@@ -1,0 +1,40 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy -compat=1.19
+    # you may remove this if you don't need go generate
+    - go generate ./...
+
+builds:
+  - id: build-service
+    main: ./cmd
+    binary: bin/dev-deploy
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X https://github.com/hstreamdb/dev-deploy/pkg/version.RELEASE={{ .Tag }}
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}-{{ .Version  }}-{{ .Os }}-{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - none*
+
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}"
+changelog:
+  skip: true

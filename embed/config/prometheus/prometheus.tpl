@@ -26,3 +26,15 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'cadvisor'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        separator: ':'
+        regex: '(.*):.*'
+        replacement: "${1}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        separator: ':'
+        regex: '(.*):.*'
+        replacement: "${1}"

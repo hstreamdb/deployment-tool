@@ -7,15 +7,15 @@ global:
   ssh_port: 22
   # # Replication factors of store metadata
   # meta_replica: 3
-  # # MetaStore config file path in local host
+  # # Local path to MetaStore config file
   # meta_store_config_path: ""
-  # # HStore config file path in local host
+  # # Local path to HStore config file
   # hstore_config_path: ""
   # # HStore config file can be loaded from network filesystem, for example, the config file
   # # can be stored in meta store and loaded via network request. Set this option to true will
   # # force store load config file from its local filesystem.
   # disable_store_network_config_path: true
-  # # HServer config file path in local host
+  # # Local path to HServer config file
   # hserver_config_path: ""
   # # Global container configuration
   # container_config:
@@ -32,12 +32,16 @@ monitor:
   # # Cadvisor port
   cadvisor_port: 7000
   # # Cadvisor image
-  # cadvisor_image: "gcr.lank8s.cn/cadvisor/cadvisor:v0.39.3"
-  # # List of nodes that don't deploy monitor.
+  # cadvisor_image: "gcr.io/cadvisor/cadvisor:v0.39.3"
+  # # List of nodes that won't be monitored.
   # excluded_hosts: []
+  # # root directory for all monitor related config files.
   # remote_config_path: "/home/deploy/monitor"
+  # # root directory for all monitor related data files.
   # data_dir: "/home/deploy/data/monitor"
+  # # Set up grafana without login
   grafana_disable_login: true
+  # # Global container configuration for monitor stacks.
   # container_config:
     # cpu_limit: 200
     # memory_limit: 8G
@@ -51,71 +55,99 @@ hserver:
     # image: "hstreamdb/hstream"
     # # HServer configuration
     # server_config:
-      # # HServer log level
+      # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
       # server_log_level: info
-      # # HStore log level
-      # store_log_level: error
+      # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      # store_log_level: info
       # # Specific server compression algorithm
-      # compression: lz4
+      # compression: lz4, valid values: [none|lz4|lz4hc]
+    # # Root directory of HServer config files
+    # remote_config_path: "/home/deploy/hserver"
+    # # Root directory of HServer data files
+    # data_dir: "/home/deploy/data/hserver"
     # # HServer container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
-    # remote_config_path: "/home/deploy/hserver"
   - host: 10.1.0.11
     # # HServer docker image
     # image: "hstreamdb/hstream"
     # # HServer configuration
     # server_config:
-      # # HServer log level
+      # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
       # server_log_level: info
-      # # HStore log level
-      # store_log_level: error
+      # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      # store_log_level: info
       # # Specific server compression algorithm
-      # compression: lz4
+      # compression: lz4, valid values: [none|lz4|lz4hc]
+    # # Root directory of HServer config files
+    # remote_config_path: "/home/deploy/hserver"
+    # # Root directory of HServer data files
+    # data_dir: "/home/deploy/data/hserver"
     # # HServer container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
-    # remote_config_path: "/home/deploy/hserver"
 
 hstore:
   - host: 10.1.0.10
+    # # HStore docker image
     # image: "hstreamdb/hstream"
+    # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
+    # # Root directory of HStore data files
     # data_dir: "/home/deploy/data/store"
+    # # Total used disks
     # disk: 1
+    # # Total shards
     # shards: 2
+    # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
+    # # When Enable_admin is turned on, the instance can receive and process admin requests
     enable_admin: true
+    # # HStore container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
   - host: 10.1.0.11
+    # # HStore docker image
     # image: "hstreamdb/hstream"
+    # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
+    # # Root directory of HStore data files
     # data_dir: "/home/deploy/data/store"
+    # # Total used disks
     # disk: 1
+    # # Total shards
     # shards: 2
+    # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
+    # # HStore container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
   - host: 10.1.0.12
+    # # HStore docker image
     # image: "hstreamdb/hstream"
+    # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
+    # # Root directory of HStore data files
     # data_dir: "/home/deploy/data/store"
+    # # Total used disks
     # disk: 1
+    # # Total shards
     # shards: 2
+    # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
+    # # HStore container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
@@ -124,18 +156,26 @@ hstore:
 
 meta_store:
   - host: 10.1.0.13
+    # # Meta-store docker image
     # image: "zookeeper:3.6"
-    # data_dir: "/home/deploy/data/meta"
-    # remote_config_path: "/home/deploy/hstore"
+    # # Root directory of Meta-Store config files
+    # remote_config_path: "/home/deploy/metastore"
+    # # Root directory of Meta-store data files
+    # data_dir: "/home/deploy/data/metastore"
+    # # Meta-store container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
   - host: 10.1.0.14
+    # # Meta-store docker image
     # image: "zookeeper:3.6"
-    # data_dir: "/home/deploy/data/meta"
-    # remote_config_path: "/home/deploy/hstore"
+    # # Root directory of Meta-Store config files
+    # remote_config_path: "/home/deploy/metastore"
+    # # Root directory of Meta-store data files
+    # data_dir: "/home/deploy/data/metastore"
+    # # Meta-store container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
@@ -144,12 +184,15 @@ meta_store:
 
 prometheus:
   - host: 10.1.0.15
+    # # Prometheus docker image
+    # image: "prom/prometheus"
     # # Prometheus service monitor port
     # port: 9090
-    # # Prometheus image
-    # image: "prom/prometheus"
-    # data_dir: "/home/deploy/data/prometheus"
+    # # Root directory of Prometheus config files
     # remote_config_path: "/home/deploy/prometheus"
+    # # Root directory of Prometheus data files
+    # data_dir: "/home/deploy/data/prometheus"
+    # # Prometheus container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
@@ -158,10 +201,15 @@ prometheus:
 
 grafana:
   - host: 10.1.0.15
-    # port: 3000
+    # # Grafana docker image
     # image: "grafana/grafana-oss:main"
-    # data_dir: "/home/deploy/data/grafana"
+    # # Grafana service monitor port
+    # port: 3000
+    # # Root directory of Grafana config files
     # remote_config_path: "/home/deploy/grafana"
+    # # Root directory of Grafana data files
+    # data_dir: "/home/deploy/data/grafana"
+    # # Grafana container configuration
     # container_config:
       # cpu_limit: 200
       # memory_limit: 8G

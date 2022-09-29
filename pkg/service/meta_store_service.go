@@ -81,7 +81,7 @@ func (m *MetaStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	checkReadyScript := script.MetaStoreReadyCheckScript{Host: m.spec.Host, Port: DefaultMetaStoreMonitorPort, Timeout: 20}
+	checkReadyScript := script.MetaStoreReadyCheckScript{Host: m.spec.Host, Port: DefaultMetaStoreMonitorPort, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
 		panic("gen script error")

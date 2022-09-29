@@ -91,7 +91,7 @@ func (h *HStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		Host:             h.spec.Host,
 		AdminApiPort:     DefaultAdminApiPort,
 		ServerListenPort: DefaultServerListenPort,
-		Timeout:          20,
+		Timeout:          600,
 	}
 	mountScript := script.HStoreMountDiskScript{
 		Host:    h.spec.Host,

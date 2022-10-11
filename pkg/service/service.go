@@ -40,6 +40,7 @@ type GlobalCtx struct {
 	// the origin server config file in local
 	LocalHServerConfigFile string
 	HadminAddress          []string
+	HStreamServerUrls      string
 }
 
 func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
@@ -62,6 +63,8 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		cfgInMetaStore = "zk:" + metaStoreUrl + spec.DefaultStoreConfigPath
 	}
 
+	hserverUrl := c.GetHServerUrl()
+
 	return &GlobalCtx{
 		User:         c.Global.User,
 		KeyPath:      c.Global.KeyPath,
@@ -77,6 +80,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		LocalHStoreConfigFile:    c.Global.HStoreConfigPath,
 		LocalHServerConfigFile:   c.Global.HServerConfigPath,
 		HadminAddress:            admins,
+		HStreamServerUrls:        hserverUrl,
 	}, nil
 }
 
@@ -88,6 +92,7 @@ type Services struct {
 	MetaStore    []*MetaStore
 	Prometheus   []*Prometheus
 	Grafana      []*Grafana
+	HttpServer   []*HttpServer
 }
 
 func NewServices(c spec.ComponentsSpec) (*Services, error) {
@@ -130,6 +135,11 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		grafana = append(grafana, NewGrafana(v, c.Monitor.GrafanaDisableLogin))
 	}
 
+	httpServer := make([]*HttpServer, 0, len(c.HttpServer))
+	for idx, v := range c.HttpServer {
+		httpServer = append(httpServer, NewHttpServer(uint32(idx+1), v))
+	}
+
 	globalCtx, err := newGlobalCtx(c, hosts)
 	if err != nil {
 		return nil, err
@@ -154,6 +164,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		MetaStore:    metaStore,
 		Prometheus:   proms,
 		Grafana:      grafana,
+		HttpServer:   httpServer,
 	}, nil
 }
 

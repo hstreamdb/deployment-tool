@@ -17,6 +17,7 @@ type ComponentsSpec struct {
 	MetaStore  []MetaStoreSpec  `yaml:"meta_store"`
 	Prometheus []PrometheusSpec `yaml:"prometheus"`
 	Grafana    []GrafanaSpec    `yaml:"grafana"`
+	HttpServer []HttpServerSpec `yaml:"http_server"`
 }
 
 func (c *ComponentsSpec) GetHosts() []string {
@@ -79,6 +80,14 @@ func (c *ComponentsSpec) GetMetaStoreUrl() (string, MetaStoreType, error) {
 
 	url = url[:len(url)-1]
 	return url, tp, nil
+}
+
+func (c *ComponentsSpec) GetHServerUrl() string {
+	hosts := []string{}
+	for _, spec := range c.HServer {
+		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
+	}
+	return strings.Join(hosts, ",")
 }
 
 func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {

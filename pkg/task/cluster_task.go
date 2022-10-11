@@ -30,6 +30,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(SetUpHStreamMonitorStack)
 	ctx.run(SetUpPrometheusService)
 	ctx.run(SetUpGrafanaService)
+	ctx.run(SetUpHttpServerService)
 
 	return ctx.err
 }
@@ -115,6 +116,7 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(RemoveHServerCluster)
 	ctx.run(RemoveHStoreCluster)
 	ctx.run(RemoveMetaStoreCluster)
+	ctx.run(RemoveHttpServerService)
 	return ctx.err
 }
 
@@ -169,6 +171,44 @@ func RemoveHServerCluster(executor ext.Executor, services *service.Services) err
 	}
 
 	fmt.Println("Remove server cluster success")
+	return nil
+}
+
+func SetUpHttpServerService(executor ext.Executor, services *service.Services) error {
+	httpServerCtx := HttpServerCtx{
+		ctx:     services.Global,
+		service: services.HttpServer,
+	}
+
+	tasks := append([]Task{}, &InitHttpServerEnv{httpServerCtx})
+	tasks = append(tasks, &SyncHttpServerConfig{httpServerCtx})
+	tasks = append(tasks, &StartHttpServer{httpServerCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Set up http-server success")
+	return nil
+}
+
+func RemoveHttpServerService(executor ext.Executor, services *service.Services) error {
+	httpServerCtx := HttpServerCtx{
+		ctx:     services.Global,
+		service: services.HttpServer,
+	}
+
+	tasks := append([]Task{}, &RemoveHttpServer{httpServerCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Remove http-server success")
 	return nil
 }
 

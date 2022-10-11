@@ -54,7 +54,10 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		args = append(args, "--seed-nodes", globalCtx.SeedNodes)
 	}
 
-	if utils.CompareVersion(version, utils.Version095) > 0 {
+	if utils.CompareVersion(version, utils.Version096) > 0 {
+		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
+		args = append(args, "--metastore-uri", metaStoreUrl)
+	} else if utils.CompareVersion(version, utils.Version095) > 0 {
 		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
 		args = append(args, "--meta-store", metaStoreUrl)
 	} else {
@@ -79,7 +82,7 @@ func (h *HServer) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	checkReadyScript := script.HServerReadyCheckScript{Host: h.spec.Host, Port: DefaultServerMonitorPort, Timeout: 20}
+	checkReadyScript := script.HServerReadyCheckScript{Host: h.spec.Host, Port: DefaultServerMonitorPort, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
 		panic("gen script error")

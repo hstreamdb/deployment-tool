@@ -79,8 +79,11 @@ var (
 	// Version090 hserver version >= v0.9.0 need call server init
 	Version090 = Version{0, 9, 0, false}
 	// Version095 hserver version > v0.9.5 should replace argument
-	// `--zkuri` to `--metastore` when start
+	// `--zkuri` to `--meta-store` when start
 	Version095 = Version{0, 9, 5, false}
+	// Version096 hserver version > v0.9.6 should replace argument
+	// `--meta-store` to `--metastore-uri`
+	Version096 = Version{0, 9, 6, false}
 )
 
 type Version struct {

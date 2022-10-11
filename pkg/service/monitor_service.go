@@ -72,24 +72,26 @@ func (m *MonitorSuite) getDirs() (string, string) {
 }
 
 type Prometheus struct {
-	spec             spec.PrometheusSpec
-	ContainerName    string
-	MonitoredHosts   []string
-	NodeExporterPort int
-	CadvisorPort     int
+	spec                spec.PrometheusSpec
+	ContainerName       string
+	MonitoredHosts      []string
+	NodeExporterPort    int
+	CadvisorPort        int
+	HStreamExporterAddr []string
 }
 
-func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite) *Prometheus {
+func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, hstreamExporterAddr []string) *Prometheus {
 	hosts := make([]string, 0, len(monitorSuites))
 	for _, suite := range monitorSuites {
 		hosts = append(hosts, suite.Host)
 	}
 	return &Prometheus{
-		spec:             promSpec,
-		ContainerName:    spec.PrometheusDefaultContainerName,
-		MonitoredHosts:   hosts,
-		NodeExporterPort: monitorSuites[0].spec.NodeExporterPort,
-		CadvisorPort:     monitorSuites[0].spec.CadvisorPort,
+		spec:                promSpec,
+		ContainerName:       spec.PrometheusDefaultContainerName,
+		MonitoredHosts:      hosts,
+		NodeExporterPort:    monitorSuites[0].spec.NodeExporterPort,
+		CadvisorPort:        monitorSuites[0].spec.CadvisorPort,
+		HStreamExporterAddr: hstreamExporterAddr,
 	}
 }
 
@@ -122,8 +124,9 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		cadAddr = append(cadAddr, fmt.Sprintf("%s:%d", host, p.CadvisorPort))
 	}
 	prometheusCfg := config.PrometheusConfig{
-		NodeExporterAddress: nodeAddr,
-		CadVisorAddress:     cadAddr,
+		NodeExporterAddress:    nodeAddr,
+		CadVisorAddress:        cadAddr,
+		HStreamExporterAddress: p.HStreamExporterAddr,
 	}
 	cfg, err := prometheusCfg.GenConfig()
 	if err != nil {
@@ -192,4 +195,42 @@ func (g *Grafana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 func (g *Grafana) getDirs() (string, string) {
 	return g.spec.RemoteCfgPath, g.spec.DataDir
+}
+
+type HStreamExporter struct {
+	spec          spec.HStreamExporterSpec
+	ContainerName string
+}
+
+func NewHStreamExporter(exporterSpec spec.HStreamExporterSpec) *HStreamExporter {
+	return &HStreamExporter{spec: exporterSpec, ContainerName: spec.HStreamExporterDefaultContainerName}
+}
+
+func (h *HStreamExporter) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	cfgDir, dataDir := h.getDirs()
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HStreamExporter) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true)
+	args = append(args, h.spec.Image)
+	// FIXME: currently, only support use one http-server
+	httpServer := globalCtx.HttpServerUrls[0]
+	args = append(args, "hstream-exporter", "--addr", httpServer)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HStreamExporter) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", h.ContainerName}
+	args = append(args, "&&", "sudo rm -rf", h.spec.DataDir, h.spec.RemoteCfgPath)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HStreamExporter) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	return nil
+}
+
+func (h *HStreamExporter) getDirs() (string, string) {
+	return h.spec.RemoteCfgPath, h.spec.DataDir
 }

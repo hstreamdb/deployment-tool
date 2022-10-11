@@ -167,3 +167,58 @@ func (r *RemoveGrafana) String() string {
 func (r *RemoveGrafana) Run(executor ext.Executor) error {
 	return serviceRemove(executor, r.ctx, r.service)
 }
+
+// ================================================================================
+
+type HStreamExporterCtx struct {
+	ctx     *service.GlobalCtx
+	service []*service.HStreamExporter
+}
+
+type InitHStreamExporter struct {
+	HStreamExporterCtx
+}
+
+func (p *InitHStreamExporter) String() string {
+	return "Task: init hstream-exporter environment"
+}
+
+func (p *InitHStreamExporter) Run(executor ext.Executor) error {
+	return serviceInitEnv(executor, p.ctx, p.service)
+}
+
+type SyncHStreamExporterConfig struct {
+	HStreamExporterCtx
+}
+
+func (s *SyncHStreamExporterConfig) String() string {
+	return "Task: sync hstream-exporter config"
+}
+
+func (s *SyncHStreamExporterConfig) Run(executor ext.Executor) error {
+	return configSync(executor, s.ctx, s.service)
+}
+
+type StartHStreamExporter struct {
+	HStreamExporterCtx
+}
+
+func (s *StartHStreamExporter) String() string {
+	return "Task: start hstream-exporter"
+}
+
+func (s *StartHStreamExporter) Run(executor ext.Executor) error {
+	return serviceDeploy(executor, s.ctx, s.service)
+}
+
+type RemoveHStreamExporter struct {
+	HStreamExporterCtx
+}
+
+func (r *RemoveHStreamExporter) String() string {
+	return "Task: remove hstream-exporter"
+}
+
+func (r *RemoveHStreamExporter) Run(executor ext.Executor) error {
+	return serviceRemove(executor, r.ctx, r.service)
+}

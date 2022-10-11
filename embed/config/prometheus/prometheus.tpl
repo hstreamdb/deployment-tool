@@ -32,3 +32,10 @@ scrape_configs:
         separator: ':'
         regex: '(.*):.*'
         replacement: "${1}"
+  - job_name: "hstream_metrics"
+    scrape_interval: 5s
+    static_configs:
+    - targets:
+      {{- range .HStreamExporterAddress }}
+      - '{{.}}'
+      {{- end }}

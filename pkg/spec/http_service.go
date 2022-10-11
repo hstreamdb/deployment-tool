@@ -10,7 +10,7 @@ const (
 type HttpServerSpec struct {
 	Host          string       `yaml:"host"`
 	Image         string       `yaml:"image"`
-	Port          int          `yaml:"port"`
+	Port          int          `yaml:"port" default:"8081"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	DataDir       string       `yaml:"data_dir"`

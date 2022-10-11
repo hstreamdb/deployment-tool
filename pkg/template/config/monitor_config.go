@@ -12,8 +12,9 @@ import (
 )
 
 type PrometheusConfig struct {
-	NodeExporterAddress []string
-	CadVisorAddress     []string
+	NodeExporterAddress    []string
+	CadVisorAddress        []string
+	HStreamExporterAddress []string
 }
 
 func (p *PrometheusConfig) GenConfig() (string, error) {

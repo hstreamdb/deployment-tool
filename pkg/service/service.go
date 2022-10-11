@@ -41,6 +41,7 @@ type GlobalCtx struct {
 	LocalHServerConfigFile string
 	HadminAddress          []string
 	HStreamServerUrls      string
+	HttpServerUrls         []string
 }
 
 func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
@@ -64,6 +65,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	}
 
 	hserverUrl := c.GetHServerUrl()
+	httpServerUrl := c.GetHttpServerUrl()
 
 	return &GlobalCtx{
 		User:         c.Global.User,
@@ -81,18 +83,20 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		LocalHServerConfigFile:   c.Global.HServerConfigPath,
 		HadminAddress:            admins,
 		HStreamServerUrls:        hserverUrl,
+		HttpServerUrls:           httpServerUrl,
 	}, nil
 }
 
 type Services struct {
-	Global       *GlobalCtx
-	MonitorSuite []*MonitorSuite
-	HServer      []*HServer
-	HStore       []*HStore
-	MetaStore    []*MetaStore
-	Prometheus   []*Prometheus
-	Grafana      []*Grafana
-	HttpServer   []*HttpServer
+	Global          *GlobalCtx
+	MonitorSuite    []*MonitorSuite
+	HServer         []*HServer
+	HStore          []*HStore
+	MetaStore       []*MetaStore
+	Prometheus      []*Prometheus
+	Grafana         []*Grafana
+	HStreamExporter []*HStreamExporter
+	HttpServer      []*HttpServer
 }
 
 func NewServices(c spec.ComponentsSpec) (*Services, error) {
@@ -125,19 +129,24 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		monitorSuites = append(monitorSuites, NewMonitorSuite(host, c.Monitor))
 	}
 
+	httpServer := make([]*HttpServer, 0, len(c.HttpServer))
+	for idx, v := range c.HttpServer {
+		httpServer = append(httpServer, NewHttpServer(uint32(idx+1), v))
+	}
+
+	hstreamExporter := make([]*HStreamExporter, 0, len(c.HStreamExporter))
+	for _, v := range c.HStreamExporter {
+		hstreamExporter = append(hstreamExporter, NewHStreamExporter(v))
+	}
+
 	proms := make([]*Prometheus, 0, len(c.Prometheus))
 	for _, v := range c.Prometheus {
-		proms = append(proms, NewPrometheus(v, monitorSuites))
+		proms = append(proms, NewPrometheus(v, monitorSuites, c.GetHStreamExporterAddr()))
 	}
 
 	grafana := make([]*Grafana, 0, len(c.Grafana))
 	for _, v := range c.Grafana {
 		grafana = append(grafana, NewGrafana(v, c.Monitor.GrafanaDisableLogin))
-	}
-
-	httpServer := make([]*HttpServer, 0, len(c.HttpServer))
-	for idx, v := range c.HttpServer {
-		httpServer = append(httpServer, NewHttpServer(uint32(idx+1), v))
 	}
 
 	globalCtx, err := newGlobalCtx(c, hosts)
@@ -157,14 +166,15 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	globalCtx.SeedNodes = strings.Join(seedNodes, ",")
 
 	return &Services{
-		Global:       globalCtx,
-		MonitorSuite: monitorSuites,
-		HServer:      hserver,
-		HStore:       hstore,
-		MetaStore:    metaStore,
-		Prometheus:   proms,
-		Grafana:      grafana,
-		HttpServer:   httpServer,
+		Global:          globalCtx,
+		MonitorSuite:    monitorSuites,
+		HServer:         hserver,
+		HStore:          hstore,
+		MetaStore:       metaStore,
+		Prometheus:      proms,
+		Grafana:         grafana,
+		HStreamExporter: hstreamExporter,
+		HttpServer:      httpServer,
 	}, nil
 }
 

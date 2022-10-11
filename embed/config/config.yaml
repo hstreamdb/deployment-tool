@@ -93,26 +93,26 @@ hserver:
       # disable_restart: true
       # remove_when_exit: true
   - host: 10.1.0.12
-      # # HServer docker image
-      # image: "hstreamdb/hstream"
-      # # HServer configuration
-      # server_config:
+    # # HServer docker image
+    # image: "hstreamdb/hstream"
+    # # HServer configuration
+    # server_config:
       # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
       # server_log_level: info
       # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
       # store_log_level: info
       # # Specific server compression algorithm, valid values: [none|lz4|lz4hc]
       # compression: lz4
-      # # Root directory of HServer config files
-      # remote_config_path: "/home/deploy/hserver"
-      # # Root directory of HServer data files
-      # data_dir: "/home/deploy/data/hserver"
-      # # HServer container configuration
+    # # Root directory of HServer config files
+    # remote_config_path: "/home/deploy/hserver"
+    # # Root directory of HServer data files
+    # data_dir: "/home/deploy/data/hserver"
+    # # HServer container configuration
       # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
-    # disable_restart: true
-    # remove_when_exit: true
+      # disable_restart: true
+      # remove_when_exit: true
 
 hstore:
   - host: 10.1.0.10
@@ -203,18 +203,34 @@ meta_store:
       # disable_restart: true
       # remove_when_exit: true
   - host: 10.1.0.12
-      # # Meta-store docker image
-      # image: "zookeeper:3.6"
-      # # Root directory of Meta-Store config files
-      # remote_config_path: "/home/deploy/metastore"
-      # # Root directory of Meta-store data files
-      # data_dir: "/home/deploy/data/metastore"
-      # # Meta-store container configuration
-      # container_config:
+    # # Meta-store docker image
+    # image: "zookeeper:3.6"
+    # # Root directory of Meta-Store config files
+    # remote_config_path: "/home/deploy/metastore"
+    # # Root directory of Meta-store data files
+    # data_dir: "/home/deploy/data/metastore"
+    # # Meta-store container configuration
+    # container_config:
       # cpu_limit: 200
       # memory_limit: 8G
-    # disable_restart: true
-    # remove_when_exit: true
+      # disable_restart: true
+      # remove_when_exit: true
+
+http_server:
+  - host: 10.1.0.15
+    # # Http_server docker image
+    # image: "hstreamdb/http-server"
+    # # Http_server service monitor port
+    # port: 8081
+    # # Root directory of http_server config files
+    # remote_config_path: "/home/deploy/http-server"
+    # # Root directory of http_server data files
+    # data_dir: "/home/deploy/data/http-server"
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
 
 prometheus:
   - host: 10.1.0.15
@@ -249,3 +265,19 @@ grafana:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+
+hstream_exporter:
+  - host: 10.1.0.15
+  # # hstream_exporter docker image
+  # image: "hstreamdb/hstream-exporter"
+  # # hstream_exporter service monitor port
+  # port: 9200
+  # # Root directory of hstream_exporter config files
+  # remote_config_path: "/home/deploy/hstream-exporter"
+  # # Root directory of hstream_exporter data files
+  # data_dir: "/home/deploy/data/hstream-exporter"
+  # container_config:
+    # cpu_limit: 200
+    # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true

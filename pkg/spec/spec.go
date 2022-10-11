@@ -10,14 +10,15 @@ import (
 const DefaultStoreConfigPath = "/logdevice.conf"
 
 type ComponentsSpec struct {
-	Global     GlobalCfg        `yaml:"global"`
-	Monitor    MonitorSpec      `yaml:"monitor"`
-	HServer    []HServerSpec    `yaml:"hserver"`
-	HStore     []HStoreSpec     `yaml:"hstore"`
-	MetaStore  []MetaStoreSpec  `yaml:"meta_store"`
-	Prometheus []PrometheusSpec `yaml:"prometheus"`
-	Grafana    []GrafanaSpec    `yaml:"grafana"`
-	HttpServer []HttpServerSpec `yaml:"http_server"`
+	Global          GlobalCfg             `yaml:"global"`
+	Monitor         MonitorSpec           `yaml:"monitor"`
+	HServer         []HServerSpec         `yaml:"hserver"`
+	HStore          []HStoreSpec          `yaml:"hstore"`
+	MetaStore       []MetaStoreSpec       `yaml:"meta_store"`
+	Prometheus      []PrometheusSpec      `yaml:"prometheus"`
+	Grafana         []GrafanaSpec         `yaml:"grafana"`
+	HStreamExporter []HStreamExporterSpec `yaml:"hstream_exporter"`
+	HttpServer      []HttpServerSpec      `yaml:"http_server"`
 }
 
 func (c *ComponentsSpec) GetHosts() []string {
@@ -88,6 +89,22 @@ func (c *ComponentsSpec) GetHServerUrl() string {
 		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
 	}
 	return strings.Join(hosts, ",")
+}
+
+func (c *ComponentsSpec) GetHttpServerUrl() []string {
+	hosts := []string{}
+	for _, spec := range c.HttpServer {
+		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
+	}
+	return hosts
+}
+
+func (c *ComponentsSpec) GetHStreamExporterAddr() []string {
+	hosts := []string{}
+	for _, spec := range c.HStreamExporter {
+		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
+	}
+	return hosts
 }
 
 func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {

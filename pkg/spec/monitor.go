@@ -17,6 +17,11 @@ const (
 	GrafanaDefaultImage         = "grafana/grafana-oss:main"
 	GrafanaDefaultCfgDir        = "/hstream/deploy/grafana"
 	GrafanaDefaultDataDir       = "/hstream/data/grafana"
+
+	HStreamExporterDefaultContainerName = "deploy_hstream_exporter"
+	HStreamExporterDefaultImage         = "hstreamdb/hstream-exporter"
+	HStreamExporterDefaultCfgDir        = "/hstream/deploy/hstream-exporter"
+	HStreamExporterDefaultDataDir       = "/hstream/data/hstream-exporter"
 )
 
 type MonitorSpec struct {
@@ -84,4 +89,25 @@ func (g *GrafanaSpec) SetDefaultImage() {
 
 func (g *GrafanaSpec) SetDefaultRemoteCfgPath() {
 	g.RemoteCfgPath = GrafanaDefaultCfgDir
+}
+
+type HStreamExporterSpec struct {
+	Host          string       `yaml:"host"`
+	Port          int          `yaml:"port" default:"9200"`
+	Image         string       `yaml:"image"`
+	DataDir       string       `yaml:"data_dir"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (g *HStreamExporterSpec) SetDefaultDataDir() {
+	g.DataDir = HStreamExporterDefaultDataDir
+}
+
+func (g *HStreamExporterSpec) SetDefaultImage() {
+	g.Image = HStreamExporterDefaultImage
+}
+
+func (g *HStreamExporterSpec) SetDefaultRemoteCfgPath() {
+	g.RemoteCfgPath = HStreamExporterDefaultCfgDir
 }

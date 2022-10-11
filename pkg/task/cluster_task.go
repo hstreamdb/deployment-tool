@@ -27,10 +27,11 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(SetUpHStoreCluster)
 	ctx.run(SetUpHServerCluster)
 	ctx.run(CheckClusterStatus)
+	ctx.run(SetUpHttpServerService)
 	ctx.run(SetUpHStreamMonitorStack)
+	ctx.run(SetUpHStreamExporterService)
 	ctx.run(SetUpPrometheusService)
 	ctx.run(SetUpGrafanaService)
-	ctx.run(SetUpHttpServerService)
 
 	return ctx.err
 }
@@ -112,11 +113,12 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
 	ctx.run(RemoveGrafanaService)
 	ctx.run(RemovePrometheusService)
+	ctx.run(RemoveHStreamExporterService)
 	ctx.run(RemoveHStreamMonitorStack)
+	ctx.run(RemoveHttpServerService)
 	ctx.run(RemoveHServerCluster)
 	ctx.run(RemoveHStoreCluster)
 	ctx.run(RemoveMetaStoreCluster)
-	ctx.run(RemoveHttpServerService)
 	return ctx.err
 }
 
@@ -247,6 +249,44 @@ func RemoveHStreamMonitorStack(executor ext.Executor, services *service.Services
 	}
 
 	fmt.Println("Remove monitor stack success")
+	return nil
+}
+
+func SetUpHStreamExporterService(executor ext.Executor, services *service.Services) error {
+	hstreamExporterCtx := HStreamExporterCtx{
+		ctx:     services.Global,
+		service: services.HStreamExporter,
+	}
+
+	tasks := append([]Task{}, &InitHStreamExporter{hstreamExporterCtx})
+	tasks = append(tasks, &SyncHStreamExporterConfig{hstreamExporterCtx})
+	tasks = append(tasks, &StartHStreamExporter{hstreamExporterCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Set up hstream-exporter service success")
+	return nil
+}
+
+func RemoveHStreamExporterService(executor ext.Executor, services *service.Services) error {
+	hstreamExporterCtx := HStreamExporterCtx{
+		ctx:     services.Global,
+		service: services.HStreamExporter,
+	}
+
+	tasks := append([]Task{}, &RemoveHStreamExporter{hstreamExporterCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Remove hstream-exporter service success")
 	return nil
 }
 

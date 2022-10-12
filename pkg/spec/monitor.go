@@ -18,6 +18,11 @@ const (
 	GrafanaDefaultCfgDir        = "/hstream/deploy/grafana"
 	GrafanaDefaultDataDir       = "/hstream/data/grafana"
 
+	AlertManagerDefaultContainerName = "deploy_alert_manager"
+	AlertManagerDefaultImage         = "prom/alertmanager"
+	AlertManagerDefaultCfgDir        = "/hstream/deploy/alertmanager"
+	AlertManagerDefaultDataDir       = "/hstream/data/alertmanager"
+
 	HStreamExporterDefaultContainerName = "deploy_hstream_exporter"
 	HStreamExporterDefaultImage         = "hstreamdb/hstream-exporter"
 	HStreamExporterDefaultCfgDir        = "/hstream/deploy/hstream-exporter"
@@ -89,6 +94,27 @@ func (g *GrafanaSpec) SetDefaultImage() {
 
 func (g *GrafanaSpec) SetDefaultRemoteCfgPath() {
 	g.RemoteCfgPath = GrafanaDefaultCfgDir
+}
+
+type AlertManagerSpec struct {
+	Host          string       `yaml:"host"`
+	Port          int          `yaml:"port" default:"9093"`
+	Image         string       `yaml:"image"`
+	DataDir       string       `yaml:"data_dir"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (a *AlertManagerSpec) SetDefaultDataDir() {
+	a.DataDir = AlertManagerDefaultDataDir
+}
+
+func (a *AlertManagerSpec) SetDefaultImage() {
+	a.Image = AlertManagerDefaultImage
+}
+
+func (a *AlertManagerSpec) SetDefaultRemoteCfgPath() {
+	a.RemoteCfgPath = AlertManagerDefaultCfgDir
 }
 
 type HStreamExporterSpec struct {

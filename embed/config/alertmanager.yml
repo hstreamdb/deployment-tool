@@ -1,0 +1,54 @@
+global:
+  # The Slack webhook URL.
+  # slack_api_url: ''
+
+  # Mark the alarm status as resolved when alertmanager has not received an alarm
+  # for a certain amount of time
+  resolve_timeout: 5m
+
+route:
+  # A default receiver
+  receiver: "default"
+
+  # The labels by which incoming alerts are grouped together. For example,
+  # multiple alerts coming in for cluster=A and alertname=LatencyHigh would
+  # be batched into a single group.
+  group_by: ["instance"]
+
+  # When a new group of alerts is created by an incoming alert, wait at
+  # least 'group_wait' to send the initial notification.
+  # This way ensures that you get multiple alerts for the same group that start
+  # firing shortly after another are batched together on the first
+  # notification.
+  group_wait: 30s
+
+  # When the first notification was sent, wait 'group_interval' to send a batch
+  # of new alerts that started firing for that group.
+  group_interval: 3m
+
+  # If an alert has successfully been sent, wait 'repeat_interval' to
+  # resend them.
+  repeat_interval: 1h
+
+  routes:
+  # - match:
+  #   receiver: webhook-kafka-adapter
+  #   continue: true
+  # - match:
+  #     env: test-cluster
+  #   receiver: db-alert-slack
+  # - match:
+  #     env: test-cluster
+  #   receiver: db-alert-email
+
+receivers:
+  - name: 'slack-notifier'
+    slack_configs:
+    - channel: '#hstream-notify'
+      username: 'hstream-alert'
+      icon_emoji: ':bell:'
+      title:   '{{ .CommonLabels.alertname }}'
+      text:    '{{ .CommonAnnotations.summary }}  {{ .CommonAnnotations.description }}'
+
+  # This doesn't alert anything, please configure your own receiver
+  - name: "default"

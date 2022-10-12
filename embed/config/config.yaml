@@ -266,6 +266,27 @@ grafana:
       # disable_restart: true
       # remove_when_exit: true
 
+# # Server configs are used to specify the configuration of Alertmanager Servers.
+alertmanager:
+  # # The ip address of the Alertmanager Server.
+  - host: 10.0.1.15
+  # # Alertmanager docker image
+  # image: "prom/alertmanager"
+  # # SSH port of the server.
+  # ssh_port: 22
+  # # Alertmanager service monitor port
+  # port: 9093
+  # # Root directory of Alertmanager config files
+  # remote_config_path: "/home/deploy/alertmanager"
+  # # Root directory of Alertmanager data files
+  # data_dir: "/home/deploy/data/alertmanager"
+  # # Alertmanager container configuration
+  # container_config:
+    # cpu_limit: 200
+    # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true
+
 hstream_exporter:
   - host: 10.1.0.15
   # # hstream_exporter docker image

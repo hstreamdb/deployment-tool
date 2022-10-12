@@ -78,9 +78,10 @@ type Prometheus struct {
 	NodeExporterPort    int
 	CadvisorPort        int
 	HStreamExporterAddr []string
+	AlertManagerAddr    []string
 }
 
-func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, hstreamExporterAddr []string) *Prometheus {
+func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, hstreamExporterAddr []string, alertAddr []string) *Prometheus {
 	hosts := make([]string, 0, len(monitorSuites))
 	for _, suite := range monitorSuites {
 		hosts = append(hosts, suite.Host)
@@ -92,6 +93,7 @@ func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, 
 		NodeExporterPort:    monitorSuites[0].spec.NodeExporterPort,
 		CadvisorPort:        monitorSuites[0].spec.CadvisorPort,
 		HStreamExporterAddr: hstreamExporterAddr,
+		AlertManagerAddr:    alertAddr,
 	}
 }
 
@@ -127,6 +129,7 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		NodeExporterAddress:    nodeAddr,
 		CadVisorAddress:        cadAddr,
 		HStreamExporterAddress: p.HStreamExporterAddr,
+		AlertManagerAddress:    p.AlertManagerAddr,
 	}
 	cfg, err := prometheusCfg.GenConfig()
 	if err != nil {
@@ -195,6 +198,49 @@ func (g *Grafana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 func (g *Grafana) getDirs() (string, string) {
 	return g.spec.RemoteCfgPath, g.spec.DataDir
+}
+
+type AlertManager struct {
+	spec          spec.AlertManagerSpec
+	ContainerName string
+	DisableLogin  bool
+}
+
+func NewAlertManager(graSpec spec.AlertManagerSpec) *AlertManager {
+	return &AlertManager{spec: graSpec, ContainerName: spec.AlertManagerDefaultContainerName}
+}
+
+func (a *AlertManager) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	cfgDir, dataDir := a.getDirs()
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
+	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (a *AlertManager) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	mountPoints := []spec.MountPoints{
+		{a.spec.RemoteCfgPath, "/etc/alertmanager"},
+	}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, a.spec.ContainerCfg, a.ContainerName, true, mountPoints...)
+	args = append(args, a.spec.Image)
+	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (a *AlertManager) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", a.ContainerName}
+	args = append(args, "&&", "sudo rm -rf", a.spec.DataDir, a.spec.RemoteCfgPath)
+	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (a *AlertManager) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	position := utils.ScpDir(filepath.Dir("template/alertmanager/alertmanager.yml"), a.spec.RemoteCfgPath)
+
+	return &executor.TransferCtx{
+		Target: a.spec.Host, Position: position,
+	}
+}
+
+func (a *AlertManager) getDirs() (string, string) {
+	return a.spec.RemoteCfgPath, a.spec.DataDir
 }
 
 type HStreamExporter struct {

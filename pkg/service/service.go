@@ -95,6 +95,7 @@ type Services struct {
 	MetaStore       []*MetaStore
 	Prometheus      []*Prometheus
 	Grafana         []*Grafana
+	AlertManager    []*AlertManager
 	HStreamExporter []*HStreamExporter
 	HttpServer      []*HttpServer
 }
@@ -139,9 +140,14 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		hstreamExporter = append(hstreamExporter, NewHStreamExporter(v))
 	}
 
+	alertManager := make([]*AlertManager, 0, len(c.AlertManager))
+	for _, v := range c.AlertManager {
+		alertManager = append(alertManager, NewAlertManager(v))
+	}
+
 	proms := make([]*Prometheus, 0, len(c.Prometheus))
 	for _, v := range c.Prometheus {
-		proms = append(proms, NewPrometheus(v, monitorSuites, c.GetHStreamExporterAddr()))
+		proms = append(proms, NewPrometheus(v, monitorSuites, c.GetHStreamExporterAddr(), c.GetAlertManagerAddr()))
 	}
 
 	grafana := make([]*Grafana, 0, len(c.Grafana))
@@ -173,6 +179,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		MetaStore:       metaStore,
 		Prometheus:      proms,
 		Grafana:         grafana,
+		AlertManager:    alertManager,
 		HStreamExporter: hstreamExporter,
 		HttpServer:      httpServer,
 	}, nil

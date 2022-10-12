@@ -170,6 +170,61 @@ func (r *RemoveGrafana) Run(executor ext.Executor) error {
 
 // ================================================================================
 
+type AlertManagerCtx struct {
+	ctx     *service.GlobalCtx
+	service []*service.AlertManager
+}
+
+type InitAlertManager struct {
+	AlertManagerCtx
+}
+
+func (p *InitAlertManager) String() string {
+	return "Task: init alertManager environment"
+}
+
+func (p *InitAlertManager) Run(executor ext.Executor) error {
+	return serviceInitEnv(executor, p.ctx, p.service)
+}
+
+type SyncAlertManagerConfig struct {
+	AlertManagerCtx
+}
+
+func (s *SyncAlertManagerConfig) String() string {
+	return "Task: sync alertManager config"
+}
+
+func (s *SyncAlertManagerConfig) Run(executor ext.Executor) error {
+	return configSync(executor, s.ctx, s.service)
+}
+
+type StartAlertManager struct {
+	AlertManagerCtx
+}
+
+func (s *StartAlertManager) String() string {
+	return "Task: start alertManager"
+}
+
+func (s *StartAlertManager) Run(executor ext.Executor) error {
+	return serviceDeploy(executor, s.ctx, s.service)
+}
+
+type RemoveAlertManager struct {
+	AlertManagerCtx
+}
+
+func (r *RemoveAlertManager) String() string {
+	return "Task: remove alertManager"
+}
+
+func (r *RemoveAlertManager) Run(executor ext.Executor) error {
+	return serviceRemove(executor, r.ctx, r.service)
+}
+
+// ================================================================================
+
 type HStreamExporterCtx struct {
 	ctx     *service.GlobalCtx
 	service []*service.HStreamExporter

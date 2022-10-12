@@ -17,6 +17,7 @@ type ComponentsSpec struct {
 	MetaStore       []MetaStoreSpec       `yaml:"meta_store"`
 	Prometheus      []PrometheusSpec      `yaml:"prometheus"`
 	Grafana         []GrafanaSpec         `yaml:"grafana"`
+	AlertManager    []AlertManagerSpec    `yaml:"alertmanager"`
 	HStreamExporter []HStreamExporterSpec `yaml:"hstream_exporter"`
 	HttpServer      []HttpServerSpec      `yaml:"http_server"`
 }
@@ -102,6 +103,14 @@ func (c *ComponentsSpec) GetHttpServerUrl() []string {
 func (c *ComponentsSpec) GetHStreamExporterAddr() []string {
 	hosts := []string{}
 	for _, spec := range c.HStreamExporter {
+		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
+	}
+	return hosts
+}
+
+func (c *ComponentsSpec) GetAlertManagerAddr() []string {
+	hosts := []string{}
+	for _, spec := range c.AlertManager {
 		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
 	}
 	return hosts

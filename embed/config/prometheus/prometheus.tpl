@@ -5,10 +5,19 @@ global:
   external_labels:
     monitor: "hstream-monitor"
 
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          {{- range .AlertManagerAddress }}
+          - '{{.}}'
+          {{- end }}
+
 rule_files:
   - "disks.yml"
   - "cluster.yml"
   - "zk.yml"
+  - "alert.yml"
 
 scrape_configs:
   - job_name: "monitor_port_probe"

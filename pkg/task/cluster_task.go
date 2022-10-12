@@ -32,6 +32,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(SetUpHStreamExporterService)
 	ctx.run(SetUpPrometheusService)
 	ctx.run(SetUpGrafanaService)
+	ctx.run(SetUpAlertService)
 
 	return ctx.err
 }
@@ -111,6 +112,7 @@ func SetUpMetaStoreCluster(executor ext.Executor, services *service.Services) er
 
 func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
+	ctx.run(RemoveAlertService)
 	ctx.run(RemoveGrafanaService)
 	ctx.run(RemovePrometheusService)
 	ctx.run(RemoveHStreamExporterService)
@@ -363,6 +365,44 @@ func RemoveGrafanaService(executor ext.Executor, services *service.Services) err
 	}
 
 	fmt.Println("Remove grafana service success")
+	return nil
+}
+
+func SetUpAlertService(executor ext.Executor, services *service.Services) error {
+	alertCtx := AlertManagerCtx{
+		ctx:     services.Global,
+		service: services.AlertManager,
+	}
+
+	tasks := append([]Task{}, &InitAlertManager{alertCtx})
+	tasks = append(tasks, &SyncAlertManagerConfig{alertCtx})
+	tasks = append(tasks, &StartAlertManager{alertCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Set up alertManager service success")
+	return nil
+}
+
+func RemoveAlertService(executor ext.Executor, services *service.Services) error {
+	alertCtx := AlertManagerCtx{
+		ctx:     services.Global,
+		service: services.AlertManager,
+	}
+
+	tasks := append([]Task{}, &RemoveAlertManager{alertCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Remove alertManager success")
 	return nil
 }
 

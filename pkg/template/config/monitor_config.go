@@ -15,6 +15,7 @@ type PrometheusConfig struct {
 	NodeExporterAddress    []string
 	CadVisorAddress        []string
 	HStreamExporterAddress []string
+	AlertManagerAddress    []string
 }
 
 func (p *PrometheusConfig) GenConfig() (string, error) {
@@ -35,7 +36,7 @@ func (p *PrometheusConfig) GenConfig() (string, error) {
 	}
 
 	file := filepath.Join("template", "prometheus", "prometheus.yml")
-	for _, p := range []string{"cluster.yml", "disks.yml", "zk.yml"} {
+	for _, p := range []string{"cluster.yml", "disks.yml", "zk.yml", "alert.yml"} {
 		path := filepath.Join("template", "prometheus", p)
 		content, err := embed.ReadConfig(filepath.Join("config", "prometheus", p))
 		if err != nil {

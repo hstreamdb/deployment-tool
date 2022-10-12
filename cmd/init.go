@@ -16,37 +16,50 @@ func newInit() *cobra.Command {
 		Use:   "init",
 		Short: "Init generates a configuration file template and initializes the execution environment",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fp := filepath.Join("config", "config.yaml")
-			tpl, err := embed.ReadConfig(fp)
-			if err != nil {
-				return fmt.Errorf("get config.yaml template error: %s\n", err.Error())
-			}
-			cfg, err := template.New("DefaultConfig").Parse(string(tpl))
-			if err != nil {
-				return fmt.Errorf("render config.yaml template error: %s\n", err.Error())
-			}
-
-			content := bytes.NewBufferString("")
-			if err := cfg.Execute(content, nil); err != nil {
-				return err
-			}
-
-			fmt.Fprintln(cmd.OutOrStdout(), content.String())
-
 			if err := utils.MakeDirs([]utils.DirCfg{
 				{Path: "template/script", Perm: 0755},
 				{Path: "template/prometheus", Perm: 0755},
 				{Path: "template/grafana/dashboards", Perm: 0755},
 				{Path: "template/grafana/datasources", Perm: 0755},
+				{Path: "template/alertmanager", Perm: 0755},
 			}); err != nil {
 				return err
 			}
 
-			if err := os.WriteFile("template/config.yaml", content.Bytes(), 0664); err != nil {
-				return fmt.Errorf("write config file error: %s\n", err.Error())
+			configFile := filepath.Join("config", "config.yaml")
+			if err := getFile(cmd, configFile, "template/config.yaml"); err != nil {
+				return err
+			}
+
+			alertManagerFile := filepath.Join("config", "alertmanager.yml")
+			if err := getFile(cmd, alertManagerFile, "template/alertmanager/alertmanager.yml"); err != nil {
+				return err
 			}
 			return nil
 		},
 	}
 	return cmd
+}
+
+func getFile(cmd *cobra.Command, fp string, target string) error {
+	tpl, err := embed.ReadConfig(fp)
+	if err != nil {
+		return fmt.Errorf("get %s template error: %s\n", fp, err.Error())
+	}
+	cfg, err := template.New("DefaultConfig").Parse(string(tpl))
+	if err != nil {
+		return fmt.Errorf("render %s template error: %s\n", fp, err.Error())
+	}
+
+	content := bytes.NewBufferString("")
+	if err := cfg.Execute(content, nil); err != nil {
+		return err
+	}
+
+	fmt.Fprintln(cmd.OutOrStdout(), content.String())
+
+	if err := os.WriteFile(target, content.Bytes(), 0664); err != nil {
+		return fmt.Errorf("write %s error: %s\n", target, err.Error())
+	}
+	return nil
 }

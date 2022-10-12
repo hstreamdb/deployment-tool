@@ -1,0 +1,21 @@
+groups:
+  - name: alert_rule
+    rules:
+      - alert: ContainerKilled
+        expr: time() - container_last_seen{name=~"deploy_.*"} > 60
+        for: 1m
+        annotations:
+          description: '{{ $value }} seconds passed since the node: {{ $labels.instance }}, container: {{ $labels.name }} was last seen'
+          summary: 'node: {{ $labels.instance }}, container: {{ $labels.name }} has been killed'
+      - alert: NodeHighCpuUsage
+        expr: (1 - sum(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) / sum(rate(node_cpu_seconds_total[1m])) by (instance)) * 100 > 80
+        for: 1m
+        annotations:
+          description: '{{ $labels.instance }} cpu usage is above 80%, current value: {{ $value }}'
+          summary: '{{ $labels.instance }}: High Cpu Usage detected.'
+      - alert: NodeMemoryCpuUsage
+        expr: (1 - sum(node_memory_MemAvailable_bytes) by(instance) / sum(node_memory_MemTotal_bytes) by(instance)) * 100 > 80
+        for: 1m
+        annotations:
+          description: '{{ $labels.instance }} memory usage is above 80%, current value: {{ $value }}'
+          summary: '{{ $labels.instance }}: High Memory Usage detected.'

@@ -5,7 +5,9 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
+	"reflect"
 	"sort"
 	"strings"
 )
@@ -199,6 +201,32 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		HStreamExporter: hstreamExporter,
 		HttpServer:      httpServer,
 	}, nil
+}
+
+func (s *Services) ShowAllServices() {
+	v := reflect.Indirect(reflect.ValueOf(s))
+	t := v.Type()
+
+	for i := 0; i < t.NumField(); i++ {
+		field := v.Field(i)
+		if field.Type().Kind() != reflect.Slice {
+			continue
+		}
+
+		for j := 0; j < field.Len(); j++ {
+			service := field.Index(j)
+			if service.Type().Kind() != reflect.Struct {
+				log.Errorf("unexpected service kind: %s", service.String())
+			}
+			ref := reflect.New(service.Type())
+			ref.Elem().Set(service)
+			fn := ref.MethodByName("Display")
+			res := fn.Call(nil)
+			field.Field(j).Set(ref.Elem().FieldByName("DataDir"))
+		}
+		res = append(res, getHostsInner(field)...)
+	}
+	return res
 }
 
 // getExcludedMonitorHosts get the hosts of all nodes which don't need to deploy

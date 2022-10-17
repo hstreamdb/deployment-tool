@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/service"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/task"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -27,7 +27,7 @@ func newRemove() *cobra.Command {
 		Short: "Remove HStreamDB cluster and all its data.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contant, err := os.ReadFile(opts.configPath)
-			fmt.Printf("opts: %+v\n", opts)
+			log.Debugf("opts: %+v\n", opts)
 			if err != nil {
 				return err
 			}

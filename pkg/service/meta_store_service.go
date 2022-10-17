@@ -5,8 +5,10 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -30,6 +32,19 @@ func NewMetaStore(id uint32, metaSpec spec.MetaStoreSpec) *MetaStore {
 		metaStoreType: spec.GetMetaStoreType(metaSpec.Image),
 		ContainerName: spec.MetaStoreDefaultContainerName,
 	}
+}
+
+func (m *MetaStore) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := m.getDirs()
+	store := utils.DisplayedComponent{
+		Name:          "MetaStore",
+		Host:          m.spec.Host,
+		Ports:         strconv.Itoa(2181),
+		ContainerName: m.ContainerName,
+		Image:         m.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"metaStore": store}
 }
 
 func (m *MetaStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {

@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bramvdbogaerde/go-scp"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 	"os"
 	"sync"
@@ -54,7 +55,7 @@ func (s *SSHExecutor) Close() {
 	defer s.mutex.Unlock()
 	for addr, client := range s.clients {
 		if err := client.Close(); err != nil {
-			fmt.Printf("close ssh client err, host: %s, err: %+v\n", addr, err)
+			log.Errorf("close ssh client err, host: %s, err: %+v\n", addr, err)
 		}
 	}
 	s.clients = make(map[string]*ssh.Client)

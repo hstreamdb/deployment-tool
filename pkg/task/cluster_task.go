@@ -5,6 +5,7 @@ import (
 	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/service"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"os"
 )
 
@@ -23,6 +24,8 @@ func (r *runCtx) run(f func(executor ext.Executor, services *service.Services) e
 
 func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
+	components := make(map[string]utils.DisplayedComponent)
+
 	ctx.run(SetUpMetaStoreCluster)
 	ctx.run(SetUpHStoreCluster)
 	ctx.run(SetUpHServerCluster)

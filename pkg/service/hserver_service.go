@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -19,13 +20,27 @@ const (
 type HServer struct {
 	serverId             uint32
 	spec                 spec.HServerSpec
+	ContainerName        string
 	CheckReadyScriptPath string
 	ServerConfigPath     string
 	StoreConfigPath      string
 }
 
 func NewHServer(id uint32, serverSpec spec.HServerSpec) *HServer {
-	return &HServer{serverId: id, spec: serverSpec}
+	return &HServer{serverId: id, spec: serverSpec, ContainerName: spec.HttpServerDefaultContainerName}
+}
+
+func (h *HServer) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := h.getDirs()
+	hserver := utils.DisplayedComponent{
+		Name:          "HServer",
+		Host:          h.spec.Host,
+		Ports:         strconv.Itoa(h.spec.Port),
+		ContainerName: h.ContainerName,
+		Image:         h.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"hserver": hserver}
 }
 
 func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
@@ -41,7 +56,7 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},
 	}
 
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.ServerDefaultContainerName, true, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.ServerDefaultBinPath}...)
 	args = append(args, "--host", h.spec.Host)
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
@@ -92,7 +107,7 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	checkReadyScript := script.HServerReadyCheckScript{Host: h.spec.Host, Port: DefaultServerMonitorPort, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
-		panic("gen script error")
+		panic(fmt.Sprintf("gen script error: %s\n", err.Error()))
 	}
 
 	scriptName := filepath.Base(file)

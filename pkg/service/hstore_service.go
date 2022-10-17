@@ -6,7 +6,9 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"path"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -18,16 +20,32 @@ const (
 	BootStrapCmd            = "nodes-config bootstrap --metadata-replicate-across "
 )
 
+// FIXME: split admin port && listen port ???
 type HStore struct {
-	storeId              uint32
-	spec                 spec.HStoreSpec
+	storeId uint32
+	spec    spec.HStoreSpec
+	// FIXME: check admin port setting
+	AdminPort            int
 	ContainerName        string
 	CheckReadyScriptPath string
 	MountScriptPath      string
 }
 
 func NewHStore(id uint32, storeSpec spec.HStoreSpec) *HStore {
-	return &HStore{storeId: id, spec: storeSpec, ContainerName: spec.StoreDefaultContainerName}
+	return &HStore{storeId: id, spec: storeSpec, ContainerName: spec.StoreDefaultContainerName, AdminPort: storeSpec.AdminPort}
+}
+
+func (h *HStore) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := h.getDirs()
+	hstore := utils.DisplayedComponent{
+		Name:          "HStore",
+		Host:          h.spec.Host,
+		Ports:         strconv.Itoa(h.AdminPort),
+		ContainerName: h.ContainerName,
+		Image:         h.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"hstore": hstore}
 }
 
 func (h *HStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
@@ -48,7 +66,7 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{h.spec.DataDir, h.spec.DataDir},
 		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.StoreDefaultContainerName, true, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.StoreDefaultBinPath}...)
 	configPath := path.Join(h.spec.RemoteCfgPath, "logdevice.conf")
 	if len(globalCtx.HStoreConfigInMetaStore) != 0 {
@@ -91,7 +109,7 @@ func (h *HStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 	checkReadyScript := script.HStoreReadyCheckScript{
 		Host:             h.spec.Host,
-		AdminApiPort:     DefaultAdminApiPort,
+		AdminApiPort:     h.AdminPort,
 		ServerListenPort: DefaultServerListenPort,
 		Timeout:          600,
 	}
@@ -146,7 +164,7 @@ func (h *HStore) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (h *HStore) Bootstrap(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker exec -t"}
 	args = append(args, h.ContainerName, "hadmin store")
-	args = append(args, fmt.Sprintf("--port %d", DefaultAdminApiPort))
+	args = append(args, fmt.Sprintf("--port %d", h.AdminPort))
 	args = append(args, BootStrapCmd)
 	args = append(args, fmt.Sprintf("node:%d", globalCtx.MetaReplica))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}

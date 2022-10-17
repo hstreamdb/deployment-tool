@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -11,6 +11,8 @@ func main() {
 		Use:   "hdt",
 		Short: "Deploy HStreamDB cluster.",
 	}
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetOutput(rootCmd.OutOrStdout())
 
 	rootCmd.AddCommand(
 		newInit(),
@@ -19,7 +21,7 @@ func main() {
 	)
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		os.Exit(1)
 	}
 }

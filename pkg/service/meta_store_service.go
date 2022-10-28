@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	// FIXME: no way to modify zk monitor port now
 	DefaultMetaStoreMonitorPort = 2181
 )
 

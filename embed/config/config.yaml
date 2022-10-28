@@ -53,6 +53,10 @@ hserver:
   - host: 10.1.0.10
     # # HServer docker image
     # image: "hstreamdb/hstream"
+    # # HServer listen port
+    # port: 6570
+    # # HServer internal port
+    # internal_port: 6571
     # # HServer configuration
     # server_config:
       # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
@@ -74,6 +78,10 @@ hserver:
   - host: 10.1.0.11
     # # HServer docker image
     # image: "hstreamdb/hstream"
+    # # HServer listen port
+    # port: 6570
+    # # HServer internal port
+    # internal_port: 6571
     # # HServer configuration
     # server_config:
       # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
@@ -95,6 +103,10 @@ hserver:
   - host: 10.1.0.12
     # # HServer docker image
     # image: "hstreamdb/hstream"
+    # # HServer listen port
+    # port: 6570
+    # # HServer internal port
+    # internal_port: 6571
     # # HServer configuration
     # server_config:
       # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
@@ -118,6 +130,8 @@ hstore:
   - host: 10.1.0.10
     # # HStore docker image
     # image: "hstreamdb/hstream"
+    # # HStore admin port
+    # admin_port: 6440
     # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
     # # Root directory of HStore data files
@@ -139,6 +153,8 @@ hstore:
   - host: 10.1.0.11
     # # HStore docker image
     # image: "hstreamdb/hstream"
+    # # HStore admin port
+    # admin_port: 6440
     # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
     # # Root directory of HStore data files
@@ -158,6 +174,8 @@ hstore:
   - host: 10.1.0.12
     # # HStore docker image
     # image: "hstreamdb/hstream"
+    # # HStore admin port
+    # admin_port: 6440
     # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
     # # Root directory of HStore data files
@@ -272,8 +290,6 @@ alertmanager:
   - host: 10.0.1.15
   # # Alertmanager docker image
   # image: "prom/alertmanager"
-  # # SSH port of the server.
-  # ssh_port: 22
   # # Alertmanager service monitor port
   # port: 9093
   # # Root directory of Alertmanager config files

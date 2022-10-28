@@ -56,6 +56,7 @@ func (m *MonitorSpec) SetDefaultRemoteCfgPath() {
 
 type PrometheusSpec struct {
 	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"9090"`
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`
@@ -77,6 +78,7 @@ func (p *PrometheusSpec) SetDefaultRemoteCfgPath() {
 
 type GrafanaSpec struct {
 	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"3000"`
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`
@@ -98,6 +100,7 @@ func (g *GrafanaSpec) SetDefaultRemoteCfgPath() {
 
 type AlertManagerSpec struct {
 	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"9093"`
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`
@@ -119,6 +122,7 @@ func (a *AlertManagerSpec) SetDefaultRemoteCfgPath() {
 
 type HStreamExporterSpec struct {
 	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"9200"`
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`

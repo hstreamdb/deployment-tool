@@ -11,18 +11,25 @@ import (
 )
 
 const (
+	// FIXME: no way to modify zk monitor port now
 	DefaultMetaStoreMonitorPort = 2181
 )
 
 type MetaStore struct {
 	metaStoreId          uint32
 	spec                 spec.MetaStoreSpec
+	metaStoreType        spec.MetaStoreType
 	ContainerName        string
 	CheckReadyScriptPath string
 }
 
 func NewMetaStore(id uint32, metaSpec spec.MetaStoreSpec) *MetaStore {
-	return &MetaStore{metaStoreId: id, spec: metaSpec, ContainerName: spec.MetaStoreDefaultContainerName}
+	return &MetaStore{
+		metaStoreId:   id,
+		spec:          metaSpec,
+		metaStoreType: spec.GetMetaStoreType(metaSpec.Image),
+		ContainerName: spec.MetaStoreDefaultContainerName,
+	}
 }
 
 func (m *MetaStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
@@ -37,8 +44,19 @@ func (m *MetaStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{m.spec.DataDir, "/data"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, spec.MetaStoreDefaultContainerName, true, mountPoints...)
-	args = append(args, zkEnvArgs(m.metaStoreId, globalCtx.MetaStoreUrls)...)
-	args = append(args, m.spec.Image)
+	switch globalCtx.MetaStoreType {
+	case spec.ZK:
+		args = append(args, zkEnvArgs(m.metaStoreId, globalCtx.MetaStoreUrls)...)
+		args = append(args, m.spec.Image)
+	case spec.RQLITE:
+		args = append(args, m.spec.Image, "rqlited")
+		args = append(args, fmt.Sprintf("-node-id %d", m.metaStoreId))
+		args = append(args, fmt.Sprintf("-http-addr=%s:%d", m.spec.Host, m.spec.Port))
+		args = append(args, fmt.Sprintf("-raft-addr=%s:%d", m.spec.Host, m.spec.RaftPort))
+		args = append(args, fmt.Sprintf("-bootstrap-expect %d", globalCtx.MetaStoreCount))
+		args = append(args, "-join", globalCtx.MetaStoreUrls, "/data")
+	}
+
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -81,6 +99,10 @@ func (m *MetaStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	if m.metaStoreType == spec.RQLITE {
+		return nil
+	}
+
 	checkReadyScript := script.MetaStoreReadyCheckScript{Host: m.spec.Host, Port: DefaultMetaStoreMonitorPort, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
@@ -104,6 +126,10 @@ func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 }
 
 func (m *MetaStore) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	if m.metaStoreType == spec.RQLITE {
+		return nil
+	}
+
 	if len(m.CheckReadyScriptPath) == 0 {
 		panic("empty checkReadyScriptPath")
 	}
@@ -114,6 +140,10 @@ func (m *MetaStore) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (m *MetaStore) StoreValue(key, value string) *executor.ExecuteCtx {
+	if m.metaStoreType != spec.ZK {
+		panic("currently only spport store value to zk.")
+	}
+
 	args := []string{"docker exec -t"}
 	args = append(args, m.ContainerName, "zkCli.sh", "create")
 	if !strings.HasPrefix(key, "/") {
@@ -124,6 +154,10 @@ func (m *MetaStore) StoreValue(key, value string) *executor.ExecuteCtx {
 }
 
 func (m *MetaStore) GetValue(key string) *executor.ExecuteCtx {
+	if m.metaStoreType != spec.ZK {
+		panic("currently only spport get value to zk.")
+	}
+
 	args := []string{"docker exec -t"}
 	args = append(args, m.ContainerName, "zkCli.sh", "get")
 	if !strings.HasPrefix(key, "/") {

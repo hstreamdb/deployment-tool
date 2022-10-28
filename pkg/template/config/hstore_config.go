@@ -9,7 +9,8 @@ import (
 )
 
 type HStoreConfig struct {
-	ZkUrl string
+	MetaStoreType string
+	MetaStoreUrl  string
 }
 
 func (m *HStoreConfig) GenConfig() (string, error) {

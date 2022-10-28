@@ -6,6 +6,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -18,6 +19,8 @@ type HServer struct {
 	serverId             uint32
 	spec                 spec.HServerSpec
 	CheckReadyScriptPath string
+	ServerConfigPath     string
+	StoreConfigPath      string
 }
 
 func NewHServer(id uint32, serverSpec spec.HServerSpec) *HServer {
@@ -31,22 +34,20 @@ func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	var (
-		mountPoints []spec.MountPoints
-		configPath  string
-	)
-	if len(globalCtx.LocalHServerConfigFile) != 0 {
-		configPath, _ = h.getDirs()
-		mountPoints = append(mountPoints, spec.MountPoints{Local: configPath, Remote: spec.ServerBinConfigPath})
+	mountPoints := []spec.MountPoints{
+		{"/mnt", "/mnt"},
+		{h.spec.DataDir, h.spec.DataDir},
+		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},
 	}
+
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.ServerDefaultContainerName, true, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.ServerDefaultBinPath}...)
 	args = append(args, "--host", h.spec.Host)
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
 	args = append(args, "--address", h.spec.Address)
 	args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
-	if len(configPath) != 0 {
-		args = append(args, "--config-path", configPath)
+	if len(h.ServerConfigPath) != 0 {
+		args = append(args, "--config-path", h.ServerConfigPath)
 	}
 
 	_, version := parseImage(h.spec.Image)
@@ -54,17 +55,28 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		args = append(args, "--seed-nodes", globalCtx.SeedNodes)
 	}
 
-	if utils.CompareVersion(version, utils.Version096) > 0 {
-		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
+	if strings.Contains(h.spec.Image, "rqlite") {
+		urls := strings.ReplaceAll(globalCtx.MetaStoreUrls, "http://", "")
+		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, urls)
 		args = append(args, "--metastore-uri", metaStoreUrl)
-	} else if utils.CompareVersion(version, utils.Version095) > 0 {
-		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
-		args = append(args, "--meta-store", metaStoreUrl)
 	} else {
-		args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
+		if utils.CompareVersion(version, utils.Version096) > 0 {
+			metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
+			args = append(args, "--metastore-uri", metaStoreUrl)
+		} else if utils.CompareVersion(version, utils.Version095) > 0 {
+			metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
+			args = append(args, "--meta-store", metaStoreUrl)
+		} else {
+			args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
+		}
 	}
 
-	args = append(args, "--store-config", globalCtx.HStoreConfigInMetaStore)
+	if len(h.StoreConfigPath) != 0 {
+		args = append(args, "--store-config", h.StoreConfigPath)
+	} else {
+		args = append(args, "--store-config", globalCtx.HStoreConfigInMetaStore)
+	}
+
 	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
 	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
 	args = append(args, "--log-level", h.spec.Opts.ServerLogLevel)
@@ -96,7 +108,14 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)},
 	}
 	if len(globalCtx.LocalHServerConfigFile) != 0 {
-		position = append(position, executor.Position{LocalDir: globalCtx.LocalHServerConfigFile, RemoteDir: cfgDir})
+		serverPath := path.Join(cfgDir, "config.yaml")
+		position = append(position, executor.Position{LocalDir: globalCtx.LocalHServerConfigFile, RemoteDir: serverPath})
+		h.ServerConfigPath = serverPath
+	}
+	if len(globalCtx.HStoreConfigInMetaStore) == 0 {
+		storePath := path.Join(cfgDir, "logdevice.conf")
+		position = append(position, executor.Position{LocalDir: globalCtx.LocalHStoreConfigFile, RemoteDir: storePath})
+		h.StoreConfigPath = storePath
 	}
 
 	return &executor.TransferCtx{
@@ -149,7 +168,7 @@ func needSeedNodes(version utils.Version) bool {
 }
 
 func parseImage(imageStr string) (string, utils.Version) {
-	if !strings.Contains(imageStr, ":") {
+	if !strings.Contains(imageStr, ":") || strings.Contains(imageStr, "rqlite") {
 		return imageStr, utils.Version{IsLatest: true}
 	}
 

@@ -29,8 +29,11 @@ type GlobalCtx struct {
 	Hosts     []string
 	SeedNodes string
 	// for zk: host1:2181,host2:2181
+	// for rqlite: http://host1:4001,http://host2:4001
 	MetaStoreUrls string
 	MetaStoreType spec.MetaStoreType
+	// total count of meta store instances
+	MetaStoreCount int
 	// for zk: use zkUrl
 	HStoreConfigInMetaStore string
 	// the origin meta store config file in local
@@ -60,7 +63,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		return nil, fmt.Errorf("need at least one hadmin node")
 	}
 	cfgInMetaStore := ""
-	if !c.Global.DisableStoreNetworkCfgPath {
+	if !c.Global.DisableStoreNetworkCfgPath && metaStoreTp == spec.ZK {
 		cfgInMetaStore = "zk:" + metaStoreUrl + spec.DefaultStoreConfigPath
 	}
 
@@ -77,6 +80,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		Hosts:                    hosts,
 		MetaStoreUrls:            metaStoreUrl,
 		MetaStoreType:            metaStoreTp,
+		MetaStoreCount:           len(c.MetaStore),
 		HStoreConfigInMetaStore:  cfgInMetaStore,
 		LocalMetaStoreConfigFile: c.Global.MetaStoreConfigPath,
 		LocalHStoreConfigFile:    c.Global.HStoreConfigPath,
@@ -160,14 +164,29 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		return nil, err
 	}
 
-	if len(c.Global.HStoreConfigPath) == 0 {
-		cfg := config.HStoreConfig{ZkUrl: "ip://" + globalCtx.MetaStoreUrls}
-		configPath, err := cfg.GenConfig()
-		if err != nil {
-			return nil, fmt.Errorf("generate hstore config err: %s", err.Error())
+	var cfg config.HStoreConfig
+	//if !c.Global.DisableStoreNetworkCfgPath {
+	switch globalCtx.MetaStoreType {
+	case spec.ZK:
+		cfg = config.HStoreConfig{
+			MetaStoreType: globalCtx.MetaStoreType.String(),
+			MetaStoreUrl:  "ip://" + globalCtx.MetaStoreUrls,
 		}
-		globalCtx.LocalHStoreConfigFile = configPath
+	case spec.RQLITE:
+		urls := strings.ReplaceAll(globalCtx.MetaStoreUrls, "http://", "")
+		fmt.Printf("==========urls: %s\n", urls)
+		cfg = config.HStoreConfig{
+			MetaStoreType: globalCtx.MetaStoreType.String(),
+			MetaStoreUrl:  "ip://" + urls,
+		}
 	}
+	//}
+
+	configPath, err := cfg.GenConfig()
+	if err != nil {
+		return nil, fmt.Errorf("generate hstore config err: %s", err.Error())
+	}
+	globalCtx.LocalHStoreConfigFile = configPath
 
 	globalCtx.SeedNodes = strings.Join(seedNodes, ",")
 

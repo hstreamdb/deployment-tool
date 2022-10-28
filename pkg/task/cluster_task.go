@@ -28,11 +28,13 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(SetUpHServerCluster)
 	ctx.run(CheckClusterStatus)
 	ctx.run(SetUpHttpServerService)
-	ctx.run(SetUpHStreamMonitorStack)
-	ctx.run(SetUpHStreamExporterService)
-	ctx.run(SetUpPrometheusService)
-	ctx.run(SetUpGrafanaService)
-	ctx.run(SetUpAlertService)
+	if len(services.Prometheus) != 0 {
+		ctx.run(SetUpHStreamMonitorStack)
+		ctx.run(SetUpHStreamExporterService)
+		ctx.run(SetUpPrometheusService)
+		ctx.run(SetUpGrafanaService)
+		ctx.run(SetUpAlertService)
+	}
 
 	return ctx.err
 }
@@ -112,11 +114,13 @@ func SetUpMetaStoreCluster(executor ext.Executor, services *service.Services) er
 
 func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
-	ctx.run(RemoveAlertService)
-	ctx.run(RemoveGrafanaService)
-	ctx.run(RemovePrometheusService)
-	ctx.run(RemoveHStreamExporterService)
-	ctx.run(RemoveHStreamMonitorStack)
+	if len(services.Prometheus) != 0 {
+		ctx.run(RemoveAlertService)
+		ctx.run(RemoveGrafanaService)
+		ctx.run(RemovePrometheusService)
+		ctx.run(RemoveHStreamExporterService)
+		ctx.run(RemoveHStreamMonitorStack)
+	}
 	ctx.run(RemoveHttpServerService)
 	ctx.run(RemoveHServerCluster)
 	ctx.run(RemoveHStoreCluster)

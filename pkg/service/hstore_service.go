@@ -5,6 +5,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -45,10 +46,11 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/mnt", "/mnt"},
 		{h.spec.DataDir, h.spec.DataDir},
+		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, spec.StoreDefaultContainerName, true, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.StoreDefaultBinPath}...)
-	configPath := h.spec.RemoteCfgPath
+	configPath := path.Join(h.spec.RemoteCfgPath, "logdevice.conf")
 	if len(globalCtx.HStoreConfigInMetaStore) != 0 {
 		configPath = globalCtx.HStoreConfigInMetaStore
 	}
@@ -105,7 +107,7 @@ func (h *HStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 
 	if len(globalCtx.HStoreConfigInMetaStore) == 0 {
-		position = append(position, executor.Position{LocalDir: globalCtx.LocalHStoreConfigFile, RemoteDir: cfgDir})
+		position = append(position, executor.Position{LocalDir: globalCtx.LocalHStoreConfigFile, RemoteDir: path.Join(cfgDir, "logdevice.conf")})
 	}
 
 	return &executor.TransferCtx{Target: h.spec.Host, Position: position}

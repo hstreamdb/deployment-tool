@@ -58,6 +58,10 @@ func (w *WaitMetaStoreReady) String() string {
 func (w *WaitMetaStoreReady) Run(executor ext.Executor) error {
 	for _, metaStore := range w.service {
 		executorCtx := metaStore.CheckReady(w.ctx)
+		if executorCtx == nil {
+			fmt.Printf("skip wait meta store ready for %s\n", getServiceName(metaStore))
+			return nil
+		}
 		target := fmt.Sprintf("%s:%d", executorCtx.Target, w.ctx.SSHPort)
 		res, err := executor.Execute(target, executorCtx.Cmd)
 		if err != nil {
@@ -80,6 +84,10 @@ func (m *MetaStoreStoreValue) String() string {
 func (m *MetaStoreStoreValue) Run(executor ext.Executor) error {
 	svc := m.service[0]
 	executorCtx := svc.StoreValue(m.Key, m.Value)
+	if executorCtx == nil {
+		fmt.Printf("skip store value to metastore")
+		return nil
+	}
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {
@@ -100,6 +108,10 @@ func (m *MetaStoreGetValue) String() string {
 func (m *MetaStoreGetValue) Run(executor ext.Executor) error {
 	svc := m.service[0]
 	executorCtx := svc.GetValue(m.Key)
+	if executorCtx == nil {
+		fmt.Printf("skip get value from metastore")
+		return nil
+	}
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {

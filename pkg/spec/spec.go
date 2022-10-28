@@ -67,21 +67,41 @@ func (c *ComponentsSpec) GetMetaStoreUrl() (string, MetaStoreType, error) {
 		return "", Unknown, nil
 	}
 
-	// append an empty string to help strings join
-	hosts = append(hosts, "")
 	var url string
-	tp := getMetaStoreType(c.MetaStore[0].Image)
+	tp := GetMetaStoreType(c.MetaStore[0].Image)
 	switch tp {
 	case ZK:
-		url = strings.Join(hosts, ":2181,")
+		url = getZkUrl(c.MetaStore)
 	case RQLITE:
-		url = strings.Join(hosts, ":4001,")
+		url = getRqliteUrl(c.MetaStore)
 	case Unknown:
 		return "", Unknown, fmt.Errorf("unknown meta store type")
 	}
-
-	url = url[:len(url)-1]
 	return url, tp, nil
+}
+
+func getZkUrl(metaStore []MetaStoreSpec) string {
+	hosts := []string{}
+	for _, spc := range metaStore {
+		hosts = append(hosts, spc.Host)
+	}
+	if len(hosts) == 0 {
+		return ""
+	}
+
+	// append an empty string to help strings join
+	hosts = append(hosts, "")
+	url := strings.Join(hosts, ":2181,")
+	url = url[:len(url)-1]
+	return url
+}
+
+func getRqliteUrl(metaStore []MetaStoreSpec) string {
+	hosts := []string{}
+	for _, spec := range metaStore {
+		hosts = append(hosts, fmt.Sprintf("http://%s:%d", spec.Host, spec.Port))
+	}
+	return strings.Join(hosts, ",")
 }
 
 func (c *ComponentsSpec) GetHServerUrl() string {
@@ -188,7 +208,19 @@ const (
 	Unknown
 )
 
-func getMetaStoreType(image string) MetaStoreType {
+func (m MetaStoreType) String() string {
+	switch m {
+	case ZK:
+		return "zookeeper"
+	case RQLITE:
+		return "rqlite"
+	case Unknown:
+		return "unknown"
+	}
+	return ""
+}
+
+func GetMetaStoreType(image string) MetaStoreType {
 	if strings.Contains(image, "zookeeper") {
 		return ZK
 	} else if strings.Contains(image, "rqlite") {

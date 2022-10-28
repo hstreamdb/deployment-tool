@@ -50,8 +50,15 @@
             "node": 3
         }
     },
+    {{- if eq .MetaStoreType "zookeeper" }}
     "zookeeper": {
-        "zookeeper_uri": "{{ .ZkUrl }}",
+        "zookeeper_uri": "{{ .MetaStoreUrl }}",
         "timeout": "30s"
     }
+    {{- else if eq .MetaStoreType "rqlite" }}
+    "rqlite": {
+        "rqlite_uri": "{{ .MetaStoreUrl }}"
+    }
+    {{- else }}
+    {{- end }}
 }

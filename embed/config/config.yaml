@@ -197,6 +197,11 @@ meta_store:
   - host: 10.1.0.10
     # # Meta-store docker image
     # image: "zookeeper:3.6"
+    # # Meta-store port, currently only works for rqlite. zk will
+    # # monitor on 4001
+    # port: 4001
+    # # Raft port used by rqlite
+    # raft_port: 4002
     # # Root directory of Meta-Store config files
     # remote_config_path: "/home/deploy/metastore"
     # # Root directory of Meta-store data files
@@ -210,6 +215,11 @@ meta_store:
   - host: 10.1.0.11
     # # Meta-store docker image
     # image: "zookeeper:3.6"
+    # # Meta-store port, currently only works for rqlite. zk will
+    # # monitor on 2181
+    # port: 4001
+    # # Raft port used by rqlite
+    # raft_port: 4002
     # # Root directory of Meta-Store config files
     # remote_config_path: "/home/deploy/metastore"
     # # Root directory of Meta-store data files
@@ -223,6 +233,11 @@ meta_store:
   - host: 10.1.0.12
     # # Meta-store docker image
     # image: "zookeeper:3.6"
+    # # Meta-store port, currently only works for rqlite. zk will
+    # # monitor on 2181
+    # port: 4001
+    # # Raft port used by rqlite
+    # raft_port: 4002
     # # Root directory of Meta-Store config files
     # remote_config_path: "/home/deploy/metastore"
     # # Root directory of Meta-store data files

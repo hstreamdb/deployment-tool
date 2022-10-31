@@ -16,8 +16,6 @@ This repository contains a command tool `hdt`, which can be used to set up a HSt
 
 - Make sure that the log-in user has `sudo` execute privileges，and configure `sudo` without password.
 
-- Make sure all cluster nodes configure the SSH mutual trust.
-
 - For nodes which deploy `HStore` instances, mount the data disk to `/mnt/data*/`.
 
   - "*" Matching incremental numbers, start from zero
@@ -48,7 +46,7 @@ The current directory structure will be as follows after running the `init` comm
 
 ### Update `config.yaml`
 
-Update the `config.yaml` file with cluster-related information. The configuration in the `config.yaml` template will deploy a cluster on 3 nodes, each consisting of a `HServer` instance, a `HStore` instance, a `Meta-Store` instance and associated monitoring components. `Prometheus` and `Grafana` will be deploy on a separate node.
+Update the `config.yaml` file with cluster-related information. The configuration in the `config.yaml` template will deploy a cluster on 3 nodes, each consisting of a `HServer` instance, a `HStore` instance, a `Meta-Store` instance and associated monitoring components. `Prometheus` 、`Grafana`  and other monitor components will be deploy on a separate node.
 
 To use this configuration file, just update the host information of the node and the ssh key-pair path. The final configuration file may looks like:
 
@@ -78,11 +76,17 @@ meta_store:
   - host: 172.24.47.173
   - host: 172.24.47.174
   - host: 172.24.47.175
+  
+http_server:
+  - host: 172.24.47.172
 
 prometheus:
   - host: 172.24.47.172
 
 grafana:
+  - host: 172.24.47.172
+  
+hstream_exporter:
   - host: 172.24.47.172
 ```
 

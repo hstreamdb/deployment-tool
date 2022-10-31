@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"gotest.tools/v3/assert"
 	"testing"
@@ -41,6 +42,65 @@ func TestCheckNeedSeedNodes(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			get := needSeedNodes(tc.input)
 			assert.Equal(t, get, tc.expected)
+		})
+	}
+}
+
+func TestParseImage(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		input   string
+		image   string
+		version utils.Version
+	}{
+		"standard name": {
+			input:   "hstreamdb/hstream:v0.10.0",
+			image:   "hstreamdb/hstream",
+			version: utils.Version{0, 10, 0, false},
+		},
+		"image lack version": {
+			input:   "hstreamdb/hstream",
+			image:   "hstreamdb/hstream",
+			version: utils.Version{IsLatest: true},
+		},
+		"unexpected image name": {
+			input:   "hstreamdb/hstream:rqlite",
+			image:   "hstreamdb/hstream:rqlite",
+			version: utils.Version{IsLatest: true},
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			image, version := parseImage(tc.input)
+			assert.Equal(t, image, tc.image)
+			assert.Equal(t, version, tc.version)
+		})
+	}
+}
+
+func TestGetMetaStoreUrl(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		input string
+		tp    spec.MetaStoreType
+		want  string
+	}{
+		"zk url": {
+			input: "host1:2181,host2:2181",
+			tp:    spec.ZK,
+			want:  "zk://host1:2181,host2:2181",
+		},
+		"rqlite url": {
+			input: "http://host1:2181,http://host2:2181",
+			tp:    spec.RQLITE,
+			want:  "rq://host1:2181,host2:2181",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			url := getMetaStoreUrl(tc.tp, tc.input)
+			assert.Equal(t, url, tc.want)
 		})
 	}
 }

@@ -11,4 +11,7 @@ fmt:
 hdt:
 	$(GO_BUILD) -o bin/hdt $(PACKAGE)/cmd
 
-.PHONY: fmt, hdt, all
+test:
+	go test -gcflags=-l -race ${TEST_FLAGS} ./...
+
+.PHONY: fmt, hdt, all, test

@@ -165,7 +165,6 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	}
 
 	var cfg config.HStoreConfig
-	//if !c.Global.DisableStoreNetworkCfgPath {
 	switch globalCtx.MetaStoreType {
 	case spec.ZK:
 		cfg = config.HStoreConfig{
@@ -174,13 +173,11 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		}
 	case spec.RQLITE:
 		urls := strings.ReplaceAll(globalCtx.MetaStoreUrls, "http://", "")
-		fmt.Printf("==========urls: %s\n", urls)
 		cfg = config.HStoreConfig{
 			MetaStoreType: globalCtx.MetaStoreType.String(),
 			MetaStoreUrl:  "ip://" + urls,
 		}
 	}
-	//}
 
 	configPath, err := cfg.GenConfig()
 	if err != nil {

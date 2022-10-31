@@ -8,6 +8,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -55,20 +56,14 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		args = append(args, "--seed-nodes", globalCtx.SeedNodes)
 	}
 
-	if strings.Contains(h.spec.Image, "rqlite") {
-		urls := strings.ReplaceAll(globalCtx.MetaStoreUrls, "http://", "")
-		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, urls)
+	if utils.CompareVersion(version, utils.Version096) > 0 {
+		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
 		args = append(args, "--metastore-uri", metaStoreUrl)
+	} else if utils.CompareVersion(version, utils.Version095) > 0 {
+		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
+		args = append(args, "--meta-store", metaStoreUrl)
 	} else {
-		if utils.CompareVersion(version, utils.Version096) > 0 {
-			metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
-			args = append(args, "--metastore-uri", metaStoreUrl)
-		} else if utils.CompareVersion(version, utils.Version095) > 0 {
-			metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
-			args = append(args, "--meta-store", metaStoreUrl)
-		} else {
-			args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
-		}
+		args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
 	}
 
 	if len(h.StoreConfigPath) != 0 {
@@ -156,7 +151,8 @@ func getMetaStoreUrl(tp spec.MetaStoreType, url string) string {
 	case spec.ZK:
 		return "zk://" + url
 	case spec.RQLITE:
-		return "rq://" + url
+		finalUrl := strings.ReplaceAll(url, "http://", "")
+		return "rq://" + finalUrl
 	case spec.Unknown:
 		return ""
 	}
@@ -168,7 +164,8 @@ func needSeedNodes(version utils.Version) bool {
 }
 
 func parseImage(imageStr string) (string, utils.Version) {
-	if !strings.Contains(imageStr, ":") || strings.Contains(imageStr, "rqlite") {
+	reg := regexp.MustCompile(".*[:v]?\\d{1,3}.\\d{1,3}.\\d{1,3}")
+	if !reg.MatchString(imageStr) {
 		return imageStr, utils.Version{IsLatest: true}
 	}
 

@@ -41,6 +41,10 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 }
 
 func SetUpHServerCluster(executor ext.Executor, services *service.Services) error {
+	if len(services.HServer) == 0 {
+		return nil
+	}
+
 	serverClusterCtx := HServerClusterCtx{
 		ctx:     services.Global,
 		service: services.HServer,
@@ -60,6 +64,10 @@ func SetUpHServerCluster(executor ext.Executor, services *service.Services) erro
 }
 
 func SetUpHStoreCluster(executor ext.Executor, services *service.Services) error {
+	if len(services.HStore) == 0 {
+		return nil
+	}
+
 	storeClusterCtx := HStoreClusterCtx{
 		ctx:     services.Global,
 		service: services.HStore,
@@ -83,6 +91,10 @@ func SetUpHStoreCluster(executor ext.Executor, services *service.Services) error
 }
 
 func SetUpMetaStoreCluster(executor ext.Executor, services *service.Services) error {
+	if len(services.MetaStore) == 0 {
+		return nil
+	}
+
 	metaStoreClusterCtx := MetaStoreClusterCtx{
 		ctx:     services.Global,
 		service: services.MetaStore,
@@ -130,6 +142,10 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 }
 
 func RemoveMetaStoreCluster(executor ext.Executor, services *service.Services) error {
+	if len(services.MetaStore) == 0 {
+		return nil
+	}
+
 	metaStoreClusterCtx := MetaStoreClusterCtx{
 		ctx:     services.Global,
 		service: services.MetaStore,
@@ -148,6 +164,10 @@ func RemoveMetaStoreCluster(executor ext.Executor, services *service.Services) e
 }
 
 func RemoveHStoreCluster(executor ext.Executor, services *service.Services) error {
+	if len(services.HStore) == 0 {
+		return nil
+	}
+
 	storeClusterCtx := HStoreClusterCtx{
 		ctx:     services.Global,
 		service: services.HStore,
@@ -166,6 +186,10 @@ func RemoveHStoreCluster(executor ext.Executor, services *service.Services) erro
 }
 
 func RemoveHServerCluster(executor ext.Executor, services *service.Services) error {
+	if len(services.HServer) == 0 {
+		return nil
+	}
+
 	serverClusterCtx := HServerClusterCtx{
 		ctx:     services.Global,
 		service: services.HServer,
@@ -184,6 +208,10 @@ func RemoveHServerCluster(executor ext.Executor, services *service.Services) err
 }
 
 func SetUpHttpServerService(executor ext.Executor, services *service.Services) error {
+	if len(services.HttpServer) == 0 {
+		return nil
+	}
+
 	httpServerCtx := HttpServerCtx{
 		ctx:     services.Global,
 		service: services.HttpServer,
@@ -204,6 +232,10 @@ func SetUpHttpServerService(executor ext.Executor, services *service.Services) e
 }
 
 func RemoveHttpServerService(executor ext.Executor, services *service.Services) error {
+	if len(services.HttpServer) == 0 {
+		return nil
+	}
+
 	httpServerCtx := HttpServerCtx{
 		ctx:     services.Global,
 		service: services.HttpServer,
@@ -222,6 +254,10 @@ func RemoveHttpServerService(executor ext.Executor, services *service.Services) 
 }
 
 func SetUpHStreamMonitorStack(executor ext.Executor, services *service.Services) error {
+	if len(services.MonitorSuite) == 0 {
+		return nil
+	}
+
 	monitorSuiteCtx := MonitorSuiteCtx{
 		ctx:     services.Global,
 		service: services.MonitorSuite,
@@ -242,6 +278,10 @@ func SetUpHStreamMonitorStack(executor ext.Executor, services *service.Services)
 }
 
 func RemoveHStreamMonitorStack(executor ext.Executor, services *service.Services) error {
+	if len(services.MonitorSuite) == 0 {
+		return nil
+	}
+
 	monitorSuiteCtx := MonitorSuiteCtx{
 		ctx:     services.Global,
 		service: services.MonitorSuite,
@@ -260,6 +300,10 @@ func RemoveHStreamMonitorStack(executor ext.Executor, services *service.Services
 }
 
 func SetUpHStreamExporterService(executor ext.Executor, services *service.Services) error {
+	if len(services.HStreamExporter) == 0 {
+		return nil
+	}
+
 	hstreamExporterCtx := HStreamExporterCtx{
 		ctx:     services.Global,
 		service: services.HStreamExporter,
@@ -280,6 +324,10 @@ func SetUpHStreamExporterService(executor ext.Executor, services *service.Servic
 }
 
 func RemoveHStreamExporterService(executor ext.Executor, services *service.Services) error {
+	if len(services.HStreamExporter) == 0 {
+		return nil
+	}
+
 	hstreamExporterCtx := HStreamExporterCtx{
 		ctx:     services.Global,
 		service: services.HStreamExporter,
@@ -298,6 +346,10 @@ func RemoveHStreamExporterService(executor ext.Executor, services *service.Servi
 }
 
 func SetUpPrometheusService(executor ext.Executor, services *service.Services) error {
+	if len(services.Prometheus) == 0 {
+		return nil
+	}
+
 	prometheusCtx := PrometheusCtx{
 		ctx:     services.Global,
 		service: services.Prometheus,
@@ -318,6 +370,10 @@ func SetUpPrometheusService(executor ext.Executor, services *service.Services) e
 }
 
 func RemovePrometheusService(executor ext.Executor, services *service.Services) error {
+	if len(services.Prometheus) == 0 {
+		return nil
+	}
+
 	prometheusCtx := PrometheusCtx{
 		ctx:     services.Global,
 		service: services.Prometheus,
@@ -336,6 +392,10 @@ func RemovePrometheusService(executor ext.Executor, services *service.Services) 
 }
 
 func SetUpGrafanaService(executor ext.Executor, services *service.Services) error {
+	if len(services.Grafana) == 0 {
+		return nil
+	}
+
 	grafanaCtx := GrafanaCtx{
 		ctx:     services.Global,
 		service: services.Grafana,
@@ -356,6 +416,10 @@ func SetUpGrafanaService(executor ext.Executor, services *service.Services) erro
 }
 
 func RemoveGrafanaService(executor ext.Executor, services *service.Services) error {
+	if len(services.Grafana) == 0 {
+		return nil
+	}
+
 	grafanaCtx := GrafanaCtx{
 		ctx:     services.Global,
 		service: services.Grafana,
@@ -374,6 +438,10 @@ func RemoveGrafanaService(executor ext.Executor, services *service.Services) err
 }
 
 func SetUpAlertService(executor ext.Executor, services *service.Services) error {
+	if len(services.AlertManager) == 0 {
+		return nil
+	}
+
 	alertCtx := AlertManagerCtx{
 		ctx:     services.Global,
 		service: services.AlertManager,
@@ -394,6 +462,10 @@ func SetUpAlertService(executor ext.Executor, services *service.Services) error 
 }
 
 func RemoveAlertService(executor ext.Executor, services *service.Services) error {
+	if len(services.AlertManager) == 0 {
+		return nil
+	}
+
 	alertCtx := AlertManagerCtx{
 		ctx:     services.Global,
 		service: services.AlertManager,
@@ -426,6 +498,10 @@ func (c *CheckClusterStats) String() string {
 }
 
 func (c *CheckClusterStats) Run(executor ext.Executor) error {
+	if len(c.storeServices) == 0 {
+		return nil
+	}
+
 	var adminStore *service.HStore
 	for _, store := range c.storeServices {
 		if store.IsAdmin() {
@@ -441,6 +517,10 @@ func (c *CheckClusterStats) Run(executor ext.Executor) error {
 		return fmt.Errorf("%s-%s", err.Error(), res)
 	}
 	fmt.Printf("=== HStore Status ===\n%s\n", res)
+
+	if len(c.serverServices) == 0 {
+		return nil
+	}
 
 	executorCtx = adminStore.AdminServerCmd(c.ctx, c.serverServices[0].GetHost(), "status")
 	res, err = executor.Execute(target, executorCtx.Cmd)

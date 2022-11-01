@@ -23,6 +23,8 @@ func (r *runCtx) run(f func(executor ext.Executor, services *service.Services) e
 
 func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
+	fmt.Println("============ Set up cluster with components ============")
+	services.ShowAllServices()
 	ctx.run(SetUpMetaStoreCluster)
 	ctx.run(SetUpHStoreCluster)
 	ctx.run(SetUpHServerCluster)
@@ -35,7 +37,6 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(SetUpGrafanaService)
 		ctx.run(SetUpAlertService)
 	}
-
 	return ctx.err
 }
 

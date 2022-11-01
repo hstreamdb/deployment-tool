@@ -7,6 +7,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -23,6 +24,30 @@ func NewMonitorSuite(host string, moSpec spec.MonitorSpec) *MonitorSuite {
 		spec:                  moSpec,
 		NodeContainerName:     spec.NodeExporterDefaultContainerName,
 		CadvisorContainerName: spec.CadvisorDefaultContainerName,
+	}
+}
+
+func (m *MonitorSuite) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := m.getDirs()
+	nodeContainer := utils.DisplayedComponent{
+		Name:          "NodeExporter",
+		Host:          m.Host,
+		Ports:         strconv.Itoa(m.spec.NodeExporterPort),
+		ContainerName: m.NodeContainerName,
+		Image:         m.spec.NodeExporterImage,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	cadVisorContainer := utils.DisplayedComponent{
+		Name:          "Cadvisor",
+		Host:          m.Host,
+		Ports:         strconv.Itoa(m.spec.CadvisorPort),
+		ContainerName: m.CadvisorContainerName,
+		Image:         m.spec.CadvisorImage,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{
+		"nodeExporter": nodeContainer,
+		"cadVisor":     cadVisorContainer,
 	}
 }
 
@@ -97,6 +122,19 @@ func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, 
 	}
 }
 
+func (p *Prometheus) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := p.getDirs()
+	prometheus := utils.DisplayedComponent{
+		Name:          "Prometheus",
+		Host:          p.spec.Host,
+		Ports:         strconv.Itoa(p.spec.Port),
+		ContainerName: p.ContainerName,
+		Image:         p.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"prometheus": prometheus}
+}
+
 func (p *Prometheus) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := p.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
@@ -157,6 +195,19 @@ func NewGrafana(graSpec spec.GrafanaSpec, disableLogin bool) *Grafana {
 	return &Grafana{spec: graSpec, ContainerName: spec.GrafanaDefaultContainerName, DisableLogin: disableLogin}
 }
 
+func (g *Grafana) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := g.getDirs()
+	grafana := utils.DisplayedComponent{
+		Name:          "Grafana",
+		Host:          g.spec.Host,
+		Ports:         strconv.Itoa(g.spec.Port),
+		ContainerName: g.ContainerName,
+		Image:         g.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"grafana": grafana}
+}
+
 func (g *Grafana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := g.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir,
@@ -210,6 +261,19 @@ func NewAlertManager(graSpec spec.AlertManagerSpec) *AlertManager {
 	return &AlertManager{spec: graSpec, ContainerName: spec.AlertManagerDefaultContainerName}
 }
 
+func (a *AlertManager) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := a.getDirs()
+	alert := utils.DisplayedComponent{
+		Name:          "AlertManager",
+		Host:          a.spec.Host,
+		Ports:         strconv.Itoa(a.spec.Port),
+		ContainerName: a.ContainerName,
+		Image:         a.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"alertManager": alert}
+}
+
 func (a *AlertManager) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := a.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
@@ -250,6 +314,19 @@ type HStreamExporter struct {
 
 func NewHStreamExporter(exporterSpec spec.HStreamExporterSpec) *HStreamExporter {
 	return &HStreamExporter{spec: exporterSpec, ContainerName: spec.HStreamExporterDefaultContainerName}
+}
+
+func (h *HStreamExporter) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := h.getDirs()
+	exporter := utils.DisplayedComponent{
+		Name:          "HStreamExporter",
+		Host:          h.spec.Host,
+		Ports:         strconv.Itoa(h.spec.Port),
+		ContainerName: h.ContainerName,
+		Image:         h.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"hstreamExporter": exporter}
 }
 
 func (h *HStreamExporter) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {

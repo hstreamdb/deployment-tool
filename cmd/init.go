@@ -27,12 +27,12 @@ func newInit() *cobra.Command {
 			}
 
 			configFile := filepath.Join("config", "config.yaml")
-			if err := getFile(cmd, configFile, "template/config.yaml"); err != nil {
+			if err := getFile(configFile, "template/config.yaml"); err != nil {
 				return err
 			}
 
 			alertManagerFile := filepath.Join("config", "alertmanager.yml")
-			if err := getFile(cmd, alertManagerFile, "template/alertmanager/alertmanager.yml"); err != nil {
+			if err := getFile(alertManagerFile, "template/alertmanager/alertmanager.yml"); err != nil {
 				return err
 			}
 			return nil
@@ -41,7 +41,7 @@ func newInit() *cobra.Command {
 	return cmd
 }
 
-func getFile(cmd *cobra.Command, fp string, target string) error {
+func getFile(fp string, target string) error {
 	tpl, err := embed.ReadConfig(fp)
 	if err != nil {
 		return fmt.Errorf("get %s template error: %s\n", fp, err.Error())
@@ -55,8 +55,6 @@ func getFile(cmd *cobra.Command, fp string, target string) error {
 	if err := cfg.Execute(content, nil); err != nil {
 		return err
 	}
-
-	fmt.Fprintln(cmd.OutOrStdout(), content.String())
 
 	if err := os.WriteFile(target, content.Bytes(), 0664); err != nil {
 		return fmt.Errorf("write %s error: %s\n", target, err.Error())

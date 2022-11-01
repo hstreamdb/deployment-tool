@@ -2,7 +2,7 @@ package spec
 
 const (
 	ServerBinConfigPath        = "/etc/hstream/config.yaml"
-	ServerDefaultImage         = "docker.io/hstreamdb/hstream"
+	ServerDefaultImage         = "hstreamdb/hstream"
 	ServerDefaultContainerName = "deploy_hserver"
 	ServerDefaultBinPath       = "/usr/local/bin/hstream-server"
 	ServerDefaultCfgDir        = "/hstream/deploy/hserver"

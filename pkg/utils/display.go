@@ -22,18 +22,20 @@ type DisplayedComponent struct {
 	Paths         string
 }
 
-func ShowComponents(mp map[string]DisplayedComponent) {
+func ShowComponents(mp map[string][]DisplayedComponent) {
 	componentsArr := []string{"metaStore", "hstore", "hserver", "httpServer", "nodeExporter",
 		"cadVisor", "hstreamExporter", "prometheus", "grafana", "alertManager"}
 	header := []string{"Component", "Host", "Ports", "Image", "ContainerName", "Dirs"}
 
 	data := make([][]string, 0, len(componentsArr))
 	for _, k := range componentsArr {
-		if component, ok := mp[k]; ok {
-			row := make([]string, 0, 6)
-			row = append(row, component.Name, component.Host, component.Ports,
-				component.Image, component.ContainerName, component.Paths)
-			data = append(data, row)
+		if components, ok := mp[k]; ok {
+			for _, component := range components {
+				row := make([]string, 0, 6)
+				row = append(row, component.Name, component.Host, component.Ports,
+					component.Image, component.ContainerName, component.Paths)
+				data = append(data, row)
+			}
 		}
 	}
 

@@ -5,7 +5,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
-	log "github.com/sirupsen/logrus"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"golang.org/x/exp/slices"
 	"reflect"
 	"sort"
@@ -207,6 +207,7 @@ func (s *Services) ShowAllServices() {
 	v := reflect.Indirect(reflect.ValueOf(s))
 	t := v.Type()
 
+	showedComponents := make(map[string][]utils.DisplayedComponent)
 	for i := 0; i < t.NumField(); i++ {
 		field := v.Field(i)
 		if field.Type().Kind() != reflect.Slice {
@@ -215,18 +216,22 @@ func (s *Services) ShowAllServices() {
 
 		for j := 0; j < field.Len(); j++ {
 			service := field.Index(j)
-			if service.Type().Kind() != reflect.Struct {
-				log.Errorf("unexpected service kind: %s", service.String())
+			if service.Type().Kind() != reflect.Ptr {
+				panic(fmt.Sprintf("Show all services error, unexpected service kind: %s", service.String()))
 			}
-			ref := reflect.New(service.Type())
-			ref.Elem().Set(service)
-			fn := ref.MethodByName("Display")
+
+			fn := service.MethodByName("Display")
 			res := fn.Call(nil)
-			field.Field(j).Set(ref.Elem().FieldByName("DataDir"))
+			displayedComponent := res[0].Interface().(map[string]utils.DisplayedComponent)
+			for k, c := range displayedComponent {
+				if _, ok := showedComponents[k]; !ok {
+					showedComponents[k] = []utils.DisplayedComponent{}
+				}
+				showedComponents[k] = append(showedComponents[k], c)
+			}
 		}
-		res = append(res, getHostsInner(field)...)
 	}
-	return res
+	utils.ShowComponents(showedComponents)
 }
 
 // getExcludedMonitorHosts get the hosts of all nodes which don't need to deploy

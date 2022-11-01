@@ -27,7 +27,7 @@ type HServer struct {
 }
 
 func NewHServer(id uint32, serverSpec spec.HServerSpec) *HServer {
-	return &HServer{serverId: id, spec: serverSpec, ContainerName: spec.HttpServerDefaultContainerName}
+	return &HServer{serverId: id, spec: serverSpec, ContainerName: spec.ServerDefaultContainerName}
 }
 
 func (h *HServer) Display() map[string]utils.DisplayedComponent {

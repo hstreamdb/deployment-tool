@@ -13,6 +13,7 @@ func main() {
 	}
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(rootCmd.OutOrStdout())
+	log.SetLevel(log.InfoLevel)
 
 	rootCmd.AddCommand(
 		newInit(),

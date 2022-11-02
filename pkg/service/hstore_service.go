@@ -5,8 +5,8 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
-	"path"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -33,6 +33,10 @@ type HStore struct {
 
 func NewHStore(id uint32, storeSpec spec.HStoreSpec) *HStore {
 	return &HStore{storeId: id, spec: storeSpec, ContainerName: spec.StoreDefaultContainerName, AdminPort: storeSpec.AdminPort}
+}
+
+func (h *HStore) GetServiceName() string {
+	return "store"
 }
 
 func (h *HStore) Display() map[string]utils.DisplayedComponent {

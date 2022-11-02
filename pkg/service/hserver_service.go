@@ -30,6 +30,10 @@ func NewHServer(id uint32, serverSpec spec.HServerSpec) *HServer {
 	return &HServer{serverId: id, spec: serverSpec, ContainerName: spec.ServerDefaultContainerName}
 }
 
+func (h *HServer) GetServiceName() string {
+	return "server"
+}
+
 func (h *HServer) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := h.getDirs()
 	hserver := utils.DisplayedComponent{

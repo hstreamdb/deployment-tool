@@ -17,6 +17,7 @@ type Service interface {
 	Deploy(cfg *GlobalCtx) *executor.ExecuteCtx
 	Remove(cfg *GlobalCtx) *executor.ExecuteCtx
 	SyncConfig(cfg *GlobalCtx) *executor.TransferCtx
+	GetServiceName() string
 }
 
 type GlobalCtx struct {

@@ -94,18 +94,6 @@ func (b *BootStrap) Run(executor ext.Executor) error {
 	return nil
 }
 
-type RemoveStore struct {
-	HStoreClusterCtx
-}
-
-func (r *RemoveStore) String() string {
-	return "Task: remove store"
-}
-
-func (r *RemoveStore) Run(executor ext.Executor) error {
-	return serviceRemove(executor, r.ctx, r.service)
-}
-
 type MountDisk struct {
 	HStoreClusterCtx
 }

@@ -27,6 +27,10 @@ func NewMonitorSuite(host string, moSpec spec.MonitorSpec) *MonitorSuite {
 	}
 }
 
+func (m *MonitorSuite) GetServiceName() string {
+	return "monitor suite"
+}
+
 func (m *MonitorSuite) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := m.getDirs()
 	nodeContainer := utils.DisplayedComponent{
@@ -122,6 +126,10 @@ func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, 
 	}
 }
 
+func (p *Prometheus) GetServiceName() string {
+	return "prometheus"
+}
+
 func (p *Prometheus) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := p.getDirs()
 	prometheus := utils.DisplayedComponent{
@@ -195,6 +203,10 @@ func NewGrafana(graSpec spec.GrafanaSpec, disableLogin bool) *Grafana {
 	return &Grafana{spec: graSpec, ContainerName: spec.GrafanaDefaultContainerName, DisableLogin: disableLogin}
 }
 
+func (g *Grafana) GetServiceName() string {
+	return "grafana"
+}
+
 func (g *Grafana) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := g.getDirs()
 	grafana := utils.DisplayedComponent{
@@ -261,6 +273,10 @@ func NewAlertManager(graSpec spec.AlertManagerSpec) *AlertManager {
 	return &AlertManager{spec: graSpec, ContainerName: spec.AlertManagerDefaultContainerName}
 }
 
+func (a *AlertManager) GetServiceName() string {
+	return "alertManager"
+}
+
 func (a *AlertManager) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := a.getDirs()
 	alert := utils.DisplayedComponent{
@@ -314,6 +330,10 @@ type HStreamExporter struct {
 
 func NewHStreamExporter(exporterSpec spec.HStreamExporterSpec) *HStreamExporter {
 	return &HStreamExporter{spec: exporterSpec, ContainerName: spec.HStreamExporterDefaultContainerName}
+}
+
+func (h *HStreamExporter) GetServiceName() string {
+	return "hstream-exporter"
 }
 
 func (h *HStreamExporter) Display() map[string]utils.DisplayedComponent {

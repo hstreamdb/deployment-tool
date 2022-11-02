@@ -73,7 +73,7 @@ func configSync[S service.Service](executor ext.Executor, ctx *service.GlobalCtx
 			defer wg.Done()
 			transferCtx := svc.SyncConfig(ctx)
 			if transferCtx == nil {
-				fmt.Printf("skip sync config for %s\n", getServiceName(svc))
+				fmt.Printf("skip sync config for %s\n", svc.GetServiceName())
 				return
 			}
 			target := fmt.Sprintf("%s:%d", transferCtx.Target, ctx.SSHPort)
@@ -101,20 +101,72 @@ func configSync[S service.Service](executor ext.Executor, ctx *service.GlobalCtx
 	return *ep.Load()
 }
 
-func getServiceName(svc service.Service) string {
-	switch svc.(type) {
-	case *service.HServer:
-		return "HServer"
-	case *service.HStore:
-		return "HStore"
-	case *service.MetaStore:
-		return "MetaStore"
-	case *service.Prometheus:
-		return "Prometheus"
-	case *service.Grafana:
-		return "Grafana"
-	case *service.MonitorSuite:
-		return "monitor service"
-	}
-	return ""
+type initEnvTask[S service.Service] struct {
+	serviceName string
+	ctx         *service.GlobalCtx
+	services    []S
+}
+
+func (i *initEnvTask[S]) String() string {
+	return fmt.Sprintf("Task: init %s environment\n", i.serviceName)
+}
+
+func (i *initEnvTask[S]) Run(executor ext.Executor) error {
+	return serviceInitEnv(executor, i.ctx, i.services)
+}
+
+type configSyncTask[S service.Service] struct {
+	serviceName string
+	ctx         *service.GlobalCtx
+	services    []S
+}
+
+func (c *configSyncTask[S]) String() string {
+	return fmt.Sprintf("Task: sync %s config\n", c.serviceName)
+}
+
+func (c *configSyncTask[S]) Run(executor ext.Executor) error {
+	return configSync(executor, c.ctx, c.services)
+}
+
+type serviceDeployTask[S service.Service] struct {
+	serviceName string
+	ctx         *service.GlobalCtx
+	services    []S
+}
+
+func (s *serviceDeployTask[S]) String() string {
+	return fmt.Sprintf("Task: start %s cluster\n", s.serviceName)
+}
+
+func (s *serviceDeployTask[S]) Run(executor ext.Executor) error {
+	return serviceDeploy(executor, s.ctx, s.services)
+}
+
+type removeServiceTask[S service.Service] struct {
+	serviceName string
+	ctx         *service.GlobalCtx
+	services    []S
+}
+
+func (r *removeServiceTask[S]) String() string {
+	return fmt.Sprintf("Task: remove %s\n", r.serviceName)
+}
+
+func (r *removeServiceTask[S]) Run(executor ext.Executor) error {
+	return serviceRemove(executor, r.ctx, r.services)
+}
+
+func getStartServiceTask[S service.Service](ctx *service.GlobalCtx, services []S) []Task {
+	serviceName := services[0].GetServiceName()
+	tasks := make([]Task, 0, 3)
+	tasks = append(tasks, &initEnvTask[S]{serviceName: serviceName, ctx: ctx, services: services})
+	tasks = append(tasks, &configSyncTask[S]{serviceName: serviceName, ctx: ctx, services: services})
+	tasks = append(tasks, &serviceDeployTask[S]{serviceName: serviceName, ctx: ctx, services: services})
+	return tasks
+}
+
+func getRemoveServiceTask[S service.Service](ctx *service.GlobalCtx, services []S) []Task {
+	serviceName := services[0].GetServiceName()
+	return []Task{&removeServiceTask[S]{serviceName: serviceName, ctx: ctx, services: services}}
 }

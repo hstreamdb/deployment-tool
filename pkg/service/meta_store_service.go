@@ -34,6 +34,10 @@ func NewMetaStore(id uint32, metaSpec spec.MetaStoreSpec) *MetaStore {
 	}
 }
 
+func (m *MetaStore) GetServiceName() string {
+	return "meta store"
+}
+
 func (m *MetaStore) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := m.getDirs()
 	store := utils.DisplayedComponent{

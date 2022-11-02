@@ -9,6 +9,10 @@ import (
 
 const DefaultStoreConfigPath = "/logdevice.conf"
 
+var (
+	globalCfgTypeName = reflect.TypeOf(GlobalCfg{}).Name()
+)
+
 type ComponentsSpec struct {
 	Global          GlobalCfg             `yaml:"global"`
 	Monitor         MonitorSpec           `yaml:"monitor"`
@@ -26,11 +30,10 @@ func (c *ComponentsSpec) GetHosts() []string {
 	v := reflect.Indirect(reflect.ValueOf(c))
 	t := v.Type()
 
-	globalCfgName := reflect.TypeOf(GlobalCfg{}).Name()
 	res := []string{}
 	for i := 0; i < t.NumField(); i++ {
 		field := v.Field(i)
-		if field.Type().Name() == globalCfgName {
+		if field.Type().Name() == globalCfgTypeName {
 			continue
 		}
 		res = append(res, getHostsInner(field)...)
@@ -241,10 +244,6 @@ func updateComponentSpecWithGlobal(globalCfg GlobalCfg, data interface{}) error 
 	}
 	return nil
 }
-
-var (
-	globalCfgTypeName = reflect.TypeOf(GlobalCfg{}).Name()
-)
 
 func updateComponent(cfg GlobalCfg, field reflect.Value) error {
 	if skipUpdate(field) {

@@ -22,6 +22,7 @@ type DeployOpts struct {
 	identityFile string
 	configPath   string
 	debugMode    bool
+	serverPath   string
 }
 
 func newDeploy() *cobra.Command {
@@ -35,6 +36,8 @@ func newDeploy() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			spec.ServerDefaultBinPath = opts.serverPath
 
 			config := spec.ComponentsSpec{}
 			if err = yaml.Unmarshal(contant, &config); err != nil {
@@ -80,5 +83,6 @@ func newDeploy() *cobra.Command {
 	cmd.Flags().BoolVarP(&opts.usePassword, "use-password", "p", false, "Use password authentication for ssh.")
 	cmd.Flags().StringVarP(&opts.identityFile, "identity-file", "i", "", "The path of the SSH identity file.")
 	cmd.Flags().BoolVarP(&opts.debugMode, "debug", "d", false, "Debug mode")
+	cmd.Flags().StringVarP(&opts.serverPath, "server-bin-path", "s", "/usr/local/bin/hstream-server-sid", "HServer binary path.")
 	return cmd
 }

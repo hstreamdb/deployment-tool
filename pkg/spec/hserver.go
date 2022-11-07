@@ -4,10 +4,11 @@ const (
 	ServerBinConfigPath        = "/etc/hstream/config.yaml"
 	ServerDefaultImage         = "hstreamdb/hstream"
 	ServerDefaultContainerName = "deploy_hserver"
-	ServerDefaultBinPath       = "/usr/local/bin/hstream-server"
 	ServerDefaultCfgDir        = "/hstream/deploy/hserver"
 	ServerDefaultDataDir       = "/hstream/data/hserver"
 )
+
+var ServerDefaultBinPath = "/usr/local/bin/hstream-server"
 
 type HServerSpec struct {
 	Host          string       `yaml:"host"`

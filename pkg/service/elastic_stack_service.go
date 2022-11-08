@@ -61,8 +61,7 @@ func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	mountPoints := []spec.MountPoints{}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true)
 	if es.DisableSecurity {
 		args = append(args, "-e xpack.security.enabled=false")
 	}
@@ -112,8 +111,7 @@ func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	mountPoints := []spec.MountPoints{}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true)
 	args = append(args, k.spec.Image)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }

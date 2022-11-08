@@ -24,7 +24,7 @@ type Filebeat struct {
 	ContainerName string
 }
 
-func NewElasticSearch(esSpec spec.ElasticSearchSpec, disableSecurity bool) *ElasticSearch {
+func NewElasticSearch(esSpec spec.ElasticSearchSpec) *ElasticSearch {
 	return &ElasticSearch{
 		spec:          esSpec,
 		ContainerName: spec.ElasticSearchDefaultContainerName,

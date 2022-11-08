@@ -167,7 +167,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 
 	elasticSearch := make([]*ElasticSearch, 0, len(c.ElasticSearch))
 	for _, v := range c.ElasticSearch {
-		elasticSearch = append(elasticSearch, NewElasticSearch(v, c.Monitor.ElasticDisableSecurity))
+		elasticSearch = append(elasticSearch, NewElasticSearch(v))
 	}
 
 	kibana := make([]*Kibana, 0, len(c.Kibana))

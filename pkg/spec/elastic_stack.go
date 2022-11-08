@@ -16,14 +16,15 @@ const (
 )
 
 type ElasticSearchSpec struct {
-	Host          string       `yaml:"host"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Port          int          `yaml:"port" default:"9200"`
-	Image         string       `yaml:"image"`
-	DataDir       string       `yaml:"data_dir"`
-	LocalCfgPath  string       `yaml:"local_cfg_path"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	Host                   string       `yaml:"host"`
+	SSHPort                int          `yaml:"ssh_port" default:"22"`
+	Port                   int          `yaml:"port" default:"9200"`
+	Image                  string       `yaml:"image"`
+	DataDir                string       `yaml:"data_dir"`
+	LocalCfgPath           string       `yaml:"local_cfg_path"`
+	RemoteCfgPath          string       `yaml:"remote_config_path"`
+	ContainerCfg           ContainerCfg `yaml:"container_config"`
+	ElasticDisableSecurity bool         `yaml:"elastic_disable_security"`
 }
 
 type KibanaSpec struct {

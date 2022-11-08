@@ -123,7 +123,7 @@ func (a *AlertManagerSpec) SetDefaultRemoteCfgPath() {
 type HStreamExporterSpec struct {
 	Host          string       `yaml:"host"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Port          int          `yaml:"port" default:"9200"`
+	Port          int          `yaml:"port" default:"9250"`
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`

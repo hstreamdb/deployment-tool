@@ -323,7 +323,7 @@ hstream_exporter:
   # # hstream_exporter docker image
   # image: "hstreamdb/hstream-exporter"
   # # hstream_exporter service monitor port
-  # port: 9200
+  # port: 9250
   # # Root directory of hstream_exporter config files
   # remote_config_path: "/home/deploy/hstream-exporter"
   # # Root directory of hstream_exporter data files
@@ -333,3 +333,63 @@ hstream_exporter:
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
+
+elasticsearch:
+  - host: 10.1.0.15
+  # port: 5601
+  # # Elasticsearch docker image
+  # image: "docker.elastic.co/elasticsearch/elasticsearch:8.4.3"
+  # # Elasticsearch container configuration
+  # container_config:
+    # cpu_limit: 200
+    # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true
+
+kibana:
+  - host: 10.1.0.15
+  # port: 9200
+  # # Kibana docker image
+  # image: "docker.elastic.co/kibana/kibana:8.4.3"
+  # # Kibana container configuration
+  # container_config:
+    # cpu_limit: 200
+    # memory_limit: 8G
+    # disable_restart: true
+    # remove_when_exit: true
+
+filebeat:
+  # # The ip address of Filebeats
+  - host: 10.1.0.10
+    # # Filebeat docker image
+    # image: "docker.elastic.co/beats/filebeat:8.4.3"
+    # # Root directory of Filebeat config files
+    # remote_config_path: "/home/deploy/filebeat"
+    # # Filebeat container configuration
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+  - host: 10.1.0.11
+    # # Filebeat docker image
+    # image: "docker.elastic.co/beats/filebeat:8.4.3"
+    # # Root directory of Filebeat config files
+    # remote_config_path: "/home/deploy/filebeat"
+    # # Filebeat container configuration
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+  - host: 10.1.0.12
+    # # Filebeat docker image
+    # image: "docker.elastic.co/beats/filebeat:8.4.3"
+    # # Root directory of Filebeat config files
+    # remote_config_path: "/home/deploy/filebeat"
+    # # Filebeat container configuration
+    # container_config:
+      # cpu_limit: 200
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true

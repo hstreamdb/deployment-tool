@@ -105,6 +105,9 @@ type Services struct {
 	AlertManager    []*AlertManager
 	HStreamExporter []*HStreamExporter
 	HttpServer      []*HttpServer
+	ElasticSearch   []*ElasticSearch
+	Kibana          []*Kibana
+	Filebeat        []*Filebeat
 }
 
 func NewServices(c spec.ComponentsSpec) (*Services, error) {
@@ -162,6 +165,21 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		grafana = append(grafana, NewGrafana(v, c.Monitor.GrafanaDisableLogin))
 	}
 
+	elasticSearch := make([]*ElasticSearch, 0, len(c.ElasticSearch))
+	for _, v := range c.ElasticSearch {
+		elasticSearch = append(elasticSearch, NewElasticSearch(v, c.Monitor.ElasticDisableSecurity))
+	}
+
+	kibana := make([]*Kibana, 0, len(c.Kibana))
+	for _, v := range c.Kibana {
+		kibana = append(kibana, NewKibana(v))
+	}
+
+	filebeat := make([]*Filebeat, 0, len(c.Filebeat))
+	for _, v := range c.Filebeat {
+		filebeat = append(filebeat, NewFilebeat(v))
+	}
+
 	globalCtx, err := newGlobalCtx(c, hosts)
 	if err != nil {
 		return nil, err
@@ -201,6 +219,9 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		AlertManager:    alertManager,
 		HStreamExporter: hstreamExporter,
 		HttpServer:      httpServer,
+		ElasticSearch:   elasticSearch,
+		Kibana:          kibana,
+		Filebeat:        filebeat,
 	}, nil
 }
 

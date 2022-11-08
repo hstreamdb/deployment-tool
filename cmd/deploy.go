@@ -30,14 +30,14 @@ func newDeploy() *cobra.Command {
 		Use:   "start",
 		Short: "Deploy a HStreamDB Cluster.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			contant, err := os.ReadFile(opts.configPath)
+			contents, err := os.ReadFile(opts.configPath)
 			log.Debugf("opts: %+v\n", opts)
 			if err != nil {
 				return err
 			}
 
 			config := spec.ComponentsSpec{}
-			if err = yaml.Unmarshal(contant, &config); err != nil {
+			if err = yaml.Unmarshal(contents, &config); err != nil {
 				return err
 			}
 			services, err = service.NewServices(config)

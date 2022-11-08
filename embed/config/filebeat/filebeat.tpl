@@ -18,7 +18,7 @@ processors:
       overwrite_keys: true
 
 output.elasticsearch:
-  hosts: [{{ ".ElasticsearchHost:.ElasticsearchPort" }}]
+  hosts: ["{{ .ElasticsearchHost }}:{{ .ElasticsearchPort }}"]
   indices:
     - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 

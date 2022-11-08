@@ -163,17 +163,10 @@ func (fb *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (fb *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	cfg := config.FilebeatConfig{
-		FilebeatHost:      fb.spec.Host,
-		ElasticsearchHost: fb.ElasticsearchHost,
-		ElasticsearchPort: fb.ElasticsearchPort,
-	}
-	cfgPath, _ := cfg.GenConfig()
-
 	mountPoints := []spec.MountPoints{
 		{"/var/lib/docker", "/var/lib/docker:ro"},
 		{"/var/run/docker.sock", "/var/run/docker.sock"},
-		{cfgPath, "/usr/share/filebeat/filebeat.yml"},
+		{filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, fb.spec.ContainerCfg, fb.ContainerName, true, mountPoints...)
 	args = append(args, fb.spec.Image)

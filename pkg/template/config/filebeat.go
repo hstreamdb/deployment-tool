@@ -31,6 +31,6 @@ func (fbCfg *FilebeatConfig) GenConfig() (string, error) {
 		return "", err
 	}
 
-	path = filepath.Join("config", "filebeat", "filebeat.yml")
+	path = filepath.Join("template", "filebeat", "filebeat.yml")
 	return path, os.WriteFile(path, content.Bytes(), 0664)
 }

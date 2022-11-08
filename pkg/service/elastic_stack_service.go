@@ -1,9 +1,12 @@
 package service
 
 import (
+	"fmt"
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -20,8 +23,10 @@ type Kibana struct {
 }
 
 type Filebeat struct {
-	spec          spec.FilebeatSpec
-	ContainerName string
+	spec              spec.FilebeatSpec
+	ContainerName     string
+	ElasticsearchHost string
+	ElasticsearchPort string
 }
 
 func NewElasticSearch(esSpec spec.ElasticSearchSpec) *ElasticSearch {
@@ -126,10 +131,12 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	return nil
 }
 
-func NewFilebeat(fbSpec spec.FilebeatSpec) *Filebeat {
+func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort string) *Filebeat {
 	return &Filebeat{
-		spec:          fbSpec,
-		ContainerName: spec.FilebeatDefaultContainerName,
+		spec:              fbSpec,
+		ContainerName:     spec.FilebeatDefaultContainerName,
+		ElasticsearchHost: elasticsearchHost,
+		ElasticsearchPort: elasticsearchPort,
 	}
 }
 func (fb *Filebeat) GetServiceName() string {
@@ -160,9 +167,6 @@ func (fb *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{"/var/lib/docker", "/var/lib/docker:ro"},
 		{"/var/run/docker.sock", "/var/run/docker.sock"},
 	}
-	if fb.spec.LocalCfgPath != "" {
-		mountPoints = append(mountPoints, spec.MountPoints{Local: fb.spec.LocalCfgPath, Remote: "/usr/share/filebeat/filebeat.yml"})
-	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, fb.spec.ContainerCfg, fb.ContainerName, true, mountPoints...)
 	args = append(args, fb.spec.Image)
 	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}
@@ -175,11 +179,18 @@ func (fb *Filebeat) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (fb *Filebeat) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	localCfg := fb.spec.LocalCfgPath
-	if localCfg == "" {
-		return nil
+	cfg := config.FilebeatConfig{
+		FilebeatHost:      fb.spec.Host,
+		ElasticsearchHost: fb.ElasticsearchHost,
+		ElasticsearchPort: fb.ElasticsearchPort,
 	}
-	position := utils.ScpDir(fb.spec.LocalCfgPath, fb.spec.RemoteCfgPath)
+	genCfg, err := cfg.GenConfig()
+	if err != nil {
+		panic(fmt.Errorf("gen FilebeatConfig error: %s", err.Error()))
+	}
+
+	position := utils.ScpDir(filepath.Dir(genCfg), fb.spec.RemoteCfgPath)
+
 	return &executor.TransferCtx{
 		Target: fb.spec.Host, Position: position,
 	}

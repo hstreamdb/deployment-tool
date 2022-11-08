@@ -40,7 +40,6 @@ type FilebeatSpec struct {
 	Host          string       `yaml:"host"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Image         string       `yaml:"image"`
-	LocalCfgPath  string       `yaml:"local_cfg_path"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }

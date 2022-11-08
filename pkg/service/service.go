@@ -9,6 +9,7 @@ import (
 	"golang.org/x/exp/slices"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -176,8 +177,10 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	}
 
 	filebeat := make([]*Filebeat, 0, len(c.Filebeat))
-	for _, v := range c.Filebeat {
-		filebeat = append(filebeat, NewFilebeat(v))
+	if len(elasticSearch) != 0 {
+		for _, v := range c.Filebeat {
+			filebeat = append(filebeat, NewFilebeat(v, elasticSearch[0].spec.Host, strconv.Itoa(elasticSearch[0].spec.Port)))
+		}
 	}
 
 	globalCtx, err := newGlobalCtx(c, hosts)

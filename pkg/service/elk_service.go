@@ -147,7 +147,7 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 	genCfg, err := cfg.GenConfig()
 	if err != nil {
-		panic(fmt.Errorf("gen FilebeatConfig error: %s", err.Error()))
+		panic(fmt.Errorf("gen KibanaConfig error: %s", err.Error()))
 	}
 	position := []executor.Position{
 		{LocalDir: genCfg, RemoteDir: filepath.Join(k.spec.RemoteCfgPath, "kibana.yml")},

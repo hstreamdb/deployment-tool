@@ -22,7 +22,7 @@ func NewElasticSearch(esSpec spec.ElasticSearchSpec) *ElasticSearch {
 		spec:          esSpec,
 		ContainerName: spec.ElasticSearchDefaultContainerName,
 		// FIXME: currently, only support `xpack.security.enabled=false`
-		DisableSecurity: false,
+		DisableSecurity: true,
 	}
 }
 
@@ -50,15 +50,13 @@ func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	mountPoints := []spec.MountPoints{
-		{es.spec.DataDir, "/usr/share/elasticsearch/data"},
-	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true)
 	if es.DisableSecurity {
 		args = append(args, "-e xpack.security.enabled=false")
+		args = append(args, "-e xpack.security.http.ssl.enabled=false")
 	}
-	args = append(args, fmt.Sprintf("-e server.host='%s'", es.spec.Host))
-	args = append(args, fmt.Sprintf("-e server.port='%s'", strconv.Itoa(es.spec.Port)))
+	args = append(args, fmt.Sprintf("-e network.host='%s'", es.spec.Host))
+	args = append(args, fmt.Sprintf("-e http.port='%s'", strconv.Itoa(es.spec.Port)))
 	args = append(args, "-e discovery.type=single-node")
 	args = append(args, es.spec.Image)
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}

@@ -165,14 +165,18 @@ type Filebeat struct {
 	ContainerName     string
 	ElasticsearchHost string
 	ElasticsearchPort string
+	KibanaHost        string
+	KibanaPort        string
 }
 
-func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort string) *Filebeat {
+func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort, kibanaHost, kibanaPort string) *Filebeat {
 	return &Filebeat{
 		spec:              fbSpec,
 		ContainerName:     spec.FilebeatDefaultContainerName,
 		ElasticsearchHost: elasticsearchHost,
 		ElasticsearchPort: elasticsearchPort,
+		KibanaHost:        kibanaHost,
+		KibanaPort:        kibanaPort,
 	}
 }
 func (f *Filebeat) GetServiceName() string {
@@ -198,15 +202,20 @@ func (f *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (f *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+func (fb *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/var/lib/docker/containers", "/var/lib/docker/containers:ro"},
 		{"/var/run/docker.sock", "/var/run/docker.sock:ro"},
-		{filepath.Join(f.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
+		{filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, f.spec.ContainerCfg, f.ContainerName, true, mountPoints...)
-	args = append(args, f.spec.Image)
-	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, fb.spec.ContainerCfg, fb.ContainerName, true, mountPoints...)
+	args = append(args, "--restart=always")
+
+	args = append(args, fb.spec.Image)
+	args = append(args, "setup")
+	args = append(args, fmt.Sprintf("-E setup.kibana.host=%s:%s", fb.KibanaHost, fb.KibanaPort))
+	args = append(args, fmt.Sprintf("-E output.elasticsearch.hosts=[\"%s:%s\"]", fb.ElasticsearchHost, fb.ElasticsearchPort))
+	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
 func (f *Filebeat) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {

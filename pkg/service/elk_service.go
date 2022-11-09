@@ -209,10 +209,12 @@ func (fb *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, fb.spec.ContainerCfg, fb.ContainerName, true, mountPoints...)
-	args = append(args, "--restart=always")
+	args = append(args, "--user=root")
 
 	args = append(args, fb.spec.Image)
-	args = append(args, "setup")
+	args = append(args, "filebeat")
+	args = append(args, "-e")
+	args = append(args, "--strict.perms=false")
 	args = append(args, fmt.Sprintf("-E setup.kibana.host=%s:%s", fb.KibanaHost, fb.KibanaPort))
 	args = append(args, fmt.Sprintf("-E output.elasticsearch.hosts=[\"%s:%s\"]", fb.ElasticsearchHost, fb.ElasticsearchPort))
 	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}

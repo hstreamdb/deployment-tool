@@ -46,9 +46,11 @@ type GlobalCtx struct {
 	LocalHStoreConfigFile string
 	// the origin server config file in local
 	LocalHServerConfigFile string
-	HadminAddress          []string
-	HStreamServerUrls      string
-	HttpServerUrls         []string
+	// the origin elastic search config file in local
+	LocalEsConfigFile string
+	HadminAddress     []string
+	HStreamServerUrls string
+	HttpServerUrls    []string
 }
 
 func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
@@ -89,6 +91,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		LocalMetaStoreConfigFile: c.Global.MetaStoreConfigPath,
 		LocalHStoreConfigFile:    c.Global.HStoreConfigPath,
 		LocalHServerConfigFile:   c.Global.HServerConfigPath,
+		LocalEsConfigFile:        c.Global.EsConfigPath,
 		HadminAddress:            admins,
 		HStreamServerUrls:        hserverUrl,
 		HttpServerUrls:           httpServerUrl,

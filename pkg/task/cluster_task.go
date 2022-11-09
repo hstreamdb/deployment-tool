@@ -31,6 +31,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(SetUpHServerCluster)
 	ctx.run(CheckClusterStatus)
 	ctx.run(SetUpHttpServerService)
+
 	if len(services.Prometheus) != 0 {
 		ctx.run(SetUpHStreamMonitorStack)
 		ctx.run(SetUpHStreamExporterService)
@@ -49,17 +50,18 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 
 func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
+	if len(services.Filebeat) != 0 {
+		ctx.run(RemoveFilebeat)
+		ctx.run(RemoveKibana)
+		ctx.run(RemoveElasticSearch)
+	}
+
 	if len(services.Prometheus) != 0 {
 		ctx.run(RemoveAlertService)
 		ctx.run(RemoveGrafanaService)
 		ctx.run(RemovePrometheusService)
 		ctx.run(RemoveHStreamExporterService)
 		ctx.run(RemoveHStreamMonitorStack)
-	}
-	if len(services.Filebeat) != 0 {
-		ctx.run(RemoveFilebeat)
-		ctx.run(RemoveKibana)
-		ctx.run(RemoveElasticSearch)
 	}
 
 	ctx.run(RemoveHttpServerService)

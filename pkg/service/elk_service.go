@@ -17,18 +17,6 @@ type ElasticSearch struct {
 	DisableSecurity bool
 }
 
-type Kibana struct {
-	spec          spec.KibanaSpec
-	ContainerName string
-}
-
-type Filebeat struct {
-	spec              spec.FilebeatSpec
-	ContainerName     string
-	ElasticsearchHost string
-	ElasticsearchPort string
-}
-
 func NewElasticSearch(esSpec spec.ElasticSearchSpec) *ElasticSearch {
 	return &ElasticSearch{
 		spec:          esSpec,
@@ -85,6 +73,11 @@ func (es *ElasticSearch) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx 
 	return nil
 }
 
+type Kibana struct {
+	spec          spec.KibanaSpec
+	ContainerName string
+}
+
 func NewKibana(kibanaSpec spec.KibanaSpec) *Kibana {
 	return &Kibana{
 		spec:          kibanaSpec,
@@ -129,6 +122,13 @@ func (k *Kibana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	return nil
+}
+
+type Filebeat struct {
+	spec              spec.FilebeatSpec
+	ContainerName     string
+	ElasticsearchHost string
+	ElasticsearchPort string
 }
 
 func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort string) *Filebeat {
@@ -189,8 +189,9 @@ func (fb *Filebeat) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	if err != nil {
 		panic(fmt.Errorf("gen FilebeatConfig error: %s", err.Error()))
 	}
-
-	position := utils.ScpDir(filepath.Dir(genCfg), fb.spec.RemoteCfgPath)
+	position := []executor.Position{
+		{LocalDir: genCfg, RemoteDir: filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml")},
+	}
 
 	return &executor.TransferCtx{
 		Target: fb.spec.Host, Position: position,

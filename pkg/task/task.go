@@ -108,7 +108,7 @@ type initEnvTask[S service.Service] struct {
 }
 
 func (i *initEnvTask[S]) String() string {
-	return fmt.Sprintf("Task: init %s environment\n", i.serviceName)
+	return fmt.Sprintf("Task: init %s environment", i.serviceName)
 }
 
 func (i *initEnvTask[S]) Run(executor ext.Executor) error {
@@ -122,7 +122,7 @@ type configSyncTask[S service.Service] struct {
 }
 
 func (c *configSyncTask[S]) String() string {
-	return fmt.Sprintf("Task: sync %s config\n", c.serviceName)
+	return fmt.Sprintf("Task: sync %s config", c.serviceName)
 }
 
 func (c *configSyncTask[S]) Run(executor ext.Executor) error {
@@ -136,7 +136,7 @@ type serviceDeployTask[S service.Service] struct {
 }
 
 func (s *serviceDeployTask[S]) String() string {
-	return fmt.Sprintf("Task: start %s cluster\n", s.serviceName)
+	return fmt.Sprintf("Task: start %s cluster", s.serviceName)
 }
 
 func (s *serviceDeployTask[S]) Run(executor ext.Executor) error {
@@ -150,7 +150,7 @@ type removeServiceTask[S service.Service] struct {
 }
 
 func (r *removeServiceTask[S]) String() string {
-	return fmt.Sprintf("Task: remove %s\n", r.serviceName)
+	return fmt.Sprintf("Task: remove %s", r.serviceName)
 }
 
 func (r *removeServiceTask[S]) Run(executor ext.Executor) error {

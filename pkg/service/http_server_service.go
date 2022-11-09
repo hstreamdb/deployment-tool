@@ -38,7 +38,7 @@ func (h *HttpServer) Display() map[string]utils.DisplayedComponent {
 
 func (h *HttpServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

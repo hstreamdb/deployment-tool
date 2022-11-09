@@ -46,7 +46,7 @@ func (es *ElasticSearch) Display() map[string]utils.DisplayedComponent {
 
 func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := es.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -119,7 +119,7 @@ func (k *Kibana) Display() map[string]utils.DisplayedComponent {
 
 func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := k.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -177,7 +177,7 @@ func (f *Filebeat) Display() map[string]utils.DisplayedComponent {
 
 func (f *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := f.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
 	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

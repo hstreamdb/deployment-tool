@@ -179,6 +179,7 @@ type GlobalCfg struct {
 	HStoreConfigPath           string       `yaml:"hstore_config_path"`
 	HServerConfigPath          string       `yaml:"hserver_config_path"`
 	DisableStoreNetworkCfgPath bool         `yaml:"disable_store_network_config_path"`
+	EsConfigPath               string       `yaml:"elastic_search_config_path"`
 	ContainerCfg               ContainerCfg `yaml:"container_config"`
 }
 

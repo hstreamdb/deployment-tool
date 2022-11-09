@@ -6,6 +6,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -30,10 +31,6 @@ func (es *ElasticSearch) GetServiceName() string {
 	return "elasticsearch"
 }
 
-func (es *ElasticSearch) getDirs() (string, string) {
-	return es.spec.RemoteCfgPath, es.spec.DataDir
-}
-
 func (es *ElasticSearch) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := es.getDirs()
 	elasticsearch := utils.DisplayedComponent{
@@ -54,7 +51,15 @@ func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true)
+	mountPoints := []spec.MountPoints{
+		{es.spec.DataDir, "/usr/share/elasticsearch/data"},
+	}
+	if len(globalCtx.LocalEsConfigFile) != 0 {
+		mountPoints = append(mountPoints, spec.MountPoints{
+			Local:  path.Join(es.spec.RemoteCfgPath, "elasticsearch.yml"),
+			Remote: "/usr/share/elasticsearch/config/elasticsearch.yml"})
+	}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true, mountPoints...)
 	if es.DisableSecurity {
 		args = append(args, "-e xpack.security.enabled=false")
 	}
@@ -70,7 +75,17 @@ func (es *ElasticSearch) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (es *ElasticSearch) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	if len(globalCtx.LocalEsConfigFile) != 0 {
+		position := []executor.Position{
+			{LocalDir: globalCtx.LocalEsConfigFile, RemoteDir: es.spec.RemoteCfgPath},
+		}
+		return &executor.TransferCtx{Target: es.spec.Host, Position: position}
+	}
 	return nil
+}
+
+func (es *ElasticSearch) getDirs() (string, string) {
+	return es.spec.RemoteCfgPath, es.spec.DataDir
 }
 
 type Kibana struct {
@@ -103,8 +118,8 @@ func (k *Kibana) Display() map[string]utils.DisplayedComponent {
 }
 
 func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	cfgDir := k.spec.RemoteCfgPath
-	args := append([]string{}, "sudo mkdir -p", cfgDir)
+	cfgDir, dataDir := k.getDirs()
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -116,12 +131,16 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (k *Kibana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", k.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", k.spec.RemoteCfgPath)
+	args = append(args, "&&", "sudo rm -rf", k.spec.RemoteCfgPath, k.spec.DataDir)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
 func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	return nil
+}
+
+func (k *Kibana) getDirs() (string, string) {
+	return k.spec.RemoteCfgPath, k.spec.DataDir
 }
 
 type Filebeat struct {
@@ -139,61 +158,65 @@ func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort 
 		ElasticsearchPort: elasticsearchPort,
 	}
 }
-func (fb *Filebeat) GetServiceName() string {
+func (f *Filebeat) GetServiceName() string {
 	return "filebeat"
 }
 
-func (fb *Filebeat) Display() map[string]utils.DisplayedComponent {
-	cfgDir := fb.spec.RemoteCfgPath
+func (f *Filebeat) Display() map[string]utils.DisplayedComponent {
+	cfgDir := f.spec.RemoteCfgPath
 	kibana := utils.DisplayedComponent{
 		Name:          "Filebeat",
-		Host:          fb.spec.Host,
+		Host:          f.spec.Host,
 		Ports:         "",
-		ContainerName: fb.ContainerName,
-		Image:         fb.spec.Image,
+		ContainerName: f.ContainerName,
+		Image:         f.spec.Image,
 		Paths:         strings.Join([]string{cfgDir}, ","),
 	}
 	return map[string]utils.DisplayedComponent{"filebeat": kibana}
 }
 
-func (fb *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	cfgDir := fb.spec.RemoteCfgPath
-	args := append([]string{}, "sudo mkdir -p", cfgDir)
-	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}
+func (f *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	cfgDir, dataDir := f.getDirs()
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir)
+	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (fb *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+func (f *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
-		{"/var/lib/docker", "/var/lib/docker:ro"},
-		{"/var/run/docker.sock", "/var/run/docker.sock"},
-		{filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml"},
+		{"/var/lib/docker/containers", "/var/lib/docker/containers:ro"},
+		{"/var/run/docker.sock", "/var/run/docker.sock:ro"},
+		{filepath.Join(f.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, fb.spec.ContainerCfg, fb.ContainerName, true, mountPoints...)
-	args = append(args, fb.spec.Image)
-	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, f.spec.ContainerCfg, f.ContainerName, true, mountPoints...)
+	args = append(args, f.spec.Image)
+	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (fb *Filebeat) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := []string{"docker rm -f", fb.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", fb.spec.RemoteCfgPath)
-	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}
+func (f *Filebeat) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", f.ContainerName}
+	args = append(args, "&&", "sudo rm -rf", f.spec.RemoteCfgPath, f.spec.DataDir)
+	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (fb *Filebeat) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+func (f *Filebeat) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	cfg := config.FilebeatConfig{
-		FilebeatHost:      fb.spec.Host,
-		ElasticsearchHost: fb.ElasticsearchHost,
-		ElasticsearchPort: fb.ElasticsearchPort,
+		FilebeatHost:      f.spec.Host,
+		ElasticsearchHost: f.ElasticsearchHost,
+		ElasticsearchPort: f.ElasticsearchPort,
 	}
 	genCfg, err := cfg.GenConfig()
 	if err != nil {
 		panic(fmt.Errorf("gen FilebeatConfig error: %s", err.Error()))
 	}
 	position := []executor.Position{
-		{LocalDir: genCfg, RemoteDir: filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml")},
+		{LocalDir: genCfg, RemoteDir: filepath.Join(f.spec.RemoteCfgPath, "filebeat.yml")},
 	}
 
 	return &executor.TransferCtx{
-		Target: fb.spec.Host, Position: position,
+		Target: f.spec.Host, Position: position,
 	}
+}
+
+func (f *Filebeat) getDirs() (string, string) {
+	return f.spec.RemoteCfgPath, f.spec.DataDir
 }

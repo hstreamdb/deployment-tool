@@ -17,6 +17,8 @@ global:
   # disable_store_network_config_path: true
   # # Local path to HServer config file
   # hserver_config_path: ""
+  # # Local path to ElasticSearch config file
+  # elastic_search_config_path: ""
   # # Global container configuration
   # container_config:
     # cpu_limit: 200
@@ -338,7 +340,7 @@ elasticsearch:
   - host: 10.1.0.15
   # port: 5601
   # # Elasticsearch docker image
-  # image: "docker.elastic.co/elasticsearch/elasticsearch:8.4.3"
+  # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
   # # Elasticsearch container configuration
   # container_config:
     # cpu_limit: 200
@@ -350,7 +352,7 @@ kibana:
   - host: 10.1.0.15
   # port: 9200
   # # Kibana docker image
-  # image: "docker.elastic.co/kibana/kibana:8.4.3"
+  # image: "docker.elastic.co/kibana/kibana:8.5.0"
   # # Kibana container configuration
   # container_config:
     # cpu_limit: 200
@@ -362,7 +364,7 @@ filebeat:
   # # The ip address of Filebeats
   - host: 10.1.0.10
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat:8.4.3"
+    # image: "docker.elastic.co/beats/filebeat:8.5.0"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
     # # Filebeat container configuration
@@ -373,7 +375,7 @@ filebeat:
       # remove_when_exit: true
   - host: 10.1.0.11
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat:8.4.3"
+    # image: "docker.elastic.co/beats/filebeat:8.5.0"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
     # # Filebeat container configuration
@@ -384,7 +386,7 @@ filebeat:
       # remove_when_exit: true
   - host: 10.1.0.12
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat:8.4.3"
+    # image: "docker.elastic.co/beats/filebeat:8.5.0"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
     # # Filebeat container configuration

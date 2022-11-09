@@ -49,7 +49,7 @@ func (h *HServer) Display() map[string]utils.DisplayedComponent {
 
 func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script")
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

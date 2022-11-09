@@ -53,7 +53,7 @@ func (m *MetaStore) Display() map[string]utils.DisplayedComponent {
 
 func (m *MetaStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := m.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script")
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

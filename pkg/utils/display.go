@@ -24,7 +24,8 @@ type DisplayedComponent struct {
 
 func ShowComponents(mp map[string][]DisplayedComponent) {
 	componentsArr := []string{"metaStore", "hstore", "hserver", "httpServer", "nodeExporter",
-		"cadVisor", "hstreamExporter", "prometheus", "grafana", "alertManager"}
+		"cadVisor", "hstreamExporter", "prometheus", "grafana", "alertManager", "elasticsearch",
+		"kibana", "filebeat"}
 	header := []string{"Component", "Host", "Ports", "Image", "ContainerName", "Dirs"}
 
 	data := make([][]string, 0, len(componentsArr))

@@ -135,8 +135,9 @@ func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	position := []executor.Position{
 		{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)},
 	}
-	if len(globalCtx.LocalHServerConfigFile) != 0 {
-		position = append(position, executor.Position{LocalDir: globalCtx.LocalHServerConfigFile, RemoteDir: cfgDir})
+
+	if len(globalCtx.LocalMetaStoreConfigFile) != 0 {
+		position = append(position, executor.Position{LocalDir: globalCtx.LocalMetaStoreConfigFile, RemoteDir: cfgDir})
 	}
 
 	return &executor.TransferCtx{

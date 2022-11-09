@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/hstreamdb/deployment-tool/embed"
 	"os"
 	"path/filepath"
@@ -14,7 +15,7 @@ type FilebeatConfig struct {
 	ElasticsearchPort string
 }
 
-func (fbCfg *FilebeatConfig) GenConfig() (string, error) {
+func (f *FilebeatConfig) GenConfig() (string, error) {
 	path := filepath.Join("config", "filebeat", "filebeat.tpl")
 	cfg, err := embed.ReadConfig(path)
 	if err != nil {
@@ -27,10 +28,10 @@ func (fbCfg *FilebeatConfig) GenConfig() (string, error) {
 	}
 
 	content := bytes.NewBufferString("")
-	if err = tpl.Execute(content, fbCfg); err != nil {
+	if err = tpl.Execute(content, f); err != nil {
 		return "", err
 	}
 
-	path = filepath.Join("template", "filebeat", "filebeat.yml")
+	path = filepath.Join("template", "filebeat", fmt.Sprintf("filebeat_%s_filebeat.yml", f.FilebeatHost))
 	return path, os.WriteFile(path, content.Bytes(), 0664)
 }

@@ -27,6 +27,18 @@ type ElasticSearchSpec struct {
 	ElasticDisableSecurity bool         `yaml:"elastic_disable_security"`
 }
 
+func (es *ElasticSearchSpec) SetDefaultDataDir() {
+	es.DataDir = ElasticSearchDefaultDataDir
+}
+
+func (es *ElasticSearchSpec) SetDefaultRemoteCfgPath() {
+	es.RemoteCfgPath = ElasticSearchDefaultCfgDir
+}
+
+func (es *ElasticSearchSpec) SetDefaultImage() {
+	es.Image = ElasticSearchDefaultImage
+}
+
 type KibanaSpec struct {
 	Host          string       `yaml:"host"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
@@ -34,6 +46,17 @@ type KibanaSpec struct {
 	Image         string       `yaml:"image"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (k *KibanaSpec) SetDefaultDataDir() {
+}
+
+func (k *KibanaSpec) SetDefaultImage() {
+	k.Image = KibanaDefaultImage
+}
+
+func (k *KibanaSpec) SetDefaultRemoteCfgPath() {
+	k.RemoteCfgPath = KibanaDefaultCfgDir
 }
 
 type FilebeatSpec struct {
@@ -44,14 +67,6 @@ type FilebeatSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (es *ElasticSearchSpec) SetDefaultDataDir() {
-	es.DataDir = ElasticSearchDefaultDataDir
-}
-
-func (es *ElasticSearchSpec) SetDefaultRemoteCfgPath() {
-	es.RemoteCfgPath = ElasticSearchDefaultCfgDir
-}
-
 func (fb *FilebeatSpec) SetDefaultRemoteCfgPath() {
 	fb.RemoteCfgPath = FilebeatDefaultCfgDir
 }
@@ -59,21 +74,6 @@ func (fb *FilebeatSpec) SetDefaultRemoteCfgPath() {
 func (fb *FilebeatSpec) SetDefaultDataDir() {
 }
 
-func (k *KibanaSpec) SetDefaultDataDir() {
-}
-
-func (k *KibanaSpec) SetDefaultImage() {
-	k.Image = KibanaDefaultImage
-}
-
 func (fb *FilebeatSpec) SetDefaultImage() {
 	fb.Image = FilebeatDefaultImage
-}
-
-func (es *ElasticSearchSpec) SetDefaultImage() {
-	es.Image = ElasticSearchDefaultImage
-}
-
-func (k *KibanaSpec) SetDefaultRemoteCfgPath() {
-	k.RemoteCfgPath = KibanaDefaultCfgDir
 }

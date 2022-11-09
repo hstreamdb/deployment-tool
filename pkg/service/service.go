@@ -175,8 +175,10 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	}
 
 	kibana := make([]*Kibana, 0, len(c.Kibana))
-	for _, v := range c.Kibana {
-		kibana = append(kibana, NewKibana(v))
+	if len(elasticSearch) != 0 {
+		for _, v := range c.Kibana {
+			kibana = append(kibana, NewKibana(v, elasticSearch[0].spec.Host, elasticSearch[0].spec.Port))
+		}
 	}
 
 	filebeat := make([]*Filebeat, 0, len(c.Filebeat))

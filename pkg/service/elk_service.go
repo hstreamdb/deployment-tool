@@ -6,7 +6,6 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
-	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -54,15 +53,12 @@ func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{es.spec.DataDir, "/usr/share/elasticsearch/data"},
 	}
-	if len(globalCtx.LocalEsConfigFile) != 0 {
-		mountPoints = append(mountPoints, spec.MountPoints{
-			Local:  path.Join(es.spec.RemoteCfgPath, "elasticsearch.yml"),
-			Remote: "/usr/share/elasticsearch/config/elasticsearch.yml"})
-	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true, mountPoints...)
 	if es.DisableSecurity {
 		args = append(args, "-e xpack.security.enabled=false")
 	}
+	args = append(args, fmt.Sprintf("-e server.host='%s'", es.spec.Host))
+	args = append(args, fmt.Sprintf("-e server.port='%s'", strconv.Itoa(es.spec.Port)))
 	args = append(args, "-e discovery.type=single-node")
 	args = append(args, es.spec.Image)
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
@@ -89,14 +85,18 @@ func (es *ElasticSearch) getDirs() (string, string) {
 }
 
 type Kibana struct {
-	spec          spec.KibanaSpec
-	ContainerName string
+	spec              spec.KibanaSpec
+	ContainerName     string
+	ElasticSearchHost string
+	ElasticSearchPort int
 }
 
-func NewKibana(kibanaSpec spec.KibanaSpec) *Kibana {
+func NewKibana(kibanaSpec spec.KibanaSpec, elasticSearchHost string, elasticSearchPort int) *Kibana {
 	return &Kibana{
-		spec:          kibanaSpec,
-		ContainerName: spec.KibanaDefaultContainerName,
+		spec:              kibanaSpec,
+		ContainerName:     spec.KibanaDefaultContainerName,
+		ElasticSearchHost: elasticSearchHost,
+		ElasticSearchPort: elasticSearchPort,
 	}
 }
 
@@ -124,7 +124,10 @@ func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true)
+	mountPoints := []spec.MountPoints{
+		{filepath.Join(k.spec.RemoteCfgPath, "kibana.yml"), "/usr/share/kibana/config/kibana.yml"},
+	}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true, mountPoints...)
 	args = append(args, k.spec.Image)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -136,7 +139,23 @@ func (k *Kibana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	return nil
+	cfg := config.KibanaConfig{
+		KibanaHost:        k.spec.Host,
+		KibanaPort:        strconv.Itoa(k.spec.Port),
+		ElasticSearchHost: k.ElasticSearchHost,
+		ElasticSearchPort: strconv.Itoa(k.ElasticSearchPort),
+	}
+	genCfg, err := cfg.GenConfig()
+	if err != nil {
+		panic(fmt.Errorf("gen FilebeatConfig error: %s", err.Error()))
+	}
+	position := []executor.Position{
+		{LocalDir: genCfg, RemoteDir: filepath.Join(k.spec.RemoteCfgPath, "kibana.yml")},
+	}
+
+	return &executor.TransferCtx{
+		Target: k.spec.Host, Position: position,
+	}
 }
 
 func (k *Kibana) getDirs() (string, string) {

@@ -6,7 +6,6 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
-	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -23,7 +22,7 @@ func NewElasticSearch(esSpec spec.ElasticSearchSpec) *ElasticSearch {
 		spec:          esSpec,
 		ContainerName: spec.ElasticSearchDefaultContainerName,
 		// FIXME: currently, only support `xpack.security.enabled=false`
-		DisableSecurity: false,
+		DisableSecurity: true,
 	}
 }
 
@@ -51,18 +50,13 @@ func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	mountPoints := []spec.MountPoints{
-		{es.spec.DataDir, "/usr/share/elasticsearch/data"},
-	}
-	if len(globalCtx.LocalEsConfigFile) != 0 {
-		mountPoints = append(mountPoints, spec.MountPoints{
-			Local:  path.Join(es.spec.RemoteCfgPath, "elasticsearch.yml"),
-			Remote: "/usr/share/elasticsearch/config/elasticsearch.yml"})
-	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true)
 	if es.DisableSecurity {
 		args = append(args, "-e xpack.security.enabled=false")
+		args = append(args, "-e xpack.security.http.ssl.enabled=false")
 	}
+	args = append(args, fmt.Sprintf("-e network.host='%s'", es.spec.Host))
+	args = append(args, fmt.Sprintf("-e http.port='%s'", strconv.Itoa(es.spec.Port)))
 	args = append(args, "-e discovery.type=single-node")
 	args = append(args, es.spec.Image)
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
@@ -89,14 +83,18 @@ func (es *ElasticSearch) getDirs() (string, string) {
 }
 
 type Kibana struct {
-	spec          spec.KibanaSpec
-	ContainerName string
+	spec              spec.KibanaSpec
+	ContainerName     string
+	ElasticSearchHost string
+	ElasticSearchPort int
 }
 
-func NewKibana(kibanaSpec spec.KibanaSpec) *Kibana {
+func NewKibana(kibanaSpec spec.KibanaSpec, elasticSearchHost string, elasticSearchPort int) *Kibana {
 	return &Kibana{
-		spec:          kibanaSpec,
-		ContainerName: spec.KibanaDefaultContainerName,
+		spec:              kibanaSpec,
+		ContainerName:     spec.KibanaDefaultContainerName,
+		ElasticSearchHost: elasticSearchHost,
+		ElasticSearchPort: elasticSearchPort,
 	}
 }
 
@@ -124,7 +122,10 @@ func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true)
+	mountPoints := []spec.MountPoints{
+		{filepath.Join(k.spec.RemoteCfgPath, "kibana.yml"), "/usr/share/kibana/config/kibana.yml"},
+	}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true, mountPoints...)
 	args = append(args, k.spec.Image)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -136,7 +137,23 @@ func (k *Kibana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	return nil
+	cfg := config.KibanaConfig{
+		KibanaHost:        k.spec.Host,
+		KibanaPort:        strconv.Itoa(k.spec.Port),
+		ElasticSearchHost: k.ElasticSearchHost,
+		ElasticSearchPort: strconv.Itoa(k.ElasticSearchPort),
+	}
+	genCfg, err := cfg.GenConfig()
+	if err != nil {
+		panic(fmt.Errorf("gen KibanaConfig error: %s", err.Error()))
+	}
+	position := []executor.Position{
+		{LocalDir: genCfg, RemoteDir: filepath.Join(k.spec.RemoteCfgPath, "kibana.yml")},
+	}
+
+	return &executor.TransferCtx{
+		Target: k.spec.Host, Position: position,
+	}
 }
 
 func (k *Kibana) getDirs() (string, string) {
@@ -148,14 +165,18 @@ type Filebeat struct {
 	ContainerName     string
 	ElasticsearchHost string
 	ElasticsearchPort string
+	KibanaHost        string
+	KibanaPort        string
 }
 
-func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort string) *Filebeat {
+func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort, kibanaHost, kibanaPort string) *Filebeat {
 	return &Filebeat{
 		spec:              fbSpec,
 		ContainerName:     spec.FilebeatDefaultContainerName,
 		ElasticsearchHost: elasticsearchHost,
 		ElasticsearchPort: elasticsearchPort,
+		KibanaHost:        kibanaHost,
+		KibanaPort:        kibanaPort,
 	}
 }
 func (f *Filebeat) GetServiceName() string {
@@ -181,15 +202,22 @@ func (f *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (f *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+func (fb *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/var/lib/docker/containers", "/var/lib/docker/containers:ro"},
 		{"/var/run/docker.sock", "/var/run/docker.sock:ro"},
-		{filepath.Join(f.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
+		{filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, f.spec.ContainerCfg, f.ContainerName, true, mountPoints...)
-	args = append(args, f.spec.Image)
-	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, fb.spec.ContainerCfg, fb.ContainerName, true, mountPoints...)
+	args = append(args, "--user=root")
+
+	args = append(args, fb.spec.Image)
+	args = append(args, "filebeat")
+	args = append(args, "-e")
+	args = append(args, "--strict.perms=false")
+	args = append(args, fmt.Sprintf("-E setup.kibana.host=%s:%s", fb.KibanaHost, fb.KibanaPort))
+	args = append(args, fmt.Sprintf("-E output.elasticsearch.hosts=[\"%s:%s\"]", fb.ElasticsearchHost, fb.ElasticsearchPort))
+	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
 func (f *Filebeat) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {

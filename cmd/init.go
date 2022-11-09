@@ -23,6 +23,7 @@ func newInit() *cobra.Command {
 				{Path: "template/grafana/datasources", Perm: 0755},
 				{Path: "template/alertmanager", Perm: 0755},
 				{Path: "template/filebeat", Perm: 0755},
+				{Path: "template/kibana", Perm: 0755},
 			}); err != nil {
 				return err
 			}

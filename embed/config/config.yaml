@@ -351,6 +351,8 @@ elasticsearch:
 kibana:
   - host: 10.1.0.15
   # port: 9200
+  # # Kibana saved objects provisioning template
+  # provisioning_template: "export"
   # # Kibana docker image
   # image: "docker.elastic.co/kibana/kibana:8.5.0"
   # # Kibana container configuration

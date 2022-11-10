@@ -41,13 +41,14 @@ func (es *ElasticSearchSpec) SetDefaultImage() {
 }
 
 type KibanaSpec struct {
-	Host          string       `yaml:"host"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Port          int          `yaml:"port" default:"5601"`
-	Image         string       `yaml:"image"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	DataDir       string       `yaml:"data_dir"`
-	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	Host                 string       `yaml:"host"`
+	SSHPort              int          `yaml:"ssh_port" default:"22"`
+	Port                 int          `yaml:"port" default:"5601"`
+	Image                string       `yaml:"image"`
+	RemoteCfgPath        string       `yaml:"remote_config_path"`
+	DataDir              string       `yaml:"data_dir"`
+	ContainerCfg         ContainerCfg `yaml:"container_config"`
+	ProvisioningTemplate string       `yaml:"provisioning_template"`
 }
 
 func (k *KibanaSpec) SetDefaultDataDir() {

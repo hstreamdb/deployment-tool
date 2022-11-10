@@ -129,7 +129,7 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, k.spec.Image)
 
 	if k.spec.ProvisioningTemplate != "" {
-		args = append(args, "&&")
+		args = append(args, "&& sleep 10 &&")
 		args = append(args,
 			fmt.Sprintf(
 				"curl -X POST \"http://%s:%s/api/saved_objects/_import?createNewCopies=true\" -H \"kbn-xsrf: true\" --form file=@%s",

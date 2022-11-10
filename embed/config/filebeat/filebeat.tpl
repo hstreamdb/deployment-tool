@@ -7,9 +7,8 @@ processors:
   - add_docker_metadata:
       host: "unix:///var/run/docker.sock"
 
-  - add_fields:
-      target: "@metadata"
-      fields:
+  - add_labels:
+      labels:
         host: {{ .FilebeatHost }}
 
   - decode_json_fields:

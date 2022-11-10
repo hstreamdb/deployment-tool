@@ -135,7 +135,7 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 				"curl -X POST \"http://%s:%s/api/saved_objects/_import?createNewCopies=true\" -H \"kbn-xsrf: true\" --form file=@%s",
 				k.spec.Host,
 				strconv.Itoa(k.spec.Port),
-				filepath.Join("template", "export.ndjson"),
+				filepath.Join("template", fmt.Sprintf("%s.ndjson", k.spec.ProvisioningTemplate)),
 			),
 		)
 	}

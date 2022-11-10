@@ -129,15 +129,14 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, k.spec.Image)
 
 	if k.spec.ProvisioningTemplate != "" {
-		args = append(args, "&& sleep 10 &&")
+		args = append(args, "&& sleep 20 &&")
 		args = append(args,
 			fmt.Sprintf(
 				"curl -X POST \"http://%s:%s/api/saved_objects/_import?createNewCopies=true\" -H \"kbn-xsrf: true\" --form file=@%s",
 				k.spec.Host,
 				strconv.Itoa(k.spec.Port),
 				filepath.Join(
-					"template",
-					"kibana",
+					k.spec.RemoteCfgPath,
 					fmt.Sprintf("%s.ndjson", k.spec.ProvisioningTemplate),
 				),
 			),
@@ -166,6 +165,10 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 	position := []executor.Position{
 		{LocalDir: genCfg, RemoteDir: filepath.Join(k.spec.RemoteCfgPath, "kibana.yml")},
+	}
+	if k.spec.ProvisioningTemplate != "" {
+		position = append(position, executor.Position{LocalDir: fmt.Sprintf("template/kibana/%s.ndjson", k.spec.ProvisioningTemplate),
+			RemoteDir: filepath.Join(k.spec.RemoteCfgPath, fmt.Sprintf("%s.ndjson", k.spec.ProvisioningTemplate))})
 	}
 
 	return &executor.TransferCtx{

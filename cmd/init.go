@@ -34,8 +34,12 @@ func newInit() *cobra.Command {
 			}
 
 			alertManagerFile := filepath.Join("config", "alertmanager.yml")
-			if err := getFile(alertManagerFile, "template/alertmanager/alertmanager.yml"); err != nil {
-				return err
+			content, err := embed.ReadConfig(alertManagerFile)
+			if err != nil {
+				return fmt.Errorf("get alert manager config file error: %s\n", err.Error())
+			}
+			if err = os.WriteFile("template/alertmanager/alertmanager.yml", content, 0644); err != nil {
+				return fmt.Errorf("write alert manager config file error: %s\n", err.Error())
 			}
 
 			logdeviceCfgFile := filepath.Join("config", "logdevice.config")

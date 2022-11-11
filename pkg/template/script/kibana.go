@@ -17,7 +17,7 @@ type KibanaReadyCheck struct {
 }
 
 func (m KibanaReadyCheck) GenScript() (string, error) {
-	ph := filepath.Join("script", "wait_kibana_timeout.sh.tpl")
+	ph := filepath.Join("script", "wait_kibana_ready.sh.tpl")
 	sh, err := embed.ReadScript(ph)
 	if err != nil {
 		return "", err
@@ -33,6 +33,6 @@ func (m KibanaReadyCheck) GenScript() (string, error) {
 		return "", err
 	}
 
-	file := filepath.Join("template", "script", fmt.Sprintf("wait_kibana_timeout%s_%s.sh", m.KibanaHost, m.KibanaPort))
+	file := filepath.Join("template", "script", fmt.Sprintf("wait_kibana_ready_%s_%s.sh", m.KibanaHost, m.KibanaPort))
 	return file, os.WriteFile(file, content.Bytes(), 0755)
 }

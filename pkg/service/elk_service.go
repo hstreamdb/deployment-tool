@@ -154,39 +154,39 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	if err != nil {
 		panic(fmt.Errorf("gen KibanaConfig error: %s", err.Error()))
 	}
-	position := []executor.Position{
+
+	positions := []executor.Position{
 		{LocalDir: genCfg, RemoteDir: filepath.Join(k.spec.RemoteCfgPath, "kibana.yml")},
 	}
-	if k.spec.ProvisioningTemplate != "" {
-		position = append(position, executor.Position{LocalDir: fmt.Sprintf("template/kibana/%s", k.spec.ProvisioningTemplate),
-			RemoteDir: filepath.Join(k.spec.RemoteCfgPath, fmt.Sprintf("%s", k.spec.ProvisioningTemplate))})
 
-		fp := filepath.Join(
-			k.spec.RemoteCfgPath,
-			fmt.Sprintf("%s", k.spec.ProvisioningTemplate),
-		)
-		chkCfg := script.KibanaReadyCheck{
-			KibanaHost: k.spec.Host,
-			KibanaPort: strconv.Itoa(k.spec.Port),
-			FilePath:   fp,
-			Timeout:    strconv.Itoa(600),
-		}
-		chkCmd, err := chkCfg.GenScript()
-		if err != nil {
-			panic(fmt.Errorf("gen KibanaReadyCheck error: %s", err.Error()))
-		}
-		scriptName := filepath.Base(chkCmd)
-		cfgDir, _ := k.getDirs()
-		remoteScriptPath := filepath.Join(cfgDir, "script", scriptName)
-		k.CheckReadyScriptPath = remoteScriptPath
-		position = append(position, executor.Position{
-			LocalDir:  chkCmd,
-			RemoteDir: remoteScriptPath,
-			Opts:      fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)})
+	remotePath := filepath.Join(k.spec.RemoteCfgPath, "export.ndjson")
+	positions = append(positions, executor.Position{
+		LocalDir:  "template/kibana/export.ndjson",
+		RemoteDir: remotePath,
+	})
+
+	chkCfg := script.KibanaReadyCheck{
+		KibanaHost: k.spec.Host,
+		KibanaPort: strconv.Itoa(k.spec.Port),
+		FilePath:   remotePath,
+		Timeout:    strconv.Itoa(600),
 	}
+	chkCmd, err := chkCfg.GenScript()
+	if err != nil {
+		panic(fmt.Errorf("gen KibanaReadyCheck error: %s", err.Error()))
+	}
+	scriptName := filepath.Base(chkCmd)
+	cfgDir, _ := k.getDirs()
+	remoteScriptPath := filepath.Join(cfgDir, "script", scriptName)
+	k.CheckReadyScriptPath = remoteScriptPath
+	positions = append(positions, executor.Position{
+		LocalDir:  chkCmd,
+		RemoteDir: remoteScriptPath,
+		Opts:      fmt.Sprintf("sudo chmod +x %s", remoteScriptPath),
+	})
 
 	return &executor.TransferCtx{
-		Target: k.spec.Host, Position: position,
+		Target: k.spec.Host, Position: positions,
 	}
 }
 

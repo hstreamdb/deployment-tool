@@ -18,14 +18,13 @@ const (
 )
 
 type ElasticSearchSpec struct {
-	Host                   string       `yaml:"host"`
-	SSHPort                int          `yaml:"ssh_port" default:"22"`
-	Port                   int          `yaml:"port" default:"9200"`
-	Image                  string       `yaml:"image"`
-	DataDir                string       `yaml:"data_dir"`
-	RemoteCfgPath          string       `yaml:"remote_config_path"`
-	ContainerCfg           ContainerCfg `yaml:"container_config"`
-	ElasticDisableSecurity bool         `yaml:"elastic_disable_security"`
+	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
+	Port          int          `yaml:"port" default:"9200"`
+	Image         string       `yaml:"image"`
+	DataDir       string       `yaml:"data_dir"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
 func (es *ElasticSearchSpec) SetDefaultDataDir() {
@@ -41,14 +40,13 @@ func (es *ElasticSearchSpec) SetDefaultImage() {
 }
 
 type KibanaSpec struct {
-	Host                 string       `yaml:"host"`
-	SSHPort              int          `yaml:"ssh_port" default:"22"`
-	Port                 int          `yaml:"port" default:"5601"`
-	Image                string       `yaml:"image"`
-	RemoteCfgPath        string       `yaml:"remote_config_path"`
-	DataDir              string       `yaml:"data_dir"`
-	ContainerCfg         ContainerCfg `yaml:"container_config"`
-	ProvisioningTemplate string       `yaml:"provisioning_template"`
+	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
+	Port          int          `yaml:"port" default:"5601"`
+	Image         string       `yaml:"image"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	DataDir       string       `yaml:"data_dir"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
 func (k *KibanaSpec) SetDefaultDataDir() {

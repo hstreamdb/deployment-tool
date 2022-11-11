@@ -40,7 +40,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(SetUpAlertService)
 	}
 
-	if len(services.Filebeat) != 0 {
+	if len(services.ElasticSearch) != 0 {
 		ctx.run(SetUpElasticSearch)
 		ctx.run(SetUpKibana)
 		ctx.run(SetUpFilebeat)
@@ -50,7 +50,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 
 func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
-	if len(services.Filebeat) != 0 {
+	if len(services.ElasticSearch) != 0 {
 		ctx.run(RemoveFilebeat)
 		ctx.run(RemoveKibana)
 		ctx.run(RemoveElasticSearch)
@@ -231,16 +231,20 @@ func SetUpElasticSearch(executor ext.Executor, services *service.Services) error
 }
 
 func SetUpKibana(executor ext.Executor, services *service.Services) error {
-	err := startCluster(executor, services.Global, services.Kibana)
-	if err != nil {
-		return err
+	if len(services.Kibana) == 0 {
+		return nil
 	}
-	for _, v := range services.Kibana {
-		executorCtx := v.CheckReady()
-		target := fmt.Sprintf("%s:%d", executorCtx.Target, v.GetSSHHost())
-		res, err := executor.Execute(target, executorCtx.Cmd)
-		if err != nil {
-			return fmt.Errorf("%s-%s", err.Error(), res)
+
+	kibanaClusterCtx := KibanaClusterCtx{
+		ctx:     services.Global,
+		service: services.Kibana,
+	}
+	tasks := getStartServiceTask(kibanaClusterCtx.ctx, kibanaClusterCtx.service)
+	tasks = append(tasks, &WaitKibanaReady{kibanaClusterCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
 		}
 	}
 	return nil

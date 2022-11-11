@@ -51,7 +51,6 @@ monitor:
     # remove_when_exit: true
 
 hserver:
-  # # The ip address of the HServer
   - host: 10.1.0.10
     # # HServer docker image
     # image: "hstreamdb/hstream"
@@ -197,54 +196,54 @@ hstore:
 
 meta_store:
   - host: 10.1.0.10
-    # # Meta-store docker image
+    # # Meta-Store docker image
     # image: "zookeeper:3.6"
-    # # Meta-store port, currently only works for rqlite. zk will
-    # # monitor on 4001
+    # # Meta-Store port, currently only works for rqlite. zk will
+    # # monitor on 2181
     # port: 4001
     # # Raft port used by rqlite
     # raft_port: 4002
     # # Root directory of Meta-Store config files
     # remote_config_path: "/home/deploy/metastore"
-    # # Root directory of Meta-store data files
+    # # Root directory of Meta-Store data files
     # data_dir: "/home/deploy/data/metastore"
-    # # Meta-store container configuration
+    # # Meta-Store container configuration
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
   - host: 10.1.0.11
-    # # Meta-store docker image
+    # # Meta-Store docker image
     # image: "zookeeper:3.6"
-    # # Meta-store port, currently only works for rqlite. zk will
+    # # Meta-Store port, currently only works for rqlite. zk will
     # # monitor on 2181
     # port: 4001
     # # Raft port used by rqlite
     # raft_port: 4002
     # # Root directory of Meta-Store config files
     # remote_config_path: "/home/deploy/metastore"
-    # # Root directory of Meta-store data files
+    # # Root directory of Meta-Store data files
     # data_dir: "/home/deploy/data/metastore"
-    # # Meta-store container configuration
+    # # Meta-Store container configuration
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
   - host: 10.1.0.12
-    # # Meta-store docker image
+    # # Meta-Store docker image
     # image: "zookeeper:3.6"
-    # # Meta-store port, currently only works for rqlite. zk will
+    # # Meta-Store port, currently only works for rqlite. zk will
     # # monitor on 2181
     # port: 4001
     # # Raft port used by rqlite
     # raft_port: 4002
     # # Root directory of Meta-Store config files
     # remote_config_path: "/home/deploy/metastore"
-    # # Root directory of Meta-store data files
+    # # Root directory of Meta-Store data files
     # data_dir: "/home/deploy/data/metastore"
-    # # Meta-store container configuration
+    # # Meta-Store container configuration
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G
@@ -253,13 +252,13 @@ meta_store:
 
 http_server:
   - host: 10.1.0.15
-    # # Http_server docker image
+    # # Http_Server docker image
     # image: "hstreamdb/http-server"
-    # # Http_server service monitor port
+    # # Http_Server service monitor port
     # port: 8081
-    # # Root directory of http_server config files
+    # # Root directory of Http_Server config files
     # remote_config_path: "/home/deploy/http-server"
-    # # Root directory of http_server data files
+    # # Root directory of Http_Server data files
     # data_dir: "/home/deploy/data/http-server"
     # container_config:
       # cpu_limit: 2.00
@@ -301,9 +300,7 @@ grafana:
       # disable_restart: true
       # remove_when_exit: true
 
-# # Server configs are used to specify the configuration of Alertmanager Servers.
 alertmanager:
-  # # The ip address of the Alertmanager Server.
   - host: 10.0.1.15
   # # Alertmanager docker image
   # image: "prom/alertmanager"
@@ -322,13 +319,13 @@ alertmanager:
 
 hstream_exporter:
   - host: 10.1.0.15
-  # # hstream_exporter docker image
+  # # HStream_Exporter docker image
   # image: "hstreamdb/hstream-exporter"
-  # # hstream_exporter service monitor port
+  # # HStream_Exporter service monitor port
   # port: 9250
-  # # Root directory of hstream_exporter config files
+  # # Root directory of HStream_Exporter config files
   # remote_config_path: "/home/deploy/hstream-exporter"
-  # # Root directory of hstream_exporter data files
+  # # Root directory of HStream_Exporter data files
   # data_dir: "/home/deploy/data/hstream-exporter"
   # container_config:
     # cpu_limit: 2.00
@@ -338,9 +335,14 @@ hstream_exporter:
 
 elasticsearch:
   - host: 10.1.0.15
-  # port: 5601
+  # # Elasticsearch service monitor port
+  # port: 9200
   # # Elasticsearch docker image
   # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
+  # # Root directory of Elasticsearch config files
+  # remote_config_path: "/home/deploy/elasticsearch"
+  # # Root directory of Elasticsearch data files
+  # data_dir: "/home/deploy/data/elasticsearch"
   # # Elasticsearch container configuration
   # container_config:
     # cpu_limit: 2.00
@@ -350,11 +352,14 @@ elasticsearch:
 
 kibana:
   - host: 10.1.0.15
-  # port: 9200
-  # # Kibana saved objects provisioning template
-  # provisioning_template: "export"
+  # # Kibana service monitor port
+  # port: 5601
   # # Kibana docker image
   # image: "docker.elastic.co/kibana/kibana:8.5.0"
+  # # Root directory of Kibana config files
+  # remote_config_path: "/home/deploy/kibana"
+  # # Root directory of Kibana data files
+  # data_dir: "/home/deploy/data/kibana"
   # # Kibana container configuration
   # container_config:
     # cpu_limit: 2.00
@@ -369,6 +374,8 @@ filebeat:
     # image: "docker.elastic.co/beats/filebeat:8.5.0"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
+    # # Root directory of Filebeat data files
+    # data_dir: "/home/deploy/data/filebeat"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -380,6 +387,8 @@ filebeat:
     # image: "docker.elastic.co/beats/filebeat:8.5.0"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
+    # # Root directory of Filebeat data files
+    # data_dir: "/home/deploy/data/filebeat"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -391,6 +400,8 @@ filebeat:
     # image: "docker.elastic.co/beats/filebeat:8.5.0"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
+    # # Root directory of Filebeat data files
+    # data_dir: "/home/deploy/data/filebeat"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00

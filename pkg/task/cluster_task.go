@@ -231,7 +231,19 @@ func SetUpElasticSearch(executor ext.Executor, services *service.Services) error
 }
 
 func SetUpKibana(executor ext.Executor, services *service.Services) error {
-	return startCluster(executor, services.Global, services.Kibana)
+	err := startCluster(executor, services.Global, services.Kibana)
+	if err != nil {
+		return err
+	}
+	for _, v := range services.Kibana {
+		executorCtx := v.CheckReady()
+		target := fmt.Sprintf("%s:%d", executorCtx.Target, v.GetSSHHost())
+		res, err := executor.Execute(target, executorCtx.Cmd)
+		if err != nil {
+			return fmt.Errorf("%s-%s", err.Error(), res)
+		}
+	}
+	return nil
 }
 
 func SetUpFilebeat(executor ext.Executor, services *service.Services) error {

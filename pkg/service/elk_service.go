@@ -91,6 +91,10 @@ type Kibana struct {
 	CheckReadyScriptPath string
 }
 
+func (k *Kibana) GetSSHHost() int {
+	return k.spec.SSHPort
+}
+
 func NewKibana(kibanaSpec spec.KibanaSpec, elasticSearchHost string, elasticSearchPort int) *Kibana {
 	return &Kibana{
 		spec:              kibanaSpec,
@@ -129,11 +133,6 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true, mountPoints...)
 	args = append(args, k.spec.Image)
-
-	if k.spec.ProvisioningTemplate != "" {
-		args = append(args, "&&")
-		args = append(args, "/usr/bin/env -S bash", filepath.Join(k.CheckReadyScriptPath))
-	}
 
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -193,12 +192,11 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 }
 
-func (k *Kibana) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+func (k *Kibana) CheckReady() *executor.ExecuteCtx {
 	if len(k.CheckReadyScriptPath) == 0 {
-		panic("empty checkReadyScriptPath")
+		return nil
 	}
-
-	args := []string{"/bin/bash"}
+	args := []string{"/usr/bin/env -S bash"}
 	args = append(args, k.CheckReadyScriptPath)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }

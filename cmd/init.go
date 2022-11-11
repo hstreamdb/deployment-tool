@@ -37,6 +37,11 @@ func newInit() *cobra.Command {
 			if err := getFile(alertManagerFile, "template/alertmanager/alertmanager.yml"); err != nil {
 				return err
 			}
+
+			logdeviceCfgFile := filepath.Join("config", "logdevice.config")
+			if err := getFile(logdeviceCfgFile, "template/logdevice.conf"); err != nil {
+				return err
+			}
 			return nil
 		},
 	}

@@ -46,6 +46,11 @@ func newInit() *cobra.Command {
 			if err := getFile(logdeviceCfgFile, "template/logdevice.conf"); err != nil {
 				return err
 			}
+
+			kibanaFile := filepath.Join("config", "kibana", "export.ndjson")
+			if err := getFile(kibanaFile, "template/kibana/export.ndjson"); err != nil {
+				return err
+			}
 			return nil
 		},
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
+	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"path/filepath"
 	"strconv"
@@ -83,10 +84,15 @@ func (es *ElasticSearch) getDirs() (string, string) {
 }
 
 type Kibana struct {
-	spec              spec.KibanaSpec
-	ContainerName     string
-	ElasticSearchHost string
-	ElasticSearchPort int
+	spec                 spec.KibanaSpec
+	ContainerName        string
+	ElasticSearchHost    string
+	ElasticSearchPort    int
+	CheckReadyScriptPath string
+}
+
+func (k *Kibana) GetSSHHost() int {
+	return k.spec.SSHPort
 }
 
 func NewKibana(kibanaSpec spec.KibanaSpec, elasticSearchHost string, elasticSearchPort int) *Kibana {
@@ -117,7 +123,7 @@ func (k *Kibana) Display() map[string]utils.DisplayedComponent {
 
 func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := k.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -127,6 +133,7 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true, mountPoints...)
 	args = append(args, k.spec.Image)
+
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -150,10 +157,46 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	position := []executor.Position{
 		{LocalDir: genCfg, RemoteDir: filepath.Join(k.spec.RemoteCfgPath, "kibana.yml")},
 	}
+	if k.spec.ProvisioningTemplate != "" {
+		position = append(position, executor.Position{LocalDir: fmt.Sprintf("template/kibana/%s", k.spec.ProvisioningTemplate),
+			RemoteDir: filepath.Join(k.spec.RemoteCfgPath, fmt.Sprintf("%s", k.spec.ProvisioningTemplate))})
+
+		fp := filepath.Join(
+			k.spec.RemoteCfgPath,
+			fmt.Sprintf("%s", k.spec.ProvisioningTemplate),
+		)
+		chkCfg := script.KibanaReadyCheck{
+			KibanaHost: k.spec.Host,
+			KibanaPort: strconv.Itoa(k.spec.Port),
+			FilePath:   fp,
+			Timeout:    strconv.Itoa(600),
+		}
+		chkCmd, err := chkCfg.GenScript()
+		if err != nil {
+			panic(fmt.Errorf("gen KibanaReadyCheck error: %s", err.Error()))
+		}
+		scriptName := filepath.Base(chkCmd)
+		cfgDir, _ := k.getDirs()
+		remoteScriptPath := filepath.Join(cfgDir, "script", scriptName)
+		k.CheckReadyScriptPath = remoteScriptPath
+		position = append(position, executor.Position{
+			LocalDir:  chkCmd,
+			RemoteDir: remoteScriptPath,
+			Opts:      fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)})
+	}
 
 	return &executor.TransferCtx{
 		Target: k.spec.Host, Position: position,
 	}
+}
+
+func (k *Kibana) CheckReady() *executor.ExecuteCtx {
+	if len(k.CheckReadyScriptPath) == 0 {
+		return nil
+	}
+	args := []string{"/usr/bin/env -S bash"}
+	args = append(args, k.CheckReadyScriptPath)
+	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
 func (k *Kibana) getDirs() (string, string) {

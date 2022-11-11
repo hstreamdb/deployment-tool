@@ -21,7 +21,7 @@ global:
   # elastic_search_config_path: ""
   # # Global container configuration
   # container_config:
-    # cpu_limit: 200
+    # cpu_limit: 2.00
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
@@ -45,7 +45,7 @@ monitor:
   grafana_disable_login: true
   # # Global container configuration for monitor stacks.
   # container_config:
-    # cpu_limit: 200
+    # cpu_limit: 2.00
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
@@ -73,7 +73,7 @@ hserver:
     # data_dir: "/home/deploy/data/hserver"
     # # HServer container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -98,7 +98,7 @@ hserver:
     # data_dir: "/home/deploy/data/hserver"
     # # HServer container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -123,7 +123,7 @@ hserver:
     # data_dir: "/home/deploy/data/hserver"
     # # HServer container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -148,7 +148,7 @@ hstore:
     enable_admin: true
     # # HStore container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -169,7 +169,7 @@ hstore:
     # role: "Both" # [Storage|Sequencer|Both]
     # # HStore container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -190,7 +190,7 @@ hstore:
     # role: "Both" # [Storage|Sequencer|Both]
     # # HStore container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -210,7 +210,7 @@ meta_store:
     # data_dir: "/home/deploy/data/metastore"
     # # Meta-store container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -228,7 +228,7 @@ meta_store:
     # data_dir: "/home/deploy/data/metastore"
     # # Meta-store container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -246,7 +246,7 @@ meta_store:
     # data_dir: "/home/deploy/data/metastore"
     # # Meta-store container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -262,7 +262,7 @@ http_server:
     # # Root directory of http_server data files
     # data_dir: "/home/deploy/data/http-server"
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -279,7 +279,7 @@ prometheus:
     # data_dir: "/home/deploy/data/prometheus"
     # # Prometheus container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -296,7 +296,7 @@ grafana:
     # data_dir: "/home/deploy/data/grafana"
     # # Grafana container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -315,7 +315,7 @@ alertmanager:
   # data_dir: "/home/deploy/data/alertmanager"
   # # Alertmanager container configuration
   # container_config:
-    # cpu_limit: 200
+    # cpu_limit: 2.00
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
@@ -331,7 +331,7 @@ hstream_exporter:
   # # Root directory of hstream_exporter data files
   # data_dir: "/home/deploy/data/hstream-exporter"
   # container_config:
-    # cpu_limit: 200
+    # cpu_limit: 2.00
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
@@ -343,7 +343,7 @@ elasticsearch:
   # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
   # # Elasticsearch container configuration
   # container_config:
-    # cpu_limit: 200
+    # cpu_limit: 2.00
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
@@ -351,11 +351,13 @@ elasticsearch:
 kibana:
   - host: 10.1.0.15
   # port: 9200
+  # # Kibana saved objects provisioning template
+  # provisioning_template: "export"
   # # Kibana docker image
   # image: "docker.elastic.co/kibana/kibana:8.5.0"
   # # Kibana container configuration
   # container_config:
-    # cpu_limit: 200
+    # cpu_limit: 2.00
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
@@ -369,7 +371,7 @@ filebeat:
     # remote_config_path: "/home/deploy/filebeat"
     # # Filebeat container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -380,7 +382,7 @@ filebeat:
     # remote_config_path: "/home/deploy/filebeat"
     # # Filebeat container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
@@ -391,7 +393,7 @@ filebeat:
     # remote_config_path: "/home/deploy/filebeat"
     # # Filebeat container configuration
     # container_config:
-      # cpu_limit: 200
+      # cpu_limit: 2.00
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true

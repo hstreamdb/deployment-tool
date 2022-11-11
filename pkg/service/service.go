@@ -1,12 +1,13 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
-	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"golang.org/x/exp/slices"
+	"os"
 	"reflect"
 	"sort"
 	"strconv"
@@ -196,24 +197,9 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		return nil, err
 	}
 
-	var cfg config.HStoreConfig
-	switch globalCtx.MetaStoreType {
-	case spec.ZK:
-		cfg = config.HStoreConfig{
-			MetaStoreType: globalCtx.MetaStoreType.String(),
-			MetaStoreUrl:  "ip://" + globalCtx.MetaStoreUrls,
-		}
-	case spec.RQLITE:
-		urls := strings.ReplaceAll(globalCtx.MetaStoreUrls, "http://", "")
-		cfg = config.HStoreConfig{
-			MetaStoreType: globalCtx.MetaStoreType.String(),
-			MetaStoreUrl:  "ip://" + urls,
-		}
-	}
-
-	configPath, err := cfg.GenConfig()
+	configPath, err := updateStoreConfig(globalCtx)
 	if err != nil {
-		return nil, fmt.Errorf("generate hstore config err: %s", err.Error())
+		return nil, fmt.Errorf("update store config file err: %s", err.Error())
 	}
 	globalCtx.LocalHStoreConfigFile = configPath
 
@@ -234,6 +220,56 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		Kibana:          kibana,
 		Filebeat:        filebeat,
 	}, nil
+}
+
+type storeCfg struct {
+	ServerSettings map[string]interface{} `json:"server_settings,omitempty"`
+	ClientSettings map[string]interface{} `json:"client_settings,omitempty"`
+	Cluster        string                 `json:"cluster,omitempty"`
+	InternalLogs   map[string]interface{} `json:"internal_logs,omitempty"`
+	MetadataLogs   map[string]interface{} `json:"metadata_logs,omitempty"`
+	Zookeeper      map[string]interface{} `json:"zookeeper,omitempty"`
+	Rqlite         map[string]interface{} `json:"rqlite,omitempty"`
+}
+
+func updateStoreConfig(ctx *GlobalCtx) (string, error) {
+	configPath := "template/logdevice.conf"
+	content, err := os.ReadFile(configPath)
+	if err != nil {
+		return "", err
+	}
+	var cfg storeCfg
+	if err = json.Unmarshal(content, &cfg); err != nil {
+		return "", err
+	}
+
+	if cfg.Zookeeper != nil && cfg.Rqlite != nil {
+		return "", fmt.Errorf("can't set both zookeeper and rqlite fields in config file")
+	}
+
+	switch ctx.MetaStoreType {
+	case spec.ZK:
+		cfg.Zookeeper = map[string]interface{}{
+			"zookeeper_uri": "ip://" + ctx.MetaStoreUrls,
+			"timeout":       "30s",
+		}
+		cfg.Rqlite = nil
+	case spec.RQLITE:
+		urls := strings.ReplaceAll(ctx.MetaStoreUrls, "http://", "")
+		cfg.Rqlite = map[string]interface{}{
+			"rqlite_uri": "ip://" + urls,
+		}
+		cfg.Zookeeper = nil
+	}
+	res, err := json.MarshalIndent(cfg, "", "\t")
+	if err != nil {
+		return "", err
+	}
+
+	if err = os.WriteFile(configPath, res, 0755); err != nil {
+		return "", err
+	}
+	return configPath, nil
 }
 
 func (s *Services) ShowAllServices() {

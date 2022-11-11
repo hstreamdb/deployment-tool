@@ -158,14 +158,12 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		{LocalDir: genCfg, RemoteDir: filepath.Join(k.spec.RemoteCfgPath, "kibana.yml")},
 	}
 	if k.spec.ProvisioningTemplate != "" {
-		position = append(position, executor.Position{LocalDir: fmt.Sprintf("template/kibana/%s.ndjson", k.spec.ProvisioningTemplate),
-			RemoteDir: filepath.Join(k.spec.RemoteCfgPath, fmt.Sprintf("%s.ndjson", k.spec.ProvisioningTemplate))})
-	}
+		position = append(position, executor.Position{LocalDir: fmt.Sprintf("template/kibana/%s", k.spec.ProvisioningTemplate),
+			RemoteDir: filepath.Join(k.spec.RemoteCfgPath, fmt.Sprintf("%s", k.spec.ProvisioningTemplate))})
 
-	if k.spec.ProvisioningTemplate != "" {
 		fp := filepath.Join(
 			k.spec.RemoteCfgPath,
-			fmt.Sprintf("%s.ndjson", k.spec.ProvisioningTemplate),
+			fmt.Sprintf("%s", k.spec.ProvisioningTemplate),
 		)
 		chkCfg := script.KibanaReadyCheck{
 			KibanaHost: k.spec.Host,

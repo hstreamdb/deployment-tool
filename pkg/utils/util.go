@@ -87,6 +87,10 @@ var (
 	// Version0100 hserver version >= v0.10.0 should support rqlite
 	// as meta store
 	Version0100 = Version{0, 10, 0, false}
+	// Version0101 hserver version >= v0.10.1 should replace argument
+	// `--host` and `--address` to `--bind-address` and
+	// `--advertised-address`, `--compression` should be removed
+	Version0101 = Version{0, 10, 1, false}
 )
 
 type Version struct {

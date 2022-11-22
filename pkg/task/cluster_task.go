@@ -110,18 +110,6 @@ func RemoveMetaStoreCluster(executor ext.Executor, services *service.Services) e
 	return removeCluster(executor, services.Global, services.MetaStore)
 }
 
-func RemoveFilebeat(executor ext.Executor, services *service.Services) error {
-	return removeCluster(executor, services.Global, services.Filebeat)
-}
-
-func RemoveKibana(executor ext.Executor, services *service.Services) error {
-	return removeCluster(executor, services.Global, services.Kibana)
-}
-
-func RemoveElasticSearch(executor ext.Executor, services *service.Services) error {
-	return removeCluster(executor, services.Global, services.ElasticSearch)
-}
-
 func SetUpHStoreCluster(executor ext.Executor, services *service.Services) error {
 	if len(services.HStore) == 0 {
 		return nil
@@ -230,6 +218,10 @@ func SetUpElasticSearch(executor ext.Executor, services *service.Services) error
 	return startCluster(executor, services.Global, services.ElasticSearch)
 }
 
+func RemoveElasticSearch(executor ext.Executor, services *service.Services) error {
+	return removeCluster(executor, services.Global, services.ElasticSearch)
+}
+
 func SetUpKibana(executor ext.Executor, services *service.Services) error {
 	if len(services.Kibana) == 0 {
 		return nil
@@ -250,8 +242,16 @@ func SetUpKibana(executor ext.Executor, services *service.Services) error {
 	return nil
 }
 
+func RemoveKibana(executor ext.Executor, services *service.Services) error {
+	return removeCluster(executor, services.Global, services.Kibana)
+}
+
 func SetUpFilebeat(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.Filebeat)
+}
+
+func RemoveFilebeat(executor ext.Executor, services *service.Services) error {
+	return removeCluster(executor, services.Global, services.Filebeat)
 }
 
 func startCluster[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S) error {

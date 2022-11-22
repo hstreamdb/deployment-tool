@@ -318,7 +318,7 @@ func updateComponent(cfg GlobalCfg, field reflect.Value) error {
 			fn := ref.MethodByName("SetDefaultImage")
 			fn.Call(nil)
 			field.Field(j).Set(ref.Elem().FieldByName("Image"))
-		case "Address":
+		case "AdvertisedAddress":
 			if len(field.Field(j).String()) != 0 {
 				continue
 			}

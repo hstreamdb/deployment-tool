@@ -49,7 +49,7 @@ func (h *HServer) Display() map[string]utils.DisplayedComponent {
 
 func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "/crash", "-m 0775")
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -57,20 +57,28 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/mnt", "/mnt"},
 		{h.spec.DataDir, h.spec.DataDir},
+		{"/crash", "/data/crash"},
 		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},
 	}
 
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
 	args = append(args, []string{h.spec.Image, spec.ServerDefaultBinPath}...)
-	args = append(args, "--host", h.spec.Host)
+	_, version := parseImage(h.spec.Image)
+	if utils.CompareVersion(version, utils.Version0101) > 0 {
+		args = append(args, "--bind-address", h.spec.Host)
+		args = append(args, "--advertised-address", h.spec.AdvertisedAddress)
+	} else {
+		args = append(args, "--host", h.spec.Host)
+		args = append(args, "--address", h.spec.AdvertisedAddress)
+		args = append(args, "--compression", h.spec.Opts.Compression)
+	}
+
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
-	args = append(args, "--address", h.spec.Address)
 	args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
 	if len(h.ServerConfigPath) != 0 {
 		args = append(args, "--config-path", h.ServerConfigPath)
 	}
 
-	_, version := parseImage(h.spec.Image)
 	if needSeedNodes(version) {
 		args = append(args, "--seed-nodes", globalCtx.SeedNodes)
 	}
@@ -94,7 +102,6 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
 	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
 	args = append(args, "--log-level", h.spec.Opts.ServerLogLevel)
-	args = append(args, "--compression", h.spec.Opts.Compression)
 	admin := globalCtx.HadminAddress[0]
 	adminInfo := strings.Split(admin, ":")
 	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %s", adminInfo[0], adminInfo[1]))
@@ -170,7 +177,8 @@ func getMetaStoreUrl(tp spec.MetaStoreType, url string) string {
 	case spec.ZK:
 		return "zk://" + url
 	case spec.RQLITE:
-		finalUrl := strings.ReplaceAll(url, "http://", "")
+		urls := strings.ReplaceAll(url, "http://", "")
+		finalUrl := strings.Split(urls, ",")[0]
 		return "rq://" + finalUrl
 	case spec.Unknown:
 		return ""

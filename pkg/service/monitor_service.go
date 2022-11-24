@@ -358,9 +358,7 @@ func (h *HStreamExporter) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (h *HStreamExporter) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true)
 	args = append(args, h.spec.Image)
-	// FIXME: currently, only support use one http-server
-	httpServer := globalCtx.HttpServerUrls[0]
-	args = append(args, "hstream-exporter", "--addr", httpServer)
+	args = append(args, "hstream-exporter", "--addr", globalCtx.HStreamServerUrls)
 	args = append(args, fmt.Sprintf("--listen-addr 0.0.0.0:%d", h.spec.Port))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }

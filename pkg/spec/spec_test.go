@@ -114,8 +114,8 @@ func TestUpdateComponentSpecWithGlobal(t *testing.T) {
 				},
 			},
 			{
-				Host:    "127.0.0.2",
-				Address: "127.1.1.1",
+				Host:              "127.0.0.2",
+				AdvertisedAddress: "127.1.1.1",
 				ContainerCfg: ContainerCfg{
 					Cpu:            "300",
 					Memory:         "10G",

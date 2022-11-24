@@ -256,8 +256,9 @@ func updateStoreConfig(ctx *GlobalCtx) (string, error) {
 		cfg.Rqlite = nil
 	case spec.RQLITE:
 		urls := strings.ReplaceAll(ctx.MetaStoreUrls, "http://", "")
+		url := strings.Split(urls, ",")[0]
 		cfg.Rqlite = map[string]interface{}{
-			"rqlite_uri": "ip://" + urls,
+			"rqlite_uri": "ip://" + url,
 		}
 		cfg.Zookeeper = nil
 	}

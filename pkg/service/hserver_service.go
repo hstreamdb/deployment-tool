@@ -177,7 +177,8 @@ func getMetaStoreUrl(tp spec.MetaStoreType, url string) string {
 	case spec.ZK:
 		return "zk://" + url
 	case spec.RQLITE:
-		finalUrl := strings.ReplaceAll(url, "http://", "")
+		urls := strings.ReplaceAll(url, "http://", "")
+		finalUrl := strings.Split(urls, ",")[0]
 		return "rq://" + finalUrl
 	case spec.Unknown:
 		return ""

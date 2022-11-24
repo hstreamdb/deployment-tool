@@ -32,6 +32,6 @@ func (m MetaStoreReadyCheckScript) GenScript() (string, error) {
 		return "", err
 	}
 
-	file := filepath.Join("template", "script", fmt.Sprintf("meta_store_wait_tcp_timeout_%s_%d.sh", m.Host, m.Port))
+	file := filepath.Join("template", "script", fmt.Sprintf("wait_meta_store_ready_%s_%d.sh", m.Host, m.Port))
 	return file, os.WriteFile(file, content.Bytes(), 0755)
 }

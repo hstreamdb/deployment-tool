@@ -18,6 +18,7 @@ type ComponentsSpec struct {
 	Monitor         MonitorSpec           `yaml:"monitor"`
 	HServer         []HServerSpec         `yaml:"hserver"`
 	HStore          []HStoreSpec          `yaml:"hstore"`
+	HAdmin          []HAdminSpec          `yaml:"hadmin"`
 	MetaStore       []MetaStoreSpec       `yaml:"meta_store"`
 	Prometheus      []PrometheusSpec      `yaml:"prometheus"`
 	Grafana         []GrafanaSpec         `yaml:"grafana"`
@@ -167,7 +168,30 @@ func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error 
 		c.Monitor.CadvisorImage = CadvisorDefaultImage
 	}
 
+	checkConflictAdminPort(c.HStore, c.HAdmin)
 	return nil
+}
+
+func checkConflictAdminPort(store []HStoreSpec, admin []HAdminSpec) {
+	if len(admin) == 0 {
+		return
+	}
+
+	adminAddress := make(map[string]struct{})
+	for _, v := range store {
+		if v.EnableAdmin {
+			addr := fmt.Sprintf("%s:%d", v.Host, v.AdminPort)
+			adminAddress[addr] = struct{}{}
+		}
+	}
+
+	for _, v := range admin {
+		addr := fmt.Sprintf("%s:%d", v.Host, v.AdminPort)
+		if _, ok := adminAddress[addr]; ok {
+			panic(fmt.Sprintf("there is a store instance monitor on %s:%d, use another admin port for hadmin",
+				v.Host, v.AdminPort))
+		}
+	}
 }
 
 type GlobalCfg struct {

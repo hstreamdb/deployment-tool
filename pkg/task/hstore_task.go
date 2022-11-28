@@ -68,32 +68,6 @@ func (w *WaitStoreReady) Run(executor ext.Executor) error {
 	return nil
 }
 
-type BootStrap struct {
-	HStoreClusterCtx
-}
-
-func (b *BootStrap) String() string {
-	return "Task: bootstrap"
-}
-
-func (b *BootStrap) Run(executor ext.Executor) error {
-	var adminStore *service.HStore
-	for _, store := range b.service {
-		if store.IsAdmin() {
-			adminStore = store
-			break
-		}
-	}
-
-	executorCtx := adminStore.Bootstrap(b.ctx)
-	target := fmt.Sprintf("%s:%d", executorCtx.Target, b.ctx.SSHPort)
-	res, err := executor.Execute(target, executorCtx.Cmd)
-	if err != nil {
-		return fmt.Errorf("%s-%s", err.Error(), res)
-	}
-	return nil
-}
-
 type MountDisk struct {
 	HStoreClusterCtx
 }

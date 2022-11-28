@@ -14,14 +14,4 @@ until (echo -n > /dev/tcp/{{.Host}}/{{.AdminApiPort}}); do
   fi;
 done
 
-until (echo -n > /dev/tcp/{{.Host}}/{{.ServerListenPort}}); do
-  >&2 echo "Waiting for {{.Host}}:{{.ServerListenPort}} ...";
-  sleep 1;
-  timeout=$((timeout - 1));
-  if [ $timeout -le 0 ]; then
-    echo "Timeout!"
-    exit 1;
-  fi;
-done
-
 sleep 4

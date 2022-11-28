@@ -6,6 +6,12 @@ const (
 	StoreDefaultBinPath       = "/usr/local/bin/logdeviced"
 	StoreDefaultCfgDir        = "/hstream/deploy/store"
 	StoreDefaultDataDir       = "/hstream/data/store"
+
+	AdminDefaultContainerName = "deploy_hadmin"
+	AdminDefaultImage         = "hstreamdb/hstream"
+	AdminDefaultBinPath       = "/usr/local/bin/ld-admin-server"
+	AdminDefaultCfgDir        = "/hstream/deploy/admin"
+	AdminDefaultDataDir       = "/hstream/data/admin"
 )
 
 type HStoreSpec struct {
@@ -39,10 +45,23 @@ type StoreOps struct {
 }
 
 type HAdminSpec struct {
-	Host         string       `yaml:"host"`
-	Image        string       `yaml:"image"`
-	SSHPort      int          `yaml:"ssh_port" default:"22"`
-	Replica      string       `yaml:"meta_replica"`
-	Embed        bool         `yaml:"embed"`
-	ContainerCfg ContainerCfg `yaml:"container_config"`
+	Host          string       `yaml:"host"`
+	Image         string       `yaml:"image"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
+	AdminPort     int          `yaml:"admin_port" default:"6440"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	DataDir       string       `yaml:"data_dir"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (h *HAdminSpec) SetDefaultDataDir() {
+	h.DataDir = AdminDefaultDataDir
+}
+
+func (h *HAdminSpec) SetDefaultImage() {
+	h.Image = AdminDefaultImage
+}
+
+func (h *HAdminSpec) SetDefaultRemoteCfgPath() {
+	h.RemoteCfgPath = AdminDefaultCfgDir
 }

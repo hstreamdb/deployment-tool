@@ -127,6 +127,23 @@ hserver:
       # disable_restart: true
       # remove_when_exit: true
 
+hadmin:
+  - host: 10.1.0.10
+    # # HAdmin docker image
+    # image: "hstreamdb/hstream"
+    # # HAdmin listen port
+    # admin_port: 6440
+    # # Root directory of HStore config files
+    # remote_config_path: "/home/deploy/hadmin"
+    # # Root directory of HStore data files
+    # data_dir: "/home/deploy/data/hadmin"
+    # # HStore container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+
 hstore:
   - host: 10.1.0.10
     # # HStore docker image

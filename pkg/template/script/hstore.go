@@ -10,10 +10,9 @@ import (
 )
 
 type HStoreReadyCheckScript struct {
-	Host             string
-	AdminApiPort     int
-	ServerListenPort int
-	Timeout          int
+	Host         string
+	AdminApiPort int
+	Timeout      int
 }
 
 func (m HStoreReadyCheckScript) GenScript() (string, error) {

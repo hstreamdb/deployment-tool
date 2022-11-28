@@ -20,6 +20,8 @@ const (
 type HServer struct {
 	serverId             uint32
 	spec                 spec.HServerSpec
+	Host                 string
+	Port                 int
 	ContainerName        string
 	CheckReadyScriptPath string
 	ServerConfigPath     string
@@ -27,7 +29,13 @@ type HServer struct {
 }
 
 func NewHServer(id uint32, serverSpec spec.HServerSpec) *HServer {
-	return &HServer{serverId: id, spec: serverSpec, ContainerName: spec.ServerDefaultContainerName}
+	return &HServer{
+		serverId:      id,
+		spec:          serverSpec,
+		Host:          serverSpec.Host,
+		Port:          serverSpec.Port,
+		ContainerName: spec.ServerDefaultContainerName,
+	}
 }
 
 func (h *HServer) GetServiceName() string {
@@ -102,9 +110,8 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
 	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
 	args = append(args, "--log-level", h.spec.Opts.ServerLogLevel)
-	admin := globalCtx.HadminAddress[0]
-	adminInfo := strings.Split(admin, ":")
-	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %s", adminInfo[0], adminInfo[1]))
+	admin := globalCtx.HAdminInfos[0]
+	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", admin.Host, admin.Port))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

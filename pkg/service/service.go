@@ -49,9 +49,31 @@ type GlobalCtx struct {
 	LocalHServerConfigFile string
 	// the origin elastic search config file in local
 	LocalEsConfigFile string
-	HadminAddress     []string
+	HAdminInfos       []AdminInfo
 	HStreamServerUrls string
 	HttpServerUrls    []string
+}
+
+func getAdminInfos(c spec.ComponentsSpec) []AdminInfo {
+	infos := []AdminInfo{}
+	for _, v := range c.HAdmin {
+		infos = append(infos, AdminInfo{
+			Host:          v.Host,
+			Port:          v.AdminPort,
+			ContainerName: spec.AdminDefaultContainerName,
+		})
+	}
+
+	for _, v := range c.HStore {
+		if v.EnableAdmin {
+			infos = append(infos, AdminInfo{
+				Host:          v.Host,
+				Port:          v.AdminPort,
+				ContainerName: spec.StoreDefaultContainerName,
+			})
+		}
+	}
+	return infos
 }
 
 func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
@@ -60,12 +82,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		return nil, err
 	}
 
-	admins := make([]string, 0, len(c.HStore))
-	for _, v := range c.HStore {
-		if v.EnableAdmin {
-			admins = append(admins, fmt.Sprintf("%s:%d", v.Host, v.AdminPort))
-		}
-	}
+	admins := getAdminInfos(c)
 	if len(admins) == 0 {
 		return nil, fmt.Errorf("need at least one hadmin node")
 	}
@@ -93,7 +110,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		LocalHStoreConfigFile:    c.Global.HStoreConfigPath,
 		LocalHServerConfigFile:   c.Global.HServerConfigPath,
 		LocalEsConfigFile:        c.Global.EsConfigPath,
-		HadminAddress:            admins,
+		HAdminInfos:              admins,
 		HStreamServerUrls:        hserverUrl,
 		HttpServerUrls:           httpServerUrl,
 	}, nil
@@ -104,6 +121,7 @@ type Services struct {
 	MonitorSuite    []*MonitorSuite
 	HServer         []*HServer
 	HStore          []*HStore
+	HAdmin          []*HAdmin
 	MetaStore       []*MetaStore
 	Prometheus      []*Prometheus
 	Grafana         []*Grafana
@@ -121,6 +139,11 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	for idx, v := range c.HServer {
 		hserver = append(hserver, NewHServer(uint32(idx+1), v))
 		seedNodes = append(seedNodes, fmt.Sprintf("%s:%d", v.Host, v.InternalPort))
+	}
+
+	hadmin := make([]*HAdmin, 0, len(c.HAdmin))
+	for idx, v := range c.HAdmin {
+		hadmin = append(hadmin, NewHAdmin(uint32(idx+1), v))
 	}
 
 	hstore := make([]*HStore, 0, len(c.HStore))
@@ -209,6 +232,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		Global:          globalCtx,
 		MonitorSuite:    monitorSuites,
 		HServer:         hserver,
+		HAdmin:          hadmin,
 		HStore:          hstore,
 		MetaStore:       metaStore,
 		Prometheus:      proms,

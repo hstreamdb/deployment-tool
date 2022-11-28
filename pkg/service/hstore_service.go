@@ -20,10 +20,10 @@ const (
 	BootStrapCmd            = "nodes-config bootstrap --metadata-replicate-across "
 )
 
-// FIXME: split admin port && listen port ???
 type HStore struct {
 	storeId uint32
 	spec    spec.HStoreSpec
+	Host    string
 	// FIXME: check admin port setting
 	AdminPort            int
 	ContainerName        string
@@ -32,7 +32,13 @@ type HStore struct {
 }
 
 func NewHStore(id uint32, storeSpec spec.HStoreSpec) *HStore {
-	return &HStore{storeId: id, spec: storeSpec, ContainerName: spec.StoreDefaultContainerName, AdminPort: storeSpec.AdminPort}
+	return &HStore{
+		storeId:       id,
+		spec:          storeSpec,
+		Host:          storeSpec.Host,
+		ContainerName: spec.StoreDefaultContainerName,
+		AdminPort:     storeSpec.AdminPort,
+	}
 }
 
 func (h *HStore) GetServiceName() string {
@@ -112,21 +118,21 @@ func (h *HStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (h *HStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	cfgDir, _ := h.getDirs()
 
-	checkReadyScript := script.HStoreReadyCheckScript{
-		Host:             h.spec.Host,
-		AdminApiPort:     h.AdminPort,
-		ServerListenPort: DefaultServerListenPort,
-		Timeout:          600,
-	}
 	mountScript := script.HStoreMountDiskScript{
 		Host:    h.spec.Host,
 		Shard:   h.spec.StoreOps.Shards,
 		Disk:    h.spec.StoreOps.Disk,
 		DataDir: h.spec.DataDir,
 	}
-	position, err := h.syncScript(cfgDir, []script.Script{checkReadyScript, mountScript}...)
+	checkReadyScript := script.HStoreReadyCheckScript{
+		Host:         h.spec.Host,
+		AdminApiPort: h.AdminPort,
+		Timeout:      600,
+	}
+
+	position, err := h.syncScript(cfgDir, []script.Script{mountScript, checkReadyScript}...)
 	if err != nil {
-		panic("gen script error")
+		panic(fmt.Sprintf("gen script error: %s", err))
 	}
 
 	if len(globalCtx.HStoreConfigInMetaStore) == 0 {
@@ -161,32 +167,7 @@ func (h *HStore) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		panic("empty checkReadyScriptPath")
 	}
 
-	args := []string{"/bin/bash"}
-	args = append(args, h.CheckReadyScriptPath)
-	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
-}
-
-func (h *HStore) Bootstrap(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := []string{"docker exec -t"}
-	args = append(args, h.ContainerName, "hadmin store")
-	args = append(args, fmt.Sprintf("--port %d", h.AdminPort))
-	args = append(args, BootStrapCmd)
-	args = append(args, fmt.Sprintf("node:%d", globalCtx.MetaReplica))
-	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
-}
-
-func (h *HStore) AdminStoreCmd(globalCtx *GlobalCtx, cmd string) *executor.ExecuteCtx {
-	args := []string{"docker exec -t"}
-	args = append(args, h.ContainerName, "hadmin store")
-	args = append(args, fmt.Sprintf("--port %d", DefaultAdminApiPort))
-	args = append(args, cmd)
-	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
-}
-
-func (h *HStore) AdminServerCmd(globalCtx *GlobalCtx, host string, cmd string) *executor.ExecuteCtx {
-	args := []string{"docker exec -t"}
-	args = append(args, h.ContainerName, "hadmin server")
-	args = append(args, "--host", host, cmd)
+	args := []string{"/usr/bin/env bash", h.CheckReadyScriptPath}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -196,4 +177,126 @@ func (h *HStore) IsAdmin() bool {
 
 func (h *HStore) getDirs() (string, string) {
 	return h.spec.RemoteCfgPath, h.spec.DataDir
+}
+
+// ============================================================================================
+
+type HAdmin struct {
+	storeId              uint32
+	spec                 spec.HAdminSpec
+	Host                 string
+	AdminPort            int
+	ContainerName        string
+	CheckReadyScriptPath string
+}
+
+func NewHAdmin(id uint32, adminSpec spec.HAdminSpec) *HAdmin {
+	return &HAdmin{
+		storeId:       id,
+		spec:          adminSpec,
+		Host:          adminSpec.Host,
+		ContainerName: spec.AdminDefaultContainerName,
+		AdminPort:     adminSpec.AdminPort,
+	}
+}
+
+func (h *HAdmin) GetServiceName() string {
+	return "admin"
+}
+
+func (h *HAdmin) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := h.getDirs()
+	admin := utils.DisplayedComponent{
+		Name:          "HAdmin",
+		Host:          h.spec.Host,
+		Ports:         strconv.Itoa(h.AdminPort),
+		ContainerName: h.ContainerName,
+		Image:         h.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"hadmin": admin}
+}
+
+func (h *HAdmin) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	cfgDir, dataDir := h.getDirs()
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "/crash", "-m 0775")
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HAdmin) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	mountPoints := []spec.MountPoints{
+		{h.spec.DataDir, h.spec.DataDir},
+		{"/crash", "/data/crash"},
+		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},
+	}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
+	args = append(args, h.spec.Image, spec.AdminDefaultBinPath)
+	configPath := path.Join(h.spec.RemoteCfgPath, "logdevice.conf")
+	if len(globalCtx.HStoreConfigInMetaStore) != 0 {
+		configPath = globalCtx.HStoreConfigInMetaStore
+	}
+	args = append(args, fmt.Sprintf("--config-path %s", configPath))
+	args = append(args, fmt.Sprintf("--admin-port %d", h.AdminPort))
+	args = append(args, "--enable-maintenance-manager",
+		"--enable-safety-check-periodic-metadata-update",
+		"--maintenance-log-snapshotting",
+	)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HAdmin) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", spec.AdminDefaultContainerName}
+	args = append(args, "&&", "sudo rm -rf",
+		h.spec.DataDir, h.spec.RemoteCfgPath)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HAdmin) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	cfgDir, _ := h.getDirs()
+
+	if len(globalCtx.HStoreConfigInMetaStore) == 0 {
+		position := append([]executor.Position{},
+			executor.Position{LocalDir: globalCtx.LocalHStoreConfigFile, RemoteDir: path.Join(cfgDir, "logdevice.conf")})
+		return &executor.TransferCtx{Target: h.spec.Host, Position: position}
+	}
+	return nil
+}
+
+func (h *HAdmin) getDirs() (string, string) {
+	return h.spec.RemoteCfgPath, h.spec.DataDir
+}
+
+// ==========================================================================================
+
+type AdminInfo struct {
+	Host          string
+	Port          int
+	ContainerName string
+}
+
+func Bootstrap(globalCtx *GlobalCtx, adminCtx AdminInfo) *executor.ExecuteCtx {
+	args := []string{"docker exec -t"}
+	args = append(args, adminCtx.ContainerName, "hadmin store")
+	args = append(args, fmt.Sprintf("--port %d", adminCtx.Port))
+	args = append(args, BootStrapCmd)
+	args = append(args, fmt.Sprintf("node:%d", globalCtx.MetaReplica))
+	return &executor.ExecuteCtx{Target: adminCtx.Host, Cmd: strings.Join(args, " ")}
+}
+
+func AdminStoreCmd(globalCtx *GlobalCtx, adminCtx AdminInfo, cmd string) *executor.ExecuteCtx {
+	args := []string{"docker exec -t"}
+	args = append(args, adminCtx.ContainerName, "hadmin store")
+	args = append(args, fmt.Sprintf("--port %d", adminCtx.Port))
+	args = append(args, cmd)
+	return &executor.ExecuteCtx{Target: adminCtx.Host, Cmd: strings.Join(args, " ")}
+}
+
+func AdminServerCmd(globalCtx *GlobalCtx, adminCtx AdminInfo, serverHost string,
+	serverPort int, cmd string) *executor.ExecuteCtx {
+	args := []string{"docker exec -t"}
+	args = append(args, adminCtx.ContainerName, "hadmin server")
+	args = append(args, "--host", serverHost)
+	args = append(args, fmt.Sprintf("--port %d", serverPort))
+	args = append(args, cmd)
+	return &executor.ExecuteCtx{Target: adminCtx.Host, Cmd: strings.Join(args, " ")}
 }

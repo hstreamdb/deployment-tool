@@ -6,6 +6,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
 	"os"
 	"reflect"
@@ -84,7 +85,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 
 	admins := getAdminInfos(c)
 	if len(admins) == 0 {
-		return nil, fmt.Errorf("need at least one hadmin node")
+		logrus.Warn("no admin nodes presented, the HStream cluster will no be initialized")
 	}
 	cfgInMetaStore := ""
 	if !c.Global.DisableStoreNetworkCfgPath && metaStoreTp == spec.ZK {

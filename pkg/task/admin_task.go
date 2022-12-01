@@ -16,6 +16,10 @@ func (b *BootstrapCtx) String() string {
 }
 
 func (b *BootstrapCtx) Run(executor ext.Executor) error {
+	if len(b.ctx.HAdminInfos) == 0 {
+		log.Info("no admin nodes presented, skip initializing HStream cluster")
+		return nil
+	}
 	for _, admin := range b.ctx.HAdminInfos {
 		executorCtx := service.Bootstrap(b.ctx, admin)
 		target := fmt.Sprintf("%s:%d", executorCtx.Target, b.ctx.SSHPort)
@@ -40,6 +44,12 @@ func (c *CheckClusterStatusCtx) String() string {
 
 func (c *CheckClusterStatusCtx) Run(executor ext.Executor) error {
 	success := false
+
+	if len(c.ctx.HAdminInfos) == 0 {
+		log.Info("no admin nodes presented, skip checking HStore status")
+		return nil
+	}
+
 	for _, admin := range c.ctx.HAdminInfos {
 		executorCtx := service.AdminStoreCmd(c.ctx, admin, "status")
 		target := fmt.Sprintf("%s:%d", executorCtx.Target, c.ctx.SSHPort)

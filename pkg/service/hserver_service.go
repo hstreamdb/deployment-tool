@@ -6,6 +6,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	"github.com/sirupsen/logrus"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -110,8 +111,25 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
 	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
 	args = append(args, "--log-level", h.spec.Opts.ServerLogLevel)
-	admin := globalCtx.HAdminInfos[0]
-	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", admin.Host, admin.Port))
+
+	if len(globalCtx.HAdminInfos) != 0 {
+		adminInfo := globalCtx.HAdminInfos[0]
+		if !(h.spec.StoreAdminHost == "" && h.spec.StoreAdminPort == 0) {
+			logrus.Warn("store admin info has already been given by the admin node config, the `store_admin_host` and `store_admin_port` config with be overridden")
+		}
+		args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", adminInfo.Host, adminInfo.Port))
+	} else {
+		if h.spec.StoreAdminHost != "" {
+			args = append(args, fmt.Sprintf("--store-admin-host %s", h.spec.StoreAdminHost))
+		} else {
+			logrus.Warn("can not get store admin host from neither admin node config nor HServer instance config, use default value instead")
+		}
+		if h.spec.StoreAdminPort != 0 {
+			args = append(args, fmt.Sprintf("--store-admin-port %d", h.spec.StoreAdminPort))
+		} else {
+			logrus.Warn("can not get store admin port from neither admin node config nor HServer instance config, use default value instead")
+		}
+	}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

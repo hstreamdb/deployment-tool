@@ -45,15 +45,15 @@ func newDeploy() *cobra.Command {
 				return err
 			}
 
-			user := services.Global.User
 			if cmd.Flags().Changed("user") {
-				user = opts.user
+				services.Global.User = opts.user
+			}
+			user := services.Global.User
+
+			if cmd.Flags().Changed("identity-file") {
+				services.Global.KeyPath = opts.identityFile
 			}
 			keyPath := services.Global.KeyPath
-			if cmd.Flags().Changed("identity-file") {
-				keyPath = opts.identityFile
-			}
-
 			identityFile, password, err := utils.CheckSSHAuthentication(keyPath, opts.usePassword)
 			if err != nil {
 				return err

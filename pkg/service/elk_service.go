@@ -47,6 +47,7 @@ func (es *ElasticSearch) Display() map[string]utils.DisplayedComponent {
 func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := es.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -124,6 +125,7 @@ func (k *Kibana) Display() map[string]utils.DisplayedComponent {
 func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := k.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -242,25 +244,26 @@ func (f *Filebeat) Display() map[string]utils.DisplayedComponent {
 func (f *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := f.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (fb *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+func (f *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/var/lib/docker/containers", "/var/lib/docker/containers:ro"},
 		{"/var/run/docker.sock", "/var/run/docker.sock:ro"},
-		{filepath.Join(fb.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
+		{filepath.Join(f.spec.RemoteCfgPath, "filebeat.yml"), "/usr/share/filebeat/filebeat.yml:ro"},
 	}
-	args := spec.GetDockerExecCmd(globalCtx.containerCfg, fb.spec.ContainerCfg, fb.ContainerName, true, mountPoints...)
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, f.spec.ContainerCfg, f.ContainerName, true, mountPoints...)
 	args = append(args, "--user=root")
 
-	args = append(args, fb.spec.Image)
+	args = append(args, f.spec.Image)
 	args = append(args, "filebeat")
 	args = append(args, "-e")
 	args = append(args, "--strict.perms=false")
-	args = append(args, fmt.Sprintf("-E setup.kibana.host=%s:%s", fb.KibanaHost, fb.KibanaPort))
-	args = append(args, fmt.Sprintf("-E output.elasticsearch.hosts=[\"%s:%s\"]", fb.ElasticsearchHost, fb.ElasticsearchPort))
-	return &executor.ExecuteCtx{Target: fb.spec.Host, Cmd: strings.Join(args, " ")}
+	args = append(args, fmt.Sprintf("-E setup.kibana.host=%s:%s", f.KibanaHost, f.KibanaPort))
+	args = append(args, fmt.Sprintf("-E output.elasticsearch.hosts=[\"%s:%s\"]", f.ElasticsearchHost, f.ElasticsearchPort))
+	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
 func (f *Filebeat) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {

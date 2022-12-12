@@ -58,6 +58,7 @@ func (m *MonitorSuite) Display() map[string]utils.DisplayedComponent {
 func (m *MonitorSuite) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := m.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: m.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -146,6 +147,7 @@ func (p *Prometheus) Display() map[string]utils.DisplayedComponent {
 func (p *Prometheus) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := p.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -224,6 +226,7 @@ func (g *Grafana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := g.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir,
 		filepath.Join(cfgDir, "dashboards"), filepath.Join(cfgDir, "datasources"), "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -293,6 +296,7 @@ func (a *AlertManager) Display() map[string]utils.DisplayedComponent {
 func (a *AlertManager) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := a.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -352,6 +356,7 @@ func (h *HStreamExporter) Display() map[string]utils.DisplayedComponent {
 func (h *HStreamExporter) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

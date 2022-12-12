@@ -61,6 +61,7 @@ func (h *HStore) Display() map[string]utils.DisplayedComponent {
 func (h *HStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "/crash", "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	args = append(args, fmt.Sprintf("&& echo %d | tee %s", h.spec.StoreOps.Shards, filepath.Join(dataDir, "NSHARDS")))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -220,6 +221,7 @@ func (h *HAdmin) Display() map[string]utils.DisplayedComponent {
 func (h *HAdmin) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
 	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "/crash", "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

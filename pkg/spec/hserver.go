@@ -20,6 +20,10 @@ type HServerSpec struct {
 	DataDir           string       `yaml:"data_dir"`
 	Opts              ServerOpts   `yaml:"server_config"`
 	ContainerCfg      ContainerCfg `yaml:"container_config"`
+
+	// optional, when scaling HServer cluster without given admin node info
+	StoreAdminHost string `yaml:"store_admin_host"`
+	StoreAdminPort int    `yaml:"store_admin_port"`
 }
 
 func (h *HServerSpec) SetDefaultDataDir() {

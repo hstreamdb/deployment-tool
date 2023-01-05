@@ -1,7 +1,4 @@
 global:
-  # The Slack webhook URL.
-  # slack_api_url: ''
-
   # Mark the alarm status as resolved when alertmanager has not received an alarm
   # for a certain amount of time
   resolve_timeout: 5m
@@ -31,24 +28,27 @@ route:
   repeat_interval: 1h
 
   routes:
-  # - match:
-  #   receiver: webhook-kafka-adapter
-  #   continue: true
-  # - match:
-  #     env: test-cluster
-  #   receiver: db-alert-slack
-  # - match:
-  #     env: test-cluster
-  #   receiver: db-alert-email
+#    - receiver: 'slack-notifier'
+#      continue: true
+#    - receiver: 'phone-call'
+#      matchers:
+#        - alert_level = "critical"
 
 receivers:
   - name: 'slack-notifier'
     slack_configs:
-    - channel: '#hstream-notify'
-      username: 'hstream-alert'
-      icon_emoji: ':bell:'
-      title:   '{{ .CommonLabels.alertname }}'
-      text:    '{{ .CommonAnnotations.summary }}  {{ .CommonAnnotations.description }}'
+      - api_url: ''
+        channel: '#hstream-notify'
+        username: 'hstream-alert'
+        icon_emoji: ':bell:'
+        title:   '{{ .CommonLabels.alertname }}'
+        text:    'Summary: {{ .CommonAnnotations.summary }}\nDescription: {{ .CommonAnnotations.description }}'
+        send_resolved: true
+
+  - name: 'phone-call'
+    webhook_configs:
+      - url: ''
+        send_resolved: true
 
   # This doesn't alert anything, please configure your own receiver
   - name: "default"

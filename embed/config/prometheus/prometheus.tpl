@@ -1,6 +1,6 @@
 global:
   scrape_interval: 15s
-  evaluation_interval: 15s
+  evaluation_interval: 30s
 
   external_labels:
     monitor: "hstream-monitor"

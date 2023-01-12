@@ -72,7 +72,7 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
-	serverBinPath := spec.ServerBinConfigPath
+	serverBinPath := spec.ServerDefaultBinPath
 	if globalCtx.EnableHsGrpc {
 		serverBinPath = spec.ServerDefaultHsGrpcBinPath
 	}
@@ -116,6 +116,7 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
 	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
 	args = append(args, "--log-level", h.spec.Opts.ServerLogLevel)
+	args = append(args, fmt.Sprintf("--checkpoint-replica %d", globalCtx.MetaReplica))
 	admin := globalCtx.HAdminInfos[0]
 	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", admin.Host, admin.Port))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}

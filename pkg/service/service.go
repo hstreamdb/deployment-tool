@@ -248,6 +248,8 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	}, nil
 }
 
+// FIXME: construct a struct to parse `replicate_across` field in
+// internal_logs and metadata_logs
 type storeCfg struct {
 	ServerSettings map[string]interface{} `json:"server_settings,omitempty"`
 	ClientSettings map[string]interface{} `json:"client_settings,omitempty"`
@@ -258,16 +260,44 @@ type storeCfg struct {
 	Rqlite         map[string]interface{} `json:"rqlite,omitempty"`
 }
 
+// FIXME: will panic if no replicate_across or node field exist.
+func (s *storeCfg) updateLogReplic(replica int) {
+	cfgValue := reflect.Indirect(reflect.ValueOf(s))
+	for j := 0; j < cfgValue.NumField(); j++ {
+		switch cfgValue.Type().Field(j).Name {
+		case "InternalLogs":
+			field := cfgValue.Field(j)
+			v := reflect.Indirect(field)
+			for item := v.MapRange(); item.Next(); {
+				logCfg := item.Value().Elem()
+				if logCfg.Kind() != reflect.Map {
+					continue
+				}
+				replicateCfg := logCfg.MapIndex(reflect.ValueOf("replicate_across")).Elem()
+				replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
+			}
+			cfgValue.Field(j).Set(v)
+		case "MetadataLogs":
+			field := cfgValue.Field(j)
+			v := reflect.Indirect(field)
+			replicateCfg := v.MapIndex(reflect.ValueOf("replicate_across")).Elem()
+			replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
+			cfgValue.Field(j).Set(v)
+		}
+	}
+}
+
 func updateStoreConfig(ctx *GlobalCtx) (string, error) {
 	configPath := "template/logdevice.conf"
 	content, err := os.ReadFile(configPath)
 	if err != nil {
 		return "", err
 	}
-	var cfg storeCfg
-	if err = json.Unmarshal(content, &cfg); err != nil {
+	cfg := &storeCfg{}
+	if err = json.Unmarshal(content, cfg); err != nil {
 		return "", err
 	}
+	cfg.updateLogReplic(ctx.MetaReplica)
 
 	if cfg.Zookeeper != nil && cfg.Rqlite != nil {
 		return "", fmt.Errorf("can't set both zookeeper and rqlite fields in config file")

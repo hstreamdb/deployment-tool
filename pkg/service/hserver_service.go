@@ -72,7 +72,11 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
-	args = append(args, []string{h.spec.Image, spec.ServerDefaultBinPath}...)
+	serverBinPath := spec.ServerBinConfigPath
+	if globalCtx.EnableHsGrpc {
+		serverBinPath = spec.ServerDefaultHsGrpcBinPath
+	}
+	args = append(args, []string{h.spec.Image, serverBinPath}...)
 	_, version := parseImage(h.spec.Image)
 	if utils.CompareVersion(version, utils.Version0101) > 0 {
 		args = append(args, "--bind-address", h.spec.Host)

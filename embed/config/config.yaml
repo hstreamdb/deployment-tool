@@ -17,6 +17,8 @@ global:
   # disable_store_network_config_path: true
   # # Local path to HServer config file
   # hserver_config_path: ""
+  # # use grpc-haskell framework
+  # enable_grpc_haskell: false
   # # Local path to ElasticSearch config file
   # elastic_search_config_path: ""
   # # Global container configuration

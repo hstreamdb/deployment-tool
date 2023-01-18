@@ -57,8 +57,8 @@ func (h *HServer) Display() map[string]utils.DisplayedComponent {
 
 func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "/crash", "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s /crash",
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "/data/crash", "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s /data/crash",
 		globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -67,7 +67,7 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/mnt", "/mnt"},
 		{h.spec.DataDir, h.spec.DataDir},
-		{"/crash", "/data/crash"},
+		{"/data/crash", "/data/crash"},
 		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},
 	}
 

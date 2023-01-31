@@ -173,7 +173,7 @@ func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		panic("empty checkReadyScriptPath")
 	}
 
-	args := []string{"/bin/bash"}
+	args := []string{"/usr/bin/env bash"}
 	args = append(args, h.CheckReadyScriptPath)
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }

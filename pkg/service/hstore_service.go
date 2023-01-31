@@ -67,7 +67,7 @@ func (h *HStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (h *HStore) MountDisk() *executor.ExecuteCtx {
-	args := []string{"/bin/bash", h.MountScriptPath}
+	args := []string{"/usr/bin/env bash", h.MountScriptPath}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

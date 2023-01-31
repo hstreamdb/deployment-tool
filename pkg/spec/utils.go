@@ -39,7 +39,8 @@ type MountPoints struct {
 	Remote string
 }
 
-func GetDockerExecCmd(globalContainerSpec, serviceContainerSpec ContainerCfg, containerName string, hostMode bool, mountPoints ...MountPoints) []string {
+func GetDockerExecCmd(globalContainerSpec, serviceContainerSpec ContainerCfg, containerName string,
+	hostMode bool, mountPoints ...MountPoints) []string {
 	args := []string{"docker run -d"}
 	if hostMode {
 		args = append(args, "--network host")

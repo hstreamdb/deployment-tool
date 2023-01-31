@@ -155,7 +155,7 @@ func (m *MetaStore) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		panic("empty checkReadyScriptPath")
 	}
 
-	args := []string{"/bin/bash"}
+	args := []string{"/usr/bin/env bash"}
 	args = append(args, m.CheckReadyScriptPath)
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }

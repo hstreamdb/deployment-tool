@@ -13,6 +13,7 @@ var (
 	globalCfgTypeName = reflect.TypeOf(GlobalCfg{}).Name()
 )
 
+// ComponentsSpec map config.yaml to a struct
 type ComponentsSpec struct {
 	Global          GlobalCfg             `yaml:"global"`
 	Monitor         MonitorSpec           `yaml:"monitor"`
@@ -30,6 +31,35 @@ type ComponentsSpec struct {
 	Filebeat        []FilebeatSpec        `yaml:"filebeat"`
 }
 
+func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	// avoid recursion unmarshal
+	type tmpSpec ComponentsSpec
+	if err := unmarshal((*tmpSpec)(c)); err != nil {
+		return err
+	}
+
+	// defaults.Set will initialize a list to an empty list, so if the default value is set first,
+	// none of the list fields in the componentsSpec will be set correctly. that's why we have to
+	// unmarshal first and then set the default value
+	if err := defaults.Set(c); err != nil {
+		return err
+	}
+
+	if err := updateComponentSpecWithGlobal(c.Global, c); err != nil {
+		return err
+	}
+
+	if len(c.Monitor.NodeExporterImage) == 0 {
+		c.Monitor.NodeExporterImage = NodeExporterDefaultImage
+	}
+	if len(c.Monitor.CadvisorImage) == 0 {
+		c.Monitor.CadvisorImage = CadvisorDefaultImage
+	}
+
+	checkConflictAdminPort(c.HStore, c.HAdmin)
+	return nil
+}
+
 func (c *ComponentsSpec) GetHosts() []string {
 	v := reflect.Indirect(reflect.ValueOf(c))
 	t := v.Type()
@@ -41,26 +71,6 @@ func (c *ComponentsSpec) GetHosts() []string {
 			continue
 		}
 		res = append(res, getHostsInner(field)...)
-	}
-	return res
-}
-
-func getHostsInner(v reflect.Value) []string {
-	t := v.Type()
-	res := []string{}
-	switch t.Kind() {
-	case reflect.Slice:
-		for i := 0; i < v.Len(); i++ {
-			if hosts := getHostsInner(v.Index(i)); hosts != nil {
-				res = append(res, hosts...)
-			}
-		}
-	case reflect.Struct:
-		host := v.FieldByName("Host")
-		if !host.IsValid() {
-			return res
-		}
-		res = append(res, host.String())
 	}
 	return res
 }
@@ -85,30 +95,6 @@ func (c *ComponentsSpec) GetMetaStoreUrl() (string, MetaStoreType, error) {
 		return "", Unknown, fmt.Errorf("unknown meta store type")
 	}
 	return url, tp, nil
-}
-
-func getZkUrl(metaStore []MetaStoreSpec) string {
-	hosts := []string{}
-	for _, spc := range metaStore {
-		hosts = append(hosts, spc.Host)
-	}
-	if len(hosts) == 0 {
-		return ""
-	}
-
-	// append an empty string to help strings join
-	hosts = append(hosts, "")
-	url := strings.Join(hosts, ":2181,")
-	url = url[:len(url)-1]
-	return url
-}
-
-func getRqliteUrl(metaStore []MetaStoreSpec) string {
-	hosts := []string{}
-	for _, spec := range metaStore {
-		hosts = append(hosts, fmt.Sprintf("http://%s:%d", spec.Host, spec.Port))
-	}
-	return strings.Join(hosts, ",")
 }
 
 func (c *ComponentsSpec) GetHServerUrl() string {
@@ -143,33 +129,80 @@ func (c *ComponentsSpec) GetAlertManagerAddr() []string {
 	return hosts
 }
 
-func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	// avoid recursion unmarshal
-	type tmpSpec ComponentsSpec
-	if err := unmarshal((*tmpSpec)(c)); err != nil {
-		return err
+type MetaStoreType uint
+
+const (
+	ZK MetaStoreType = iota
+	RQLITE
+	Unknown
+)
+
+func (m MetaStoreType) String() string {
+	switch m {
+	case ZK:
+		return "zookeeper"
+	case RQLITE:
+		return "rqlite"
+	case Unknown:
+		return "unknown"
+	}
+	return ""
+}
+
+// GetMetaStoreType check docker image and return the proper meta store type
+func GetMetaStoreType(image string) MetaStoreType {
+	if strings.Contains(image, "zookeeper") {
+		return ZK
+	} else if strings.Contains(image, "rqlite") {
+		return RQLITE
+	}
+	return Unknown
+}
+
+// =================================================================================
+
+func getHostsInner(v reflect.Value) []string {
+	t := v.Type()
+	res := []string{}
+	switch t.Kind() {
+	case reflect.Slice:
+		for i := 0; i < v.Len(); i++ {
+			if hosts := getHostsInner(v.Index(i)); hosts != nil {
+				res = append(res, hosts...)
+			}
+		}
+	case reflect.Struct:
+		host := v.FieldByName("Host")
+		if !host.IsValid() {
+			return res
+		}
+		res = append(res, host.String())
+	}
+	return res
+}
+
+func getZkUrl(metaStore []MetaStoreSpec) string {
+	hosts := []string{}
+	for _, spc := range metaStore {
+		hosts = append(hosts, spc.Host)
+	}
+	if len(hosts) == 0 {
+		return ""
 	}
 
-	// defaults.Set will initialize a list to an empty list, so if the default value is set first,
-	// none of the list fields in the componentsSpec will be set correctly. that's why we have to
-	// unmarshal first and then set the default value
-	if err := defaults.Set(c); err != nil {
-		return err
-	}
+	// append an empty string to help strings join
+	hosts = append(hosts, "")
+	url := strings.Join(hosts, ":2181,")
+	url = url[:len(url)-1]
+	return url
+}
 
-	if err := updateComponentSpecWithGlobal(c.Global, c); err != nil {
-		return err
+func getRqliteUrl(metaStore []MetaStoreSpec) string {
+	hosts := []string{}
+	for _, spec := range metaStore {
+		hosts = append(hosts, fmt.Sprintf("http://%s:%d", spec.Host, spec.Port))
 	}
-
-	if len(c.Monitor.NodeExporterImage) == 0 {
-		c.Monitor.NodeExporterImage = NodeExporterDefaultImage
-	}
-	if len(c.Monitor.CadvisorImage) == 0 {
-		c.Monitor.CadvisorImage = CadvisorDefaultImage
-	}
-
-	checkConflictAdminPort(c.HStore, c.HAdmin)
-	return nil
+	return strings.Join(hosts, ",")
 }
 
 func checkConflictAdminPort(store []HStoreSpec, admin []HAdminSpec) {
@@ -192,73 +225,6 @@ func checkConflictAdminPort(store []HStoreSpec, admin []HAdminSpec) {
 				v.Host, v.AdminPort))
 		}
 	}
-}
-
-type GlobalCfg struct {
-	User                       string       `yaml:"user"`
-	KeyPath                    string       `yaml:"key_path"`
-	SSHPort                    int          `yaml:"ssh_port" default:"22"`
-	MetaReplica                int          `yaml:"meta_replica" default:"3"`
-	MetaStoreConfigPath        string       `yaml:"meta_store_config_path"`
-	HStoreConfigPath           string       `yaml:"hstore_config_path"`
-	HServerConfigPath          string       `yaml:"hserver_config_path"`
-	EnableHsGrpc               bool         `yaml:"enable_grpc_haskell"`
-	DisableStoreNetworkCfgPath bool         `yaml:"disable_store_network_config_path"`
-	EsConfigPath               string       `yaml:"elastic_search_config_path"`
-	ContainerCfg               ContainerCfg `yaml:"container_config"`
-}
-
-type ContainerCfg struct {
-	Cpu            string `yaml:"cpu_limit"`
-	Memory         string `yaml:"memory_limit"`
-	RemoveWhenExit bool   `yaml:"remove_when_exit"`
-	DisableRestart bool   `yaml:"disable_restart"`
-}
-
-func (c ContainerCfg) GetCmd() string {
-	args := make([]string, 0, 4)
-	if !c.DisableRestart {
-		args = append(args, "--restart unless-stopped")
-	}
-	if c.RemoveWhenExit {
-		args = append(args, "--rm")
-	}
-	if len(c.Cpu) != 0 {
-		args = append(args, fmt.Sprintf("--cpus=%s", c.Cpu))
-	}
-	if len(c.Memory) != 0 {
-		args = append(args, fmt.Sprintf("--memory=%s", c.Memory))
-	}
-	return strings.Join(args, " ")
-}
-
-type MetaStoreType uint
-
-const (
-	ZK MetaStoreType = iota
-	RQLITE
-	Unknown
-)
-
-func (m MetaStoreType) String() string {
-	switch m {
-	case ZK:
-		return "zookeeper"
-	case RQLITE:
-		return "rqlite"
-	case Unknown:
-		return "unknown"
-	}
-	return ""
-}
-
-func GetMetaStoreType(image string) MetaStoreType {
-	if strings.Contains(image, "zookeeper") {
-		return ZK
-	} else if strings.Contains(image, "rqlite") {
-		return RQLITE
-	}
-	return Unknown
 }
 
 func updateComponentSpecWithGlobal(globalCfg GlobalCfg, data interface{}) error {

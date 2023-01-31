@@ -55,28 +55,6 @@ type GlobalCtx struct {
 	HttpServerUrls    []string
 }
 
-func getAdminInfos(c spec.ComponentsSpec) []AdminInfo {
-	infos := []AdminInfo{}
-	for _, v := range c.HAdmin {
-		infos = append(infos, AdminInfo{
-			Host:          v.Host,
-			Port:          v.AdminPort,
-			ContainerName: spec.AdminDefaultContainerName,
-		})
-	}
-
-	for _, v := range c.HStore {
-		if v.EnableAdmin {
-			infos = append(infos, AdminInfo{
-				Host:          v.Host,
-				Port:          v.AdminPort,
-				ContainerName: spec.StoreDefaultContainerName,
-			})
-		}
-	}
-	return infos
-}
-
 func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	metaStoreUrl, metaStoreTp, err := c.GetMetaStoreUrl()
 	if err != nil {
@@ -248,45 +226,39 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	}, nil
 }
 
-// FIXME: construct a struct to parse `replicate_across` field in
-// internal_logs and metadata_logs
-type storeCfg struct {
-	ServerSettings map[string]interface{} `json:"server_settings,omitempty"`
-	ClientSettings map[string]interface{} `json:"client_settings,omitempty"`
-	Cluster        string                 `json:"cluster,omitempty"`
-	InternalLogs   map[string]interface{} `json:"internal_logs,omitempty"`
-	MetadataLogs   map[string]interface{} `json:"metadata_logs,omitempty"`
-	Zookeeper      map[string]interface{} `json:"zookeeper,omitempty"`
-	Rqlite         map[string]interface{} `json:"rqlite,omitempty"`
-}
+func (s *Services) ShowAllServices() {
+	v := reflect.Indirect(reflect.ValueOf(s))
+	t := v.Type()
 
-// FIXME: will panic if no replicate_across or node field exist.
-func (s *storeCfg) updateLogReplic(replica int) {
-	cfgValue := reflect.Indirect(reflect.ValueOf(s))
-	for j := 0; j < cfgValue.NumField(); j++ {
-		switch cfgValue.Type().Field(j).Name {
-		case "InternalLogs":
-			field := cfgValue.Field(j)
-			v := reflect.Indirect(field)
-			for item := v.MapRange(); item.Next(); {
-				logCfg := item.Value().Elem()
-				if logCfg.Kind() != reflect.Map {
-					continue
-				}
-				replicateCfg := logCfg.MapIndex(reflect.ValueOf("replicate_across")).Elem()
-				replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
+	showedComponents := make(map[string][]utils.DisplayedComponent)
+	for i := 0; i < t.NumField(); i++ {
+		field := v.Field(i)
+		if field.Type().Kind() != reflect.Slice {
+			continue
+		}
+
+		for j := 0; j < field.Len(); j++ {
+			service := field.Index(j)
+			if service.Type().Kind() != reflect.Ptr {
+				panic(fmt.Sprintf("Show all services error, unexpected service kind: %s", service.String()))
 			}
-			cfgValue.Field(j).Set(v)
-		case "MetadataLogs":
-			field := cfgValue.Field(j)
-			v := reflect.Indirect(field)
-			replicateCfg := v.MapIndex(reflect.ValueOf("replicate_across")).Elem()
-			replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
-			cfgValue.Field(j).Set(v)
+
+			fn := service.MethodByName("Display")
+			res := fn.Call(nil)
+			displayedComponent := res[0].Interface().(map[string]utils.DisplayedComponent)
+			for k, c := range displayedComponent {
+				if _, ok := showedComponents[k]; !ok {
+					showedComponents[k] = []utils.DisplayedComponent{}
+				}
+				showedComponents[k] = append(showedComponents[k], c)
+			}
 		}
 	}
+	utils.ShowComponents(showedComponents)
 }
 
+// updateStoreConfig update hstore config file and write the updated config
+// file to template/logdevice.conf
 func updateStoreConfig(ctx *GlobalCtx) (string, error) {
 	configPath := "template/logdevice.conf"
 	content, err := os.ReadFile(configPath)
@@ -329,35 +301,44 @@ func updateStoreConfig(ctx *GlobalCtx) (string, error) {
 	return configPath, nil
 }
 
-func (s *Services) ShowAllServices() {
-	v := reflect.Indirect(reflect.ValueOf(s))
-	t := v.Type()
+// FIXME: construct a struct to parse `replicate_across` field in
+// internal_logs and metadata_logs
+// storeCfg map a hstore config file to a struct
+type storeCfg struct {
+	ServerSettings map[string]interface{} `json:"server_settings,omitempty"`
+	ClientSettings map[string]interface{} `json:"client_settings,omitempty"`
+	Cluster        string                 `json:"cluster,omitempty"`
+	InternalLogs   map[string]interface{} `json:"internal_logs,omitempty"`
+	MetadataLogs   map[string]interface{} `json:"metadata_logs,omitempty"`
+	Zookeeper      map[string]interface{} `json:"zookeeper,omitempty"`
+	Rqlite         map[string]interface{} `json:"rqlite,omitempty"`
+}
 
-	showedComponents := make(map[string][]utils.DisplayedComponent)
-	for i := 0; i < t.NumField(); i++ {
-		field := v.Field(i)
-		if field.Type().Kind() != reflect.Slice {
-			continue
-		}
-
-		for j := 0; j < field.Len(); j++ {
-			service := field.Index(j)
-			if service.Type().Kind() != reflect.Ptr {
-				panic(fmt.Sprintf("Show all services error, unexpected service kind: %s", service.String()))
-			}
-
-			fn := service.MethodByName("Display")
-			res := fn.Call(nil)
-			displayedComponent := res[0].Interface().(map[string]utils.DisplayedComponent)
-			for k, c := range displayedComponent {
-				if _, ok := showedComponents[k]; !ok {
-					showedComponents[k] = []utils.DisplayedComponent{}
+// FIXME: will panic if no replicate_across or node field exist.
+func (s *storeCfg) updateLogReplic(replica int) {
+	cfgValue := reflect.Indirect(reflect.ValueOf(s))
+	for j := 0; j < cfgValue.NumField(); j++ {
+		switch cfgValue.Type().Field(j).Name {
+		case "InternalLogs":
+			field := cfgValue.Field(j)
+			v := reflect.Indirect(field)
+			for item := v.MapRange(); item.Next(); {
+				logCfg := item.Value().Elem()
+				if logCfg.Kind() != reflect.Map {
+					continue
 				}
-				showedComponents[k] = append(showedComponents[k], c)
+				replicateCfg := logCfg.MapIndex(reflect.ValueOf("replicate_across")).Elem()
+				replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
 			}
+			cfgValue.Field(j).Set(v)
+		case "MetadataLogs":
+			field := cfgValue.Field(j)
+			v := reflect.Indirect(field)
+			replicateCfg := v.MapIndex(reflect.ValueOf("replicate_across")).Elem()
+			replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
+			cfgValue.Field(j).Set(v)
 		}
 	}
-	utils.ShowComponents(showedComponents)
 }
 
 // getExcludedMonitorHosts get the hosts of all nodes which don't need to deploy
@@ -376,4 +357,26 @@ func getExcludedMonitorHosts(c spec.ComponentsSpec) []string {
 	//}
 	sort.Strings(res)
 	return slices.Compact(res)
+}
+
+func getAdminInfos(c spec.ComponentsSpec) []AdminInfo {
+	infos := []AdminInfo{}
+	for _, v := range c.HAdmin {
+		infos = append(infos, AdminInfo{
+			Host:          v.Host,
+			Port:          v.AdminPort,
+			ContainerName: spec.AdminDefaultContainerName,
+		})
+	}
+
+	for _, v := range c.HStore {
+		if v.EnableAdmin {
+			infos = append(infos, AdminInfo{
+				Host:          v.Host,
+				Port:          v.AdminPort,
+				ContainerName: spec.StoreDefaultContainerName,
+			})
+		}
+	}
+	return infos
 }

@@ -105,7 +105,7 @@ func (s *SSHExecutor) Download(localPath, remotePath string) error {
 	//	return err
 	//}
 
-	return nil
+	panic("unimplemented method")
 }
 
 func (s *SSHExecutor) getClient(address string) (*ssh.Client, error) {

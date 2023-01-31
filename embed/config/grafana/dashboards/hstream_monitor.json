@@ -558,7 +558,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(hstream_exporter_subscription_send_bytes{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(rate(hstream_exporter_subscription_send_out_bytes{server_host=~\"$host\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-send-speed",
           "range": true,
           "refId": "A"
@@ -569,7 +569,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(hstream_exporter_subscription_send_bytes[$interval]))",
+          "expr": "sum(rate(hstream_exporter_subscription_send_out_bytes[$interval]))",
           "hide": false,
           "legendFormat": "total-send-speed",
           "range": true,
@@ -663,7 +663,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(hstream_exporter_subscription_acks{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(rate(hstream_exporter_subscription_received_acks{server_host=~\"$host\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-ack",
           "range": true,
           "refId": "A"
@@ -674,7 +674,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(hstream_exporter_subscription_acks[$interval]))",
+          "expr": "sum(rate(hstream_exporter_subscription_received_acks[$interval]))",
           "hide": false,
           "legendFormat": "total-ack",
           "range": true,

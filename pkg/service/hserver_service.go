@@ -73,8 +73,8 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
 	serverBinPath := spec.ServerDefaultBinPath
-	if globalCtx.EnableHsGrpc {
-		serverBinPath = spec.ServerDefaultHsGrpcBinPath
+	if globalCtx.EnableGrpcHs {
+		serverBinPath = spec.ServerGrpcHaskellBinPath
 	}
 	args = append(args, []string{h.spec.Image, serverBinPath}...)
 	_, version := parseImage(h.spec.Image)

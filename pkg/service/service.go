@@ -27,7 +27,7 @@ type GlobalCtx struct {
 	KeyPath       string
 	SSHPort       int
 	MetaReplica   int
-	EnableHsGrpc  bool
+	EnableGrpcHs  bool
 	RemoteCfgPath string
 	DataDir       string
 	containerCfg  spec.ContainerCfg
@@ -78,7 +78,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		KeyPath:      c.Global.KeyPath,
 		SSHPort:      c.Global.SSHPort,
 		MetaReplica:  c.Global.MetaReplica,
-		EnableHsGrpc: c.Global.EnableHsGrpc,
+		EnableGrpcHs: c.Global.EnableHsGrpc,
 		containerCfg: c.Global.ContainerCfg,
 
 		Hosts:                    hosts,

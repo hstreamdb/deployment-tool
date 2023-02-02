@@ -4,8 +4,8 @@ const (
 	ServerBinConfigPath        = "/etc/hstream/config.yaml"
 	ServerDefaultImage         = "hstreamdb/hstream"
 	ServerDefaultContainerName = "deploy_hserver"
-	ServerDefaultBinPath       = "/usr/local/bin/hstream-server-sid"
-	ServerDefaultHsGrpcBinPath = "/usr/local/bin/hstream-server"
+	ServerDefaultBinPath       = "/usr/local/bin/hstream-server"
+	ServerGrpcHaskellBinPath   = "/usr/local/bin/hstream-server-old"
 	ServerDefaultCfgDir        = "/hstream/deploy/hserver"
 	ServerDefaultDataDir       = "/hstream/data/hserver"
 )

@@ -233,6 +233,7 @@ func (g *Grafana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{g.spec.RemoteCfgPath, "/etc/grafana/provisioning"},
+		{g.spec.DataDir, "/var/lib/grafana"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, g.spec.ContainerCfg, g.ContainerName, true, mountPoints...)
 	if g.DisableLogin {

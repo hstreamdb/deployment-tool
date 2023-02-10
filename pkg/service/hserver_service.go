@@ -79,8 +79,11 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, []string{h.spec.Image, serverBinPath}...)
 	_, version := parseImage(h.spec.Image)
 	if utils.CompareVersion(version, utils.Version0101) > 0 {
-		args = append(args, "--bind-address", h.spec.Host)
-		args = append(args, "--advertised-address", h.spec.AdvertisedAddress)
+		args = append(args, "--bind-address", "0.0.0.0")
+		args = append(args, "--advertised-address", h.spec.Host)
+		if len(h.spec.AdvertisedListener) != 0 {
+			args = append(args, "--advertised-listeners", h.spec.AdvertisedListener)
+		}
 	} else {
 		args = append(args, "--host", h.spec.Host)
 		args = append(args, "--address", h.spec.AdvertisedAddress)

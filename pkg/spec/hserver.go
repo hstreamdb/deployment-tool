@@ -11,16 +11,19 @@ const (
 )
 
 type HServerSpec struct {
-	Host              string       `yaml:"host"`
-	AdvertisedAddress string       `yaml:"advertised_address"`
-	Port              int          `yaml:"port" default:"6570"`
-	InternalPort      int          `yaml:"internal_port" default:"6571"`
-	Image             string       `yaml:"image"`
-	SSHPort           int          `yaml:"ssh_port" default:"22"`
-	RemoteCfgPath     string       `yaml:"remote_config_path"`
-	DataDir           string       `yaml:"data_dir"`
-	Opts              ServerOpts   `yaml:"server_config"`
-	ContainerCfg      ContainerCfg `yaml:"container_config"`
+	Host string `yaml:"host"`
+	// AdvertisedAddress only used before hstream v0.10.1
+	// After v0.10.1, this field will be filled with the internal ip address
+	AdvertisedAddress  string       `yaml:"advertised_address"`
+	AdvertisedListener string       `yaml:"advertised_listener"`
+	Port               int          `yaml:"port" default:"6570"`
+	InternalPort       int          `yaml:"internal_port" default:"6571"`
+	Image              string       `yaml:"image"`
+	SSHPort            int          `yaml:"ssh_port" default:"22"`
+	RemoteCfgPath      string       `yaml:"remote_config_path"`
+	DataDir            string       `yaml:"data_dir"`
+	Opts               ServerOpts   `yaml:"server_config"`
+	ContainerCfg       ContainerCfg `yaml:"container_config"`
 }
 
 func (h *HServerSpec) SetDefaultDataDir() {

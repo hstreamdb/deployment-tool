@@ -59,8 +59,8 @@ func (m *MonitorSuite) Display() map[string]utils.DisplayedComponent {
 
 func (m *MonitorSuite) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := m.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: m.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -96,7 +96,7 @@ func (m *MonitorSuite) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (m *MonitorSuite) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", m.NodeContainerName, m.CadvisorContainerName}
-	args = append(args, "&&", "sudo rm -rf", m.spec.DataDir, m.spec.RemoteCfgPath)
+	args = append(args, "&&", "rm -rf", m.spec.DataDir, m.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: m.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -140,8 +140,8 @@ func (b *BlackBox) Display() map[string]utils.DisplayedComponent {
 
 func (b *BlackBox) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := b.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: b.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -161,7 +161,7 @@ func (b *BlackBox) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (b *BlackBox) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", b.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", b.spec.DataDir, b.spec.RemoteCfgPath)
+	args = append(args, "&&", "rm -rf", b.spec.DataDir, b.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: b.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -239,8 +239,8 @@ func (p *Prometheus) Display() map[string]utils.DisplayedComponent {
 
 func (p *Prometheus) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := p.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -263,7 +263,7 @@ func (p *Prometheus) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (p *Prometheus) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", p.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", p.spec.DataDir, p.spec.RemoteCfgPath)
+	args = append(args, "&&", "rm -rf", p.spec.DataDir, p.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -338,9 +338,9 @@ func (g *Grafana) Display() map[string]utils.DisplayedComponent {
 
 func (g *Grafana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := g.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir,
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir,
 		filepath.Join(cfgDir, "dashboards"), filepath.Join(cfgDir, "datasources"), "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -375,7 +375,7 @@ func (g *Grafana) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (g *Grafana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", g.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", g.spec.DataDir, g.spec.RemoteCfgPath)
+	args = append(args, "&&", "rm -rf", g.spec.DataDir, g.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -429,8 +429,8 @@ func (a *AlertManager) Display() map[string]utils.DisplayedComponent {
 
 func (a *AlertManager) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := a.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -450,7 +450,7 @@ func (a *AlertManager) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (a *AlertManager) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", a.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", a.spec.DataDir, a.spec.RemoteCfgPath)
+	args = append(args, "&&", "rm -rf", a.spec.DataDir, a.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -497,8 +497,8 @@ func (h *HStreamExporter) Display() map[string]utils.DisplayedComponent {
 
 func (h *HStreamExporter) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -518,7 +518,7 @@ func (h *HStreamExporter) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (h *HStreamExporter) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", h.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", h.spec.DataDir, h.spec.RemoteCfgPath)
+	args = append(args, "&&", "rm -rf", h.spec.DataDir, h.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

@@ -69,8 +69,8 @@ func (es *ElasticSearch) Display() map[string]utils.DisplayedComponent {
 
 func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := es.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -94,7 +94,7 @@ func (es *ElasticSearch) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (es *ElasticSearch) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", es.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", es.spec.DataDir, es.spec.RemoteCfgPath)
+	args = append(args, "&&", "rm -rf", es.spec.DataDir, es.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -152,8 +152,8 @@ func (k *Kibana) Display() map[string]utils.DisplayedComponent {
 
 func (k *Kibana) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := k.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -188,7 +188,7 @@ func (k *Kibana) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (k *Kibana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", k.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", k.spec.RemoteCfgPath, k.spec.DataDir)
+	args = append(args, "&&", "rm -rf", k.spec.RemoteCfgPath, k.spec.DataDir)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -242,7 +242,7 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	positions = append(positions, executor.Position{
 		LocalDir:  chkCmd,
 		RemoteDir: remoteScriptPath,
-		Opts:      fmt.Sprintf("sudo chmod +x %s", remoteScriptPath),
+		Opts:      fmt.Sprintf("chmod +x %s", remoteScriptPath),
 	})
 
 	return &executor.TransferCtx{
@@ -301,8 +301,8 @@ func (f *Filebeat) Display() map[string]utils.DisplayedComponent {
 
 func (f *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := f.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -331,7 +331,7 @@ func (f *Filebeat) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (f *Filebeat) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", f.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", f.spec.RemoteCfgPath, f.spec.DataDir)
+	args = append(args, "&&", "rm -rf", f.spec.RemoteCfgPath, f.spec.DataDir)
 	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

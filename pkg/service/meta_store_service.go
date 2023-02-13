@@ -50,8 +50,8 @@ func (m *MetaStore) Display() map[string]utils.DisplayedComponent {
 
 func (m *MetaStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := m.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, dataDir+"/data", dataDir+"/datalog", cfgDir+"/script", "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, dataDir+"/data", dataDir+"/datalog", cfgDir+"/script", "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -120,7 +120,7 @@ func (m *MetaStore) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (m *MetaStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", spec.MetaStoreDefaultContainerName}
-	args = append(args, "&&", "sudo rm -rf", m.spec.DataDir,
+	args = append(args, "&&", "rm -rf", m.spec.DataDir,
 		m.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -142,7 +142,7 @@ func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	remoteScriptPath := filepath.Join(cfgDir, "script", scriptName)
 	m.CheckReadyScriptPath = remoteScriptPath
 	position := []executor.Position{
-		{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)},
+		{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("chmod +x %s", remoteScriptPath)},
 	}
 
 	if len(globalCtx.LocalMetaStoreConfigFile) != 0 {

@@ -62,8 +62,8 @@ func (h *HStore) Display() map[string]utils.DisplayedComponent {
 
 func (h *HStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "/data/crash", "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s /data/crash", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, cfgDir+"/script", "/data/crash", "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s /data/crash", globalCtx.User, cfgDir, dataDir))
 	args = append(args, fmt.Sprintf("&& echo %d | tee %s", h.spec.StoreOps.Shards, filepath.Join(dataDir, "NSHARDS")))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -120,7 +120,7 @@ func (h *HStore) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (h *HStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", spec.StoreDefaultContainerName}
-	args = append(args, "&&", "sudo rm -rf",
+	args = append(args, "&&", "rm -rf",
 		fmt.Sprintf("%s/shard*/*", h.spec.DataDir),
 		h.spec.DataDir, h.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
@@ -169,7 +169,7 @@ func (h *HStore) syncScript(cfgDir string, scpts ...script.Script) ([]executor.P
 		case script.HStoreMountDiskScript:
 			h.MountScriptPath = remoteScriptPath
 		}
-		res = append(res, executor.Position{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("sudo chmod +x %s", remoteScriptPath)})
+		res = append(res, executor.Position{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("chmod +x %s", remoteScriptPath)})
 	}
 	return res, nil
 }
@@ -232,8 +232,8 @@ func (h *HAdmin) Display() map[string]utils.DisplayedComponent {
 
 func (h *HAdmin) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "/data/crash", "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s /data/crash", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "/data/crash", "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s /data/crash", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -265,7 +265,7 @@ func (h *HAdmin) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (h *HAdmin) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", spec.AdminDefaultContainerName}
-	args = append(args, "&&", "sudo rm -rf",
+	args = append(args, "&&", "rm -rf",
 		h.spec.DataDir, h.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }

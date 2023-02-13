@@ -41,8 +41,8 @@ func (h *HStreamConsole) Display() map[string]utils.DisplayedComponent {
 
 func (h *HStreamConsole) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
-	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -63,7 +63,7 @@ func (h *HStreamConsole) Stop(cfg *GlobalCtx) *executor.ExecuteCtx {
 
 func (h *HStreamConsole) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", h.ContainerName}
-	args = append(args, "&&", "sudo rm -rf", h.spec.DataDir,
+	args = append(args, "&&", "rm -rf", h.spec.DataDir,
 		h.spec.RemoteCfgPath)
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }

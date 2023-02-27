@@ -56,6 +56,12 @@ hserver:
   - host: 10.1.0.10
     # # HServer docker image
     # image: "hstreamdb/hstream"
+    # # The listener is an adderss that a server advertises to its clients so they can connect to the server.
+    # # Each listener is specified as "listener_name:hstream://host_name:port_number". The listener_name is
+    # # a name that identifies the listener, and the "host_name" and "port_number" are the IP address and
+    # # port number that reachable from the client's network. Multi listener will split by comma.
+    # # For example: public_ip:hstream://39.101.190.70:6582
+    # advertised_listener: ""
     # # HServer listen port
     # port: 6570
     # # HServer internal port
@@ -81,6 +87,12 @@ hserver:
   - host: 10.1.0.11
     # # HServer docker image
     # image: "hstreamdb/hstream"
+    # # The listener is an adderss that a server advertises to its clients so they can connect to the server.
+    # # Each listener is specified as "listener_name:hstream://host_name:port_number". The listener_name is
+    # # a name that identifies the listener, and the "host_name" and "port_number" are the IP address and
+    # # port number that reachable from the client's network. Multi listener will split by comma.
+    # # For example: public_ip:hstream://39.101.190.71:6582
+    # advertised_listener: ""
     # # HServer listen port
     # port: 6570
     # # HServer internal port
@@ -106,6 +118,12 @@ hserver:
   - host: 10.1.0.12
     # # HServer docker image
     # image: "hstreamdb/hstream"
+    # # The listener is an adderss that a server advertises to its clients so they can connect to the server.
+    # # Each listener is specified as "listener_name:hstream://host_name:port_number". The listener_name is
+    # # a name that identifies the listener, and the "host_name" and "port_number" are the IP address and
+    # # port number that reachable from the client's network. Multi listener will split by comma.
+    # # For example: public_ip:hstream://39.101.190.72:6582
+    # advertised_listener: ""
     # # HServer listen port
     # port: 6570
     # # HServer internal port

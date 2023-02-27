@@ -240,7 +240,7 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		args = append(args, "-e GF_AUTH_ANONYMOUS_ORG_ROLE=Admin",
 			"-e GF_AUTH_ANONYMOUS_ENABLED=true", "-e GF_AUTH_DISABLE_LOGIN_FORM=true")
 	}
-	args = append(args, g.spec.Image)
+	args = append(args, "-u root", g.spec.Image)
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

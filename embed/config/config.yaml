@@ -6,7 +6,7 @@ global:
   # # SSH service monitor port
   ssh_port: 22
   # # Replication factors of store metadata
-  # meta_replica: 3
+  # meta_replica: 1
   # # Local path to MetaStore config file
   # meta_store_config_path: ""
   # # Local path to HStore config file

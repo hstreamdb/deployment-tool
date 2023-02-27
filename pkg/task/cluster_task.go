@@ -42,6 +42,10 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(SetUpAlertService)
 	}
 
+	if len(services.HStreamConsole) != 0 {
+		ctx.run(SetUpHStreamConsole)
+	}
+
 	if len(services.ElasticSearch) != 0 {
 		ctx.run(SetUpElasticSearch)
 		ctx.run(SetUpKibana)
@@ -56,6 +60,10 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(RemoveFilebeat)
 		ctx.run(RemoveKibana)
 		ctx.run(RemoveElasticSearch)
+	}
+
+	if len(services.HStreamConsole) != 0 {
+		ctx.run(RemoveHStreamConsole)
 	}
 
 	if len(services.Prometheus) != 0 {
@@ -174,6 +182,14 @@ func SetUpHServerCluster(executor ext.Executor, services *service.Services) erro
 
 func RemoveHServerCluster(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.HServer)
+}
+
+func SetUpHStreamConsole(executor ext.Executor, services *service.Services) error {
+	return startCluster(executor, services.Global, services.HStreamConsole)
+}
+
+func RemoveHStreamConsole(executor ext.Executor, services *service.Services) error {
+	return removeCluster(executor, services.Global, services.HStreamConsole)
 }
 
 func SetUpHttpServerService(executor ext.Executor, services *service.Services) error {

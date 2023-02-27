@@ -53,6 +53,8 @@ type GlobalCtx struct {
 	LocalEsConfigFile string
 	HAdminInfos       []AdminInfo
 	HStreamServerUrls string
+	HServerEndPoints  string
+	PrometheusUrls    []string
 	HttpServerUrls    []string
 }
 
@@ -73,6 +75,8 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 
 	hserverUrl := c.GetHServerUrl()
 	httpServerUrl := c.GetHttpServerUrl()
+	hserverEndpoints := c.GetHServerEndpoint()
+	prometheusUrls := c.GetPrometheusAddr()
 
 	return &GlobalCtx{
 		User:                 c.Global.User,
@@ -94,6 +98,8 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		LocalEsConfigFile:        c.Global.EsConfigPath,
 		HAdminInfos:              admins,
 		HStreamServerUrls:        hserverUrl,
+		HServerEndPoints:         hserverEndpoints,
+		PrometheusUrls:           prometheusUrls,
 		HttpServerUrls:           httpServerUrl,
 	}, nil
 }
@@ -105,6 +111,7 @@ type Services struct {
 	HStore          []*HStore
 	HAdmin          []*HAdmin
 	MetaStore       []*MetaStore
+	HStreamConsole  []*HStreamConsole
 	Prometheus      []*Prometheus
 	Grafana         []*Grafana
 	AlertManager    []*AlertManager
@@ -136,6 +143,11 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	metaStore := make([]*MetaStore, 0, len(c.MetaStore))
 	for idx, v := range c.MetaStore {
 		metaStore = append(metaStore, NewMetaStore(uint32(idx+1), v))
+	}
+
+	hstreamConsole := make([]*HStreamConsole, 0, len(c.HStreamConsole))
+	for idx, v := range c.HStreamConsole {
+		hstreamConsole = append(hstreamConsole, NewHStreamConsole(uint32(idx+1), v))
 	}
 
 	hosts := c.GetHosts()
@@ -217,6 +229,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		HAdmin:          hadmin,
 		HStore:          hstore,
 		MetaStore:       metaStore,
+		HStreamConsole:  hstreamConsole,
 		Prometheus:      proms,
 		Grafana:         grafana,
 		AlertManager:    alertManager,

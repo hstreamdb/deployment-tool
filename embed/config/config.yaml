@@ -290,6 +290,18 @@ meta_store:
       # disable_restart: true
       # remove_when_exit: true
 
+hstream_console:
+  - host: 10.1.0.15
+    # # HStream-console image
+    # image: "hstreamdb/hstream-console"
+    # # HStream-console service monitor port
+    # port: 5177
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+
 http_server:
   - host: 10.1.0.15
     # # Http_Server docker image

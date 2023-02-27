@@ -21,6 +21,7 @@ type ComponentsSpec struct {
 	HStore          []HStoreSpec          `yaml:"hstore"`
 	HAdmin          []HAdminSpec          `yaml:"hadmin"`
 	MetaStore       []MetaStoreSpec       `yaml:"meta_store"`
+	HStreamConsole  []HStreamConsoleSpec  `yaml:"hstream_console"`
 	Prometheus      []PrometheusSpec      `yaml:"prometheus"`
 	Grafana         []GrafanaSpec         `yaml:"grafana"`
 	AlertManager    []AlertManagerSpec    `yaml:"alertmanager"`
@@ -105,6 +106,24 @@ func (c *ComponentsSpec) GetHServerUrl() string {
 	return strings.Join(hosts, ",")
 }
 
+func (c *ComponentsSpec) GetHServerEndpoint() string {
+	endpoints := []string{}
+	for _, spec := range c.HServer {
+		endpoints = append(endpoints, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
+		if len(spec.AdvertisedListener) != 0 {
+			listeners := strings.Split(spec.AdvertisedListener, ",")
+			for _, listener := range listeners {
+				parts := strings.Split(listener, "hstream://")
+				if len(parts) != 2 {
+					panic(fmt.Sprintf("invalied advertised listener: %s", listener))
+				}
+				endpoints = append(endpoints, parts[1])
+			}
+		}
+	}
+	return strings.Join(endpoints, ",")
+}
+
 func (c *ComponentsSpec) GetHttpServerUrl() []string {
 	hosts := []string{}
 	for _, spec := range c.HttpServer {
@@ -116,6 +135,14 @@ func (c *ComponentsSpec) GetHttpServerUrl() []string {
 func (c *ComponentsSpec) GetHStreamExporterAddr() []string {
 	hosts := []string{}
 	for _, spec := range c.HStreamExporter {
+		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
+	}
+	return hosts
+}
+
+func (c *ComponentsSpec) GetPrometheusAddr() []string {
+	hosts := []string{}
+	for _, spec := range c.Prometheus {
 		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
 	}
 	return hosts

@@ -105,6 +105,9 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 			"--maintenance-log-snapshotting",
 		)
 	}
+	if !globalCtx.EnableDscpReflection {
+		args = append(args, "--enable-dscp-reflection false")
+	}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

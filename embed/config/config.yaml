@@ -21,6 +21,9 @@ global:
   # enable_grpc_haskell: false
   # # Local path to ElasticSearch config file
   # elastic_search_config_path: ""
+  # # Only enable for linux kernel which support dscp reflection(linux kernel version
+  # # greater and equal than 4.x)
+  # enable_dscp_reflection: false
   # # Global container configuration
   # container_config:
     # cpu_limit: 2.00

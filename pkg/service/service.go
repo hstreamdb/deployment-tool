@@ -23,14 +23,15 @@ type Service interface {
 }
 
 type GlobalCtx struct {
-	User          string
-	KeyPath       string
-	SSHPort       int
-	MetaReplica   int
-	EnableGrpcHs  bool
-	RemoteCfgPath string
-	DataDir       string
-	containerCfg  spec.ContainerCfg
+	User                 string
+	KeyPath              string
+	SSHPort              int
+	MetaReplica          int
+	EnableGrpcHs         bool
+	RemoteCfgPath        string
+	DataDir              string
+	EnableDscpReflection bool
+	containerCfg         spec.ContainerCfg
 
 	Hosts     []string
 	SeedNodes string
@@ -74,12 +75,13 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	httpServerUrl := c.GetHttpServerUrl()
 
 	return &GlobalCtx{
-		User:         c.Global.User,
-		KeyPath:      c.Global.KeyPath,
-		SSHPort:      c.Global.SSHPort,
-		MetaReplica:  c.Global.MetaReplica,
-		EnableGrpcHs: c.Global.EnableHsGrpc,
-		containerCfg: c.Global.ContainerCfg,
+		User:                 c.Global.User,
+		KeyPath:              c.Global.KeyPath,
+		SSHPort:              c.Global.SSHPort,
+		MetaReplica:          c.Global.MetaReplica,
+		EnableGrpcHs:         c.Global.EnableHsGrpc,
+		EnableDscpReflection: c.Global.EnableDscpReflection,
+		containerCfg:         c.Global.ContainerCfg,
 
 		Hosts:                    hosts,
 		MetaStoreUrls:            metaStoreUrl,

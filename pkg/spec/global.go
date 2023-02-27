@@ -16,6 +16,7 @@ type GlobalCfg struct {
 	EnableHsGrpc               bool         `yaml:"enable_grpc_haskell"`
 	DisableStoreNetworkCfgPath bool         `yaml:"disable_store_network_config_path"`
 	EsConfigPath               string       `yaml:"elastic_search_config_path"`
+	EnableDscpReflection       bool         `yaml:"enable_dscp_reflection"`
 	ContainerCfg               ContainerCfg `yaml:"container_config"`
 }
 

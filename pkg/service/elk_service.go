@@ -196,7 +196,7 @@ func (k *Kibana) CheckReady() *executor.ExecuteCtx {
 	if len(k.CheckReadyScriptPath) == 0 {
 		return nil
 	}
-	args := []string{"/usr/bin/env -S bash"}
+	args := []string{"/usr/bin/env bash"}
 	args = append(args, k.CheckReadyScriptPath)
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }

@@ -38,11 +38,17 @@ receivers:
   - name: 'slack-notifier'
     slack_configs:
       - api_url: ''
-        channel: '#hstream-notify'
+        channel: '#hstream-notification'
         username: 'hstream-alert'
         icon_emoji: ':bell:'
-        title:   '{{ .CommonLabels.alertname }}'
-        text:    'Summary: {{ .CommonAnnotations.summary }}\nDescription: {{ .CommonAnnotations.description }}'
+        title: |-
+          [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+        text: >-
+          {{ range .Alerts -}}
+          *Summary:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+          
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
         send_resolved: true
 
   - name: 'phone-call'

@@ -17,6 +17,7 @@ type basicExecuteTask uint8
 const (
 	InitEnv basicExecuteTask = iota + 1
 	Deploy
+	Stop
 	Remove
 )
 
@@ -30,6 +31,10 @@ func serviceDeploy[S service.Service](executor ext.Executor, ctx *service.Global
 
 func serviceRemove[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S) error {
 	return parallelRun(executor, ctx, services, Remove)
+}
+
+func serviceStop[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S) error {
+	return parallelRun(executor, ctx, services, Stop)
 }
 
 func parallelRun[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S, tp basicExecuteTask) error {
@@ -49,6 +54,8 @@ func parallelRun[S service.Service](executor ext.Executor, ctx *service.GlobalCt
 				executorCtx = svc.Deploy(ctx)
 			case Remove:
 				executorCtx = svc.Remove(ctx)
+			case Stop:
+				executorCtx = svc.Stop(ctx)
 			}
 			target := fmt.Sprintf("%s:%d", executorCtx.Target, ctx.SSHPort)
 			res, err := executor.Execute(target, executorCtx.Cmd)
@@ -157,6 +164,20 @@ func (r *removeServiceTask[S]) Run(executor ext.Executor) error {
 	return serviceRemove(executor, r.ctx, r.services)
 }
 
+type stopServiceTask[S service.Service] struct {
+	serviceName string
+	ctx         *service.GlobalCtx
+	services    []S
+}
+
+func (s *stopServiceTask[S]) String() string {
+	return fmt.Sprintf("Task: stop %s", s.serviceName)
+}
+
+func (s *stopServiceTask[S]) Run(executor ext.Executor) error {
+	return serviceStop(executor, s.ctx, s.services)
+}
+
 func getStartServiceTask[S service.Service](ctx *service.GlobalCtx, services []S) []Task {
 	serviceName := services[0].GetServiceName()
 	tasks := make([]Task, 0, 3)
@@ -169,4 +190,9 @@ func getStartServiceTask[S service.Service](ctx *service.GlobalCtx, services []S
 func getRemoveServiceTask[S service.Service](ctx *service.GlobalCtx, services []S) []Task {
 	serviceName := services[0].GetServiceName()
 	return []Task{&removeServiceTask[S]{serviceName: serviceName, ctx: ctx, services: services}}
+}
+
+func getStopServiceTask[S service.Service](ctx *service.GlobalCtx, services []S) []Task {
+	serviceName := services[0].GetServiceName()
+	return []Task{&stopServiceTask[S]{serviceName: serviceName, ctx: ctx, services: services}}
 }

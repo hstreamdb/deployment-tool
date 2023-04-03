@@ -64,6 +64,11 @@ func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
+func (es *ElasticSearch) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", es.ContainerName}
+	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
 func (es *ElasticSearch) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", es.ContainerName}
 	args = append(args, "&&", "sudo rm -rf", es.spec.DataDir, es.spec.RemoteCfgPath)
@@ -136,6 +141,11 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true, mountPoints...)
 	args = append(args, k.spec.Image)
 
+	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (k *Kibana) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", k.ContainerName}
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -263,6 +273,11 @@ func (f *Filebeat) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, "--strict.perms=false")
 	args = append(args, fmt.Sprintf("-E setup.kibana.host=%s:%s", f.KibanaHost, f.KibanaPort))
 	args = append(args, fmt.Sprintf("-E output.elasticsearch.hosts=[\"%s:%s\"]", f.ElasticsearchHost, f.ElasticsearchPort))
+	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (f *Filebeat) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", f.ContainerName}
 	return &executor.ExecuteCtx{Target: f.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

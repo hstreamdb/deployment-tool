@@ -87,6 +87,11 @@ func (m *MonitorSuite) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: m.Host, Cmd: strings.Join(args, " ")}
 }
 
+func (m *MonitorSuite) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", m.NodeContainerName, m.CadvisorContainerName}
+	return &executor.ExecuteCtx{Target: m.Host, Cmd: strings.Join(args, " ")}
+}
+
 func (m *MonitorSuite) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", m.NodeContainerName, m.CadvisorContainerName}
 	args = append(args, "&&", "sudo rm -rf", m.spec.DataDir, m.spec.RemoteCfgPath)
@@ -157,6 +162,11 @@ func (p *Prometheus) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, p.spec.ContainerCfg, p.ContainerName, true, mountPoints...)
 	args = append(args, p.spec.Image)
+	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (p *Prometheus) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", p.ContainerName}
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -244,6 +254,11 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
+func (g *Grafana) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", g.ContainerName}
+	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
 func (g *Grafana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", g.ContainerName}
 	args = append(args, "&&", "sudo rm -rf", g.spec.DataDir, g.spec.RemoteCfgPath)
@@ -310,6 +325,11 @@ func (a *AlertManager) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
+func (a *AlertManager) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", a.ContainerName}
+	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
 func (a *AlertManager) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", a.ContainerName}
 	args = append(args, "&&", "sudo rm -rf", a.spec.DataDir, a.spec.RemoteCfgPath)
@@ -366,6 +386,11 @@ func (h *HStreamExporter) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, h.spec.Image)
 	args = append(args, "hstream-exporter", "--addr", "hstream://"+globalCtx.HStreamServerUrls)
 	args = append(args, fmt.Sprintf("--listen-addr 0.0.0.0:%d", h.spec.Port))
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HStreamExporter) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", h.ContainerName}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

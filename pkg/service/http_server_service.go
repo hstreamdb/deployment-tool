@@ -51,6 +51,11 @@ func (h *HttpServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
+func (h *HttpServer) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", h.ContainerName}
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
 func (h *HttpServer) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", h.ContainerName}
 	args = append(args, "&&", "sudo rm -rf", h.spec.DataDir,

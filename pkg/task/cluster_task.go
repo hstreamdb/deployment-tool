@@ -2,10 +2,11 @@ package task
 
 import (
 	"fmt"
+	"os"
+
 	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/service"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
-	"os"
 )
 
 type runCtx struct {
@@ -82,6 +83,34 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	return ctx.err
 }
 
+func StopCluster(executor ext.Executor, services *service.Services) error {
+	ctx := runCtx{executor: executor, services: services}
+	if len(services.ElasticSearch) != 0 {
+		ctx.run(StopFilebeat)
+		ctx.run(StopKibana)
+		ctx.run(StopElasticSearch)
+	}
+
+	if len(services.HStreamConsole) != 0 {
+		ctx.run(StopHStreamConsole)
+	}
+
+	if len(services.Prometheus) != 0 {
+		ctx.run(StopAlertService)
+		ctx.run(StopGrafanaService)
+		ctx.run(StopPrometheusService)
+		ctx.run(StopHStreamExporterService)
+		ctx.run(StopHStreamMonitorStack)
+	}
+
+	ctx.run(StopHttpServerService)
+	ctx.run(StopHServerCluster)
+	ctx.run(StopHStoreCluster)
+	ctx.run(StopHAdminCluster)
+	ctx.run(StopMetaStoreCluster)
+	return ctx.err
+}
+
 // ==========================================================================================================
 
 func SetUpMetaStoreCluster(executor ext.Executor, services *service.Services) error {
@@ -121,12 +150,20 @@ func RemoveMetaStoreCluster(executor ext.Executor, services *service.Services) e
 	return removeCluster(executor, services.Global, services.MetaStore)
 }
 
+func StopMetaStoreCluster(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.MetaStore)
+}
+
 func SetUpHAdminCluster(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.HAdmin)
 }
 
 func RemoveHAdminCluster(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.HAdmin)
+}
+
+func StopHAdminCluster(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.HAdmin)
 }
 
 func SetUpHStoreCluster(executor ext.Executor, services *service.Services) error {
@@ -159,6 +196,10 @@ func RemoveHStoreCluster(executor ext.Executor, services *service.Services) erro
 	return removeCluster(executor, services.Global, services.HStore)
 }
 
+func StopHStoreCluster(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.HStore)
+}
+
 func SetUpHServerCluster(executor ext.Executor, services *service.Services) error {
 	if len(services.HServer) == 0 {
 		return nil
@@ -184,12 +225,20 @@ func RemoveHServerCluster(executor ext.Executor, services *service.Services) err
 	return removeCluster(executor, services.Global, services.HServer)
 }
 
+func StopHServerCluster(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.HServer)
+}
+
 func SetUpHStreamConsole(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.HStreamConsole)
 }
 
 func RemoveHStreamConsole(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.HStreamConsole)
+}
+
+func StopHStreamConsole(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.HStreamConsole)
 }
 
 func SetUpHttpServerService(executor ext.Executor, services *service.Services) error {
@@ -200,12 +249,20 @@ func RemoveHttpServerService(executor ext.Executor, services *service.Services) 
 	return removeCluster(executor, services.Global, services.HttpServer)
 }
 
+func StopHttpServerService(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.HttpServer)
+}
+
 func SetUpHStreamMonitorStack(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.MonitorSuite)
 }
 
 func RemoveHStreamMonitorStack(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.MonitorSuite)
+}
+
+func StopHStreamMonitorStack(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.MonitorSuite)
 }
 
 func SetUpHStreamExporterService(executor ext.Executor, services *service.Services) error {
@@ -216,12 +273,20 @@ func RemoveHStreamExporterService(executor ext.Executor, services *service.Servi
 	return removeCluster(executor, services.Global, services.HStreamExporter)
 }
 
+func StopHStreamExporterService(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.HStreamExporter)
+}
+
 func SetUpPrometheusService(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.Prometheus)
 }
 
 func RemovePrometheusService(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.Prometheus)
+}
+
+func StopPrometheusService(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.Prometheus)
 }
 
 func SetUpGrafanaService(executor ext.Executor, services *service.Services) error {
@@ -232,6 +297,10 @@ func RemoveGrafanaService(executor ext.Executor, services *service.Services) err
 	return removeCluster(executor, services.Global, services.Grafana)
 }
 
+func StopGrafanaService(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.Grafana)
+}
+
 func SetUpAlertService(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.AlertManager)
 }
@@ -240,12 +309,20 @@ func RemoveAlertService(executor ext.Executor, services *service.Services) error
 	return removeCluster(executor, services.Global, services.AlertManager)
 }
 
+func StopAlertService(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.AlertManager)
+}
+
 func SetUpElasticSearch(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.ElasticSearch)
 }
 
 func RemoveElasticSearch(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.ElasticSearch)
+}
+
+func StopElasticSearch(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.ElasticSearch)
 }
 
 func SetUpKibana(executor ext.Executor, services *service.Services) error {
@@ -272,12 +349,20 @@ func RemoveKibana(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.Kibana)
 }
 
+func StopKibana(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.Kibana)
+}
+
 func SetUpFilebeat(executor ext.Executor, services *service.Services) error {
 	return startCluster(executor, services.Global, services.Filebeat)
 }
 
 func RemoveFilebeat(executor ext.Executor, services *service.Services) error {
 	return removeCluster(executor, services.Global, services.Filebeat)
+}
+
+func StopFilebeat(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.Filebeat)
 }
 
 func startCluster[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S) error {
@@ -311,6 +396,23 @@ func removeCluster[S service.Service](executor ext.Executor, ctx *service.Global
 	}
 
 	fmt.Printf("Remove %s cluster success\n", services[0].GetServiceName())
+	return nil
+}
+
+func stopCluster[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S) error {
+	if len(services) == 0 {
+		return nil
+	}
+
+	tasks := getStopServiceTask(ctx, services)
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("Stop %s cluster success\n", services[0].GetServiceName())
 	return nil
 }
 

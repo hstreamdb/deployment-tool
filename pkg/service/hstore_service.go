@@ -111,6 +111,11 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
+func (h *HStore) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", spec.StoreDefaultContainerName}
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
 func (h *HStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := []string{"docker rm -f", spec.StoreDefaultContainerName}
 	args = append(args, "&&", "sudo rm -rf",
@@ -246,6 +251,11 @@ func (h *HAdmin) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		"--enable-safety-check-periodic-metadata-update",
 		"--maintenance-log-snapshotting",
 	)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HAdmin) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", spec.AdminDefaultContainerName}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

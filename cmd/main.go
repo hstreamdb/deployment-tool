@@ -45,6 +45,7 @@ func main() {
 		newInit(),
 		newDeploy(),
 		newRemove(),
+		newStop(),
 	)
 
 	if err := rootCmd.Execute(); err != nil {

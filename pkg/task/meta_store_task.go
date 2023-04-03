@@ -47,7 +47,7 @@ func (m *MetaStoreStoreValue) String() string {
 
 func (m *MetaStoreStoreValue) Run(executor ext.Executor) error {
 	svc := m.service[0]
-	executorCtx := svc.StoreValue(m.Key, m.Value)
+	executorCtx := svc.RemoveThenStore(m.Key, m.Value)
 	if executorCtx == nil {
 		fmt.Printf("skip store value to metastore")
 		return nil

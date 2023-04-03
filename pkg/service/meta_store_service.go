@@ -53,7 +53,7 @@ func (m *MetaStore) Display() map[string]utils.DisplayedComponent {
 
 func (m *MetaStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := m.getDirs()
-	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, cfgDir+"/script", "-m 0775")
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, dataDir+"/data", dataDir+"/datalog", cfgDir+"/script", "-m 0775")
 	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
@@ -61,7 +61,8 @@ func (m *MetaStore) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (m *MetaStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/mnt", "/mnt"},
-		{m.spec.DataDir, "/data"},
+		{m.spec.DataDir + "/data", "/data"},
+		{m.spec.DataDir + "/datalog", "/datalog"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, spec.MetaStoreDefaultContainerName, true, mountPoints...)
 	switch globalCtx.MetaStoreType {
@@ -109,6 +110,11 @@ func zkEnvArgs(idx uint32, metaStoreUrls string) []string {
 		fmt.Sprintf("-e ZOO_SERVERS=\"%s\"", zooServers),
 		"-e ZOO_CFG_EXTRA=\"metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider metricsProvider.httpPort=7070\"",
 	}
+}
+
+func (m *MetaStore) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", spec.MetaStoreDefaultContainerName}
+	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
 func (m *MetaStore) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
@@ -171,6 +177,20 @@ func (m *MetaStore) StoreValue(key, value string) *executor.ExecuteCtx {
 		key = "/" + key
 	}
 	args = append(args, key, fmt.Sprintf("'%s'", value))
+	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (m *MetaStore) RemoveThenStore(key, value string) *executor.ExecuteCtx {
+	if m.metaStoreType != spec.ZK {
+		panic("currently only spport store value to zk.")
+	}
+
+	args := []string{"docker exec -t"}
+	if !strings.HasPrefix(key, "/") {
+		key = "/" + key
+	}
+	args = append(args, m.ContainerName, fmt.Sprintf("zkCli.sh delete %s || true", key))
+	args = append(args, "&& docker exec -t", m.ContainerName, "zkCli.sh create ", key, fmt.Sprintf("'%s'", value))
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

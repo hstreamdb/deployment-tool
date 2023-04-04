@@ -386,6 +386,7 @@ func (h *HStreamExporter) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, h.spec.Image)
 	args = append(args, "hstream-exporter", "--addr", "hstream://"+globalCtx.HStreamServerUrls)
 	args = append(args, fmt.Sprintf("--listen-addr 0.0.0.0:%d", h.spec.Port))
+	args = append(args, fmt.Sprintf("--log-level %s", h.spec.LogLevel))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

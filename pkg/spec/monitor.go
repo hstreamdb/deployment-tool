@@ -125,6 +125,7 @@ type HStreamExporterSpec struct {
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"9250"`
 	Image         string       `yaml:"image"`
+	LogLevel      string       `yaml:"log_level" default:"info"`
 	DataDir       string       `yaml:"data_dir"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`

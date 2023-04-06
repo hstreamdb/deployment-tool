@@ -16,6 +16,8 @@ type PrometheusConfig struct {
 	CadVisorAddress        []string
 	HStreamExporterAddress []string
 	AlertManagerAddress    []string
+	BlackBoxAddress        string
+	BlackBoxTargets        map[string][]string
 }
 
 func (p *PrometheusConfig) GenConfig() (string, error) {

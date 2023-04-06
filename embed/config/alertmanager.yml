@@ -42,12 +42,16 @@ receivers:
         username: 'hstream-alert'
         icon_emoji: ':bell:'
         title: |-
-          [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+          [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
         text: >-
           {{ range .Alerts -}}
           *Summary:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
           
           *Description:* {{ .Annotations.description }}
+          
+          *Details:*
+            {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+            {{ end }}
           {{ end }}
         send_resolved: true
 

@@ -19,6 +19,7 @@ func newInit() *cobra.Command {
 			if err := utils.MakeDirs([]utils.DirCfg{
 				{Path: "template/script", Perm: 0755},
 				{Path: "template/prometheus", Perm: 0755},
+				{Path: "template/blackbox", Perm: 0755},
 				{Path: "template/grafana/dashboards", Perm: 0755},
 				{Path: "template/grafana/datasources", Perm: 0755},
 				{Path: "template/alertmanager", Perm: 0755},

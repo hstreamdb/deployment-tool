@@ -10,7 +10,7 @@ const (
 type MetaStoreSpec struct {
 	Host          string       `yaml:"host"`
 	Image         string       `yaml:"image"`
-	Port          int          `yaml:"port" default:"4001"`
+	Port          int          `yaml:"port"`
 	RaftPort      int          `yaml:"raft_port" default:"4002"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`

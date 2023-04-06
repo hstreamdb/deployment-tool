@@ -8,6 +8,11 @@ const (
 	MonitorDefaultCfgDir             = "/hstream/deploy/monitor"
 	MonitorDefaultDataDir            = "/hstream/data/monitor"
 
+	BlackBoxDefaultContainerName = "deploy_blackbox"
+	BlackBoxDefaultImage         = "prom/blackbox-exporter"
+	BlackBoxDefaultCfgDir        = "/hstream/deploy/blackbox"
+	BlackBoxDefaultDataDir       = "/hstream/data/blackbox"
+
 	PrometheusDefaultContainerName = "deploy_prom"
 	PrometheusDefaultImage         = "prom/prometheus"
 	PrometheusDefaultCfgDir        = "/hstream/deploy/prometheus"
@@ -28,6 +33,9 @@ const (
 	HStreamExporterDefaultCfgDir        = "/hstream/deploy/hstream-exporter"
 	HStreamExporterDefaultDataDir       = "/hstream/data/hstream-exporter"
 )
+
+// ================================================================================
+// 	monitor spec
 
 type MonitorSpec struct {
 	NodeExporterImage   string       `yaml:"node_exporter_image"`
@@ -54,6 +62,34 @@ func (m *MonitorSpec) SetDefaultRemoteCfgPath() {
 	m.RemoteCfgPath = MonitorDefaultCfgDir
 }
 
+// ================================================================================
+// 	blackbox
+
+type BlackBoxSpec struct {
+	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
+	Port          int          `yaml:"port" default:"9115"`
+	Image         string       `yaml:"image"`
+	DataDir       string       `yaml:"data_dir"`
+	RemoteCfgPath string       `yaml:"remote_config_path"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
+}
+
+func (b *BlackBoxSpec) SetDefaultDataDir() {
+	b.DataDir = BlackBoxDefaultDataDir
+}
+
+func (b *BlackBoxSpec) SetDefaultImage() {
+	b.Image = BlackBoxDefaultImage
+}
+
+func (b *BlackBoxSpec) SetDefaultRemoteCfgPath() {
+	b.RemoteCfgPath = BlackBoxDefaultCfgDir
+}
+
+// ================================================================================
+// 	prometheus
+
 type PrometheusSpec struct {
 	Host          string       `yaml:"host"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
@@ -75,6 +111,9 @@ func (p *PrometheusSpec) SetDefaultImage() {
 func (p *PrometheusSpec) SetDefaultRemoteCfgPath() {
 	p.RemoteCfgPath = PrometheusDefaultCfgDir
 }
+
+// ================================================================================
+// 	grafana
 
 type GrafanaSpec struct {
 	Host          string       `yaml:"host"`
@@ -98,6 +137,9 @@ func (g *GrafanaSpec) SetDefaultRemoteCfgPath() {
 	g.RemoteCfgPath = GrafanaDefaultCfgDir
 }
 
+// ================================================================================
+// 	alert-manager
+
 type AlertManagerSpec struct {
 	Host          string       `yaml:"host"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
@@ -119,6 +161,9 @@ func (a *AlertManagerSpec) SetDefaultImage() {
 func (a *AlertManagerSpec) SetDefaultRemoteCfgPath() {
 	a.RemoteCfgPath = AlertManagerDefaultCfgDir
 }
+
+// ================================================================================
+// 	hstream-exporter
 
 type HStreamExporterSpec struct {
 	Host          string       `yaml:"host"`

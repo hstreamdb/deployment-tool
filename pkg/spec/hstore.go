@@ -22,7 +22,7 @@ type HStoreSpec struct {
 	DataDir       string       `yaml:"data_dir"`
 	Role          string       `yaml:"role" default:"Both"`
 	EnableAdmin   bool         `yaml:"enable_admin"`
-	AdminPort     int          `yaml:"admin_port" default:"6440"`
+	Port          int          `yaml:"port" default:"6440"`
 	StoreOps      StoreOps     `yaml:",inline"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
@@ -48,7 +48,7 @@ type HAdminSpec struct {
 	Host          string       `yaml:"host"`
 	Image         string       `yaml:"image"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	AdminPort     int          `yaml:"admin_port" default:"6440"`
+	Port          int          `yaml:"port" default:"6440"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	DataDir       string       `yaml:"data_dir"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`

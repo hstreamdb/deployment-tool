@@ -7,6 +7,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	log "github.com/sirupsen/logrus"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -82,7 +83,8 @@ func (h *HStreamConsole) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx 
 	}
 	genCfg, err := cfg.GenConfig()
 	if err != nil {
-		panic(fmt.Errorf("gen ConsoleConfig error: %s", err.Error()))
+		log.Errorf("gen ConsoleConfig error: %s", err.Error())
+		os.Exit(1)
 	}
 
 	positions := []executor.Position{

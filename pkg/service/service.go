@@ -6,6 +6,7 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
 	"os"
 	"reflect"
@@ -271,7 +272,8 @@ func (s *Services) ShowAllServices() {
 		for j := 0; j < field.Len(); j++ {
 			service := field.Index(j)
 			if service.Type().Kind() != reflect.Ptr {
-				panic(fmt.Sprintf("Show all services error, unexpected service kind: %s", service.String()))
+				log.Errorf("Show all services error, unexpected service kind: %s", service.String())
+				os.Exit(1)
 			}
 
 			fn := service.MethodByName("Display")

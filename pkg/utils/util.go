@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/hstreamdb/deployment-tool/pkg/executor"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 	"io/fs"
@@ -66,7 +67,8 @@ func ScpDir(originPath, remotePath string) []executor.Position {
 		}
 		return nil
 	}); err != nil {
-		panic(fmt.Errorf("scp command error: %s", err.Error()))
+		log.Errorf("scp command error: %s", err.Error())
+		os.Exit(1)
 	}
 	return position
 }

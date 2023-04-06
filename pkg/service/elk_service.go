@@ -7,6 +7,8 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -164,7 +166,8 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 	genCfg, err := cfg.GenConfig()
 	if err != nil {
-		panic(fmt.Errorf("gen KibanaConfig error: %s", err.Error()))
+		log.Errorf("gen KibanaConfig error: %s", err.Error())
+		os.Exit(1)
 	}
 
 	positions := []executor.Position{
@@ -181,11 +184,12 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		KibanaHost: k.spec.Host,
 		KibanaPort: strconv.Itoa(k.spec.Port),
 		FilePath:   remotePath,
-		Timeout:    strconv.Itoa(600),
+		Timeout:    strconv.Itoa(120),
 	}
 	chkCmd, err := chkCfg.GenScript()
 	if err != nil {
-		panic(fmt.Errorf("gen KibanaReadyCheck error: %s", err.Error()))
+		log.Errorf("gen KibanaReadyCheck error: %s", err.Error())
+		os.Exit(1)
 	}
 	scriptName := filepath.Base(chkCmd)
 	cfgDir, _ := k.getDirs()
@@ -295,7 +299,8 @@ func (f *Filebeat) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 	genCfg, err := cfg.GenConfig()
 	if err != nil {
-		panic(fmt.Errorf("gen FilebeatConfig error: %s", err.Error()))
+		log.Errorf("gen FilebeatConfig error: %s", err.Error())
+		os.Exit(1)
 	}
 	position := []executor.Position{
 		{LocalDir: genCfg, RemoteDir: filepath.Join(f.spec.RemoteCfgPath, "filebeat.yml")},

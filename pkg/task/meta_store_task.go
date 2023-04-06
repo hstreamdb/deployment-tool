@@ -55,7 +55,7 @@ func (m *MetaStoreStoreValue) Run(executor ext.Executor) error {
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, m.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {
-		return fmt.Errorf("%s-%s", err.Error(), res)
+		return fmt.Errorf("store value to metastore error: %s, res: %s", err.Error(), res)
 	}
 	return nil
 }

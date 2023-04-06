@@ -64,7 +64,7 @@ func (m *MetaStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, spec.MetaStoreDefaultContainerName, true, mountPoints...)
 	switch globalCtx.MetaStoreType {
 	case spec.ZK:
-		args = append(args, zkEnvArgs(m.metaStoreId, globalCtx.MetaStoreUrls)...)
+		args = append(args, zkEnvArgs(m.metaStoreId, globalCtx.MetaStoreUrls, m.spec.Port)...)
 		args = append(args, m.spec.Image)
 	case spec.RQLITE:
 		args = append(args, m.spec.Image, "rqlited")
@@ -78,13 +78,13 @@ func (m *MetaStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func zkEnvArgs(idx uint32, metaStoreUrls string) []string {
+func zkEnvArgs(idx uint32, metaStoreUrls string, port int) []string {
 	if metaStoreUrls == "" {
 		log.Error("metaStoreUrls should not be empty")
 		os.Exit(1)
 	}
 
-	reg, err := regexp.Compile(":2181,?")
+	reg, err := regexp.Compile(fmt.Sprintf(":%d,?", port))
 	if err != nil {
 		log.Errorf("regexp compile err: %s", err.Error())
 		os.Exit(1)
@@ -101,13 +101,14 @@ func zkEnvArgs(idx uint32, metaStoreUrls string) []string {
 		}
 
 		// according to https://hub.docker.com/_/zookeeper, ZOO_MY_ID must between 1 and 255
-		zkUrls = append(zkUrls, fmt.Sprintf("server.%d=%s:2888:3888;2181", i+1, url))
+		zkUrls = append(zkUrls, fmt.Sprintf("server.%d=%s:2888:3888;%d", i+1, url, port))
 	}
 
 	zooServers := strings.Join(zkUrls, " ")
 	return []string{
 		fmt.Sprintf("-e ZOO_MY_ID=%d", idx),
 		fmt.Sprintf("-e ZOO_SERVERS=\"%s\"", zooServers),
+		fmt.Sprintf("-e ZOO_CLIENT_PORT=%d", port),
 		"-e ZOO_CFG_EXTRA=\"metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider metricsProvider.httpPort=7070\"",
 	}
 }
@@ -174,7 +175,7 @@ func (m *MetaStore) StoreValue(key, value string) *executor.ExecuteCtx {
 	}
 
 	args := []string{"docker exec -t"}
-	args = append(args, m.ContainerName, "zkCli.sh", "create")
+	args = append(args, m.ContainerName, "zkCli.sh", fmt.Sprintf("-server localhost:%d", m.spec.Port), "create")
 	if !strings.HasPrefix(key, "/") {
 		key = "/" + key
 	}
@@ -191,8 +192,9 @@ func (m *MetaStore) RemoveThenStore(key, value string) *executor.ExecuteCtx {
 	if !strings.HasPrefix(key, "/") {
 		key = "/" + key
 	}
-	args = append(args, m.ContainerName, fmt.Sprintf("zkCli.sh delete %s || true", key))
-	args = append(args, "&& docker exec -t", m.ContainerName, "zkCli.sh create ", key, fmt.Sprintf("'%s'", value))
+	args = append(args, m.ContainerName, fmt.Sprintf("zkCli.sh -server localhost:%d delete  %s || true", m.spec.Port, key))
+	args = append(args, "&& docker exec -t", m.ContainerName,
+		fmt.Sprintf("zkCli.sh -server localhost:%d create ", m.spec.Port), key, fmt.Sprintf("'%s'", value))
 	return &executor.ExecuteCtx{Target: m.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -202,7 +204,7 @@ func (m *MetaStore) GetValue(key string) *executor.ExecuteCtx {
 	}
 
 	args := []string{"docker exec -t"}
-	args = append(args, m.ContainerName, "zkCli.sh", "get")
+	args = append(args, m.ContainerName, "zkCli.sh", fmt.Sprintf("-server localhost:%d", m.spec.Port), "get")
 	if !strings.HasPrefix(key, "/") {
 		key = "/" + key
 	}

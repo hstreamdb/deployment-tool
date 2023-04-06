@@ -257,17 +257,9 @@ func getAddrInner(v reflect.Value) []string {
 func getZkUrl(metaStore []MetaStoreSpec) string {
 	hosts := []string{}
 	for _, spc := range metaStore {
-		hosts = append(hosts, spc.Host)
+		hosts = append(hosts, fmt.Sprintf("%s:%d", spc.Host, spc.Port))
 	}
-	if len(hosts) == 0 {
-		return ""
-	}
-
-	// append an empty string to help strings join
-	hosts = append(hosts, "")
-	url := strings.Join(hosts, ":2181,")
-	url = url[:len(url)-1]
-	return url
+	return strings.Join(hosts, ",")
 }
 
 func getRqliteUrl(metaStore []MetaStoreSpec) string {

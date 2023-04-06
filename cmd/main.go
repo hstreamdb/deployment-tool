@@ -26,17 +26,22 @@ func main() {
 			case "-h", "--help":
 				return cmd.Help()
 			case "server":
-				cmd := cmpt.NewServerCmd()
+				cmd = cmpt.NewServerCmd()
 				if err := cmd.Execute(); err != nil {
 					log.Error(err)
 					os.Exit(1)
 				}
-				return nil
+			case "console":
+				cmd = cmpt.NewConsoleCmd()
+				if err := cmd.Execute(); err != nil {
+					log.Error(err)
+					os.Exit(1)
+				}
 			}
-
 			return nil
 		},
 	}
+
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(rootCmd.OutOrStdout())
 	log.SetLevel(log.InfoLevel)

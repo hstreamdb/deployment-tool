@@ -5,10 +5,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewServerCmd() *cobra.Command {
+func NewConsoleCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "server",
-		Short: "Manage HStream Server instance.",
+		Use:   "console",
+		Short: "Manage HStream Console instance.",
 		Args: func(cmd *cobra.Command, args []string) error {
 			cmd.SetArgs(args[1:])
 			return nil
@@ -28,24 +28,24 @@ func NewServerCmd() *cobra.Command {
 			return cmd.Execute()
 		},
 	}
-	cmd.AddCommand(newStartServerCmd())
-	cmd.AddCommand(newRemoveServerCmd())
+	cmd.AddCommand(newStartConsoleCmd())
+	cmd.AddCommand(newRemoveConsoleCmd())
 
 	return cmd
 }
 
-func newStartServerCmd() *cobra.Command {
+func newStartConsoleCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
 		Use:          "start",
-		Short:        "Start HStream Server Cluster",
+		Short:        "Start HStream Console",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {
 				return err
 			}
-			return task.SetUpHServerCluster(executor, services)
+			return task.SetUpHStreamConsole(executor, services)
 		},
 	}
 
@@ -57,18 +57,18 @@ func newStartServerCmd() *cobra.Command {
 	return cmd
 }
 
-func newRemoveServerCmd() *cobra.Command {
+func newRemoveConsoleCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
 		Use:          "remove",
-		Short:        "Remove HStream Server Cluster",
+		Short:        "Remove HStream Console",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {
 				return err
 			}
-			return task.RemoveHServerCluster(executor, services)
+			return task.RemoveHStreamConsole(executor, services)
 		},
 	}
 

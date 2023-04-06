@@ -25,7 +25,7 @@ type HStore struct {
 	spec    spec.HStoreSpec
 	Host    string
 	// FIXME: check admin port setting
-	AdminPort            int
+	Port                 int
 	ContainerName        string
 	CheckReadyScriptPath string
 	MountScriptPath      string
@@ -37,7 +37,7 @@ func NewHStore(id uint32, storeSpec spec.HStoreSpec) *HStore {
 		spec:          storeSpec,
 		Host:          storeSpec.Host,
 		ContainerName: spec.StoreDefaultContainerName,
-		AdminPort:     storeSpec.AdminPort,
+		Port:          storeSpec.Port,
 	}
 }
 
@@ -50,7 +50,7 @@ func (h *HStore) Display() map[string]utils.DisplayedComponent {
 	hstore := utils.DisplayedComponent{
 		Name:          "HStore",
 		Host:          h.spec.Host,
-		Ports:         strconv.Itoa(h.AdminPort),
+		Ports:         strconv.Itoa(h.Port),
 		ContainerName: h.ContainerName,
 		Image:         h.spec.Image,
 		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
@@ -134,9 +134,9 @@ func (h *HStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		DataDir: h.spec.DataDir,
 	}
 	checkReadyScript := script.HStoreReadyCheckScript{
-		Host:         h.spec.Host,
-		AdminApiPort: h.AdminPort,
-		Timeout:      600,
+		Host:    h.spec.Host,
+		Port:    h.Port,
+		Timeout: 600,
 	}
 
 	position, err := h.syncScript(cfgDir, []script.Script{mountScript, checkReadyScript}...)
@@ -194,7 +194,7 @@ type HAdmin struct {
 	storeId              uint32
 	spec                 spec.HAdminSpec
 	Host                 string
-	AdminPort            int
+	Port                 int
 	ContainerName        string
 	CheckReadyScriptPath string
 }
@@ -205,7 +205,7 @@ func NewHAdmin(id uint32, adminSpec spec.HAdminSpec) *HAdmin {
 		spec:          adminSpec,
 		Host:          adminSpec.Host,
 		ContainerName: spec.AdminDefaultContainerName,
-		AdminPort:     adminSpec.AdminPort,
+		Port:          adminSpec.Port,
 	}
 }
 
@@ -218,7 +218,7 @@ func (h *HAdmin) Display() map[string]utils.DisplayedComponent {
 	admin := utils.DisplayedComponent{
 		Name:          "HAdmin",
 		Host:          h.spec.Host,
-		Ports:         strconv.Itoa(h.AdminPort),
+		Ports:         strconv.Itoa(h.Port),
 		ContainerName: h.ContainerName,
 		Image:         h.spec.Image,
 		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
@@ -246,7 +246,7 @@ func (h *HAdmin) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		configPath = globalCtx.HStoreConfigInMetaStore
 	}
 	args = append(args, fmt.Sprintf("--config-path %s", configPath))
-	args = append(args, fmt.Sprintf("--admin-port %d", h.AdminPort))
+	args = append(args, fmt.Sprintf("--admin-port %d", h.Port))
 	args = append(args, "--enable-maintenance-manager",
 		"--enable-safety-check-periodic-metadata-update",
 		"--maintenance-log-snapshotting",

@@ -106,6 +106,83 @@ func (m *MonitorSuite) getDirs() (string, string) {
 	return m.spec.RemoteCfgPath, m.spec.DataDir
 }
 
+// ================================================================================
+// 	BlackBox
+
+type BlackBox struct {
+	spec           spec.BlackBoxSpec
+	ContainerName  string
+	MonitoredHosts []string
+}
+
+func NewBlackBox(blackBoxSpec spec.BlackBoxSpec) *BlackBox {
+	return &BlackBox{spec: blackBoxSpec, ContainerName: spec.BlackBoxDefaultContainerName}
+}
+
+func (b *BlackBox) GetServiceName() string {
+	return "blackbox"
+}
+
+func (b *BlackBox) Display() map[string]utils.DisplayedComponent {
+	cfgDir, dataDir := b.getDirs()
+	blackBox := utils.DisplayedComponent{
+		Name:          "BlackBox",
+		Host:          b.spec.Host,
+		Ports:         strconv.Itoa(b.spec.Port),
+		ContainerName: b.ContainerName,
+		Image:         b.spec.Image,
+		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"blackbox": blackBox}
+}
+
+func (b *BlackBox) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	cfgDir, dataDir := b.getDirs()
+	args := append([]string{}, "sudo mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& sudo chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	return &executor.ExecuteCtx{Target: b.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (b *BlackBox) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	mountPoints := []spec.MountPoints{
+		{b.spec.RemoteCfgPath, "/etc/blackbox_exporter"},
+	}
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, b.spec.ContainerCfg, b.ContainerName, true, mountPoints...)
+	args = append(args, b.spec.Image, "--config.file=/etc/blackbox_exporter/blackbox.yml")
+	return &executor.ExecuteCtx{Target: b.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (b *BlackBox) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", b.ContainerName}
+	return &executor.ExecuteCtx{Target: b.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (b *BlackBox) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", b.ContainerName}
+	args = append(args, "&&", "sudo rm -rf", b.spec.DataDir, b.spec.RemoteCfgPath)
+	return &executor.ExecuteCtx{Target: b.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (b *BlackBox) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	blackboxCfg := config.BlackBoxConfig{}
+	cfg, err := blackboxCfg.GenConfig()
+	if err != nil {
+		panic(fmt.Errorf("gen blackbox config error: %s", err.Error()))
+	}
+	position := utils.ScpDir(cfg, b.spec.RemoteCfgPath)
+
+	return &executor.TransferCtx{
+		Target: b.spec.Host, Position: position,
+	}
+}
+
+func (b *BlackBox) getDirs() (string, string) {
+	return b.spec.RemoteCfgPath, b.spec.DataDir
+}
+
+// ================================================================================
+// 	Prometheus
+
 type Prometheus struct {
 	spec                spec.PrometheusSpec
 	ContainerName       string
@@ -114,9 +191,11 @@ type Prometheus struct {
 	CadvisorPort        int
 	HStreamExporterAddr []string
 	AlertManagerAddr    []string
+	BlackBoxAddr        string
 }
 
-func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, hstreamExporterAddr []string, alertAddr []string) *Prometheus {
+func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite,
+	hstreamExporterAddr []string, alertAddr []string, blackBoxAddr string) *Prometheus {
 	hosts := make([]string, 0, len(monitorSuites))
 	for _, suite := range monitorSuites {
 		hosts = append(hosts, suite.Host)
@@ -129,6 +208,7 @@ func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite, 
 		CadvisorPort:        monitorSuites[0].spec.CadvisorPort,
 		HStreamExporterAddr: hstreamExporterAddr,
 		AlertManagerAddr:    alertAddr,
+		BlackBoxAddr:        blackBoxAddr,
 	}
 }
 
@@ -177,17 +257,26 @@ func (p *Prometheus) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	allServiceAddr := globalCtx.ServiceAddr
+
 	nodeAddr := make([]string, 0, len(p.MonitoredHosts))
 	cadAddr := make([]string, 0, len(p.MonitoredHosts))
 	for _, host := range p.MonitoredHosts {
-		nodeAddr = append(nodeAddr, fmt.Sprintf("%s:%d", host, p.NodeExporterPort))
-		cadAddr = append(cadAddr, fmt.Sprintf("%s:%d", host, p.CadvisorPort))
+		node := fmt.Sprintf("%s:%d", host, p.NodeExporterPort)
+		cad := fmt.Sprintf("%s:%d", host, p.CadvisorPort)
+		nodeAddr = append(nodeAddr, node)
+		cadAddr = append(cadAddr, cad)
 	}
+
+	allServiceAddr["node-exporter"] = nodeAddr
+	allServiceAddr["cadvisor"] = cadAddr
 	prometheusCfg := config.PrometheusConfig{
 		NodeExporterAddress:    nodeAddr,
 		CadVisorAddress:        cadAddr,
 		HStreamExporterAddress: p.HStreamExporterAddr,
 		AlertManagerAddress:    p.AlertManagerAddr,
+		BlackBoxAddress:        p.BlackBoxAddr,
+		BlackBoxTargets:        allServiceAddr,
 	}
 	cfg, err := prometheusCfg.GenConfig()
 	if err != nil {
@@ -204,6 +293,9 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 func (p *Prometheus) getDirs() (string, string) {
 	return p.spec.RemoteCfgPath, p.spec.DataDir
 }
+
+// ================================================================================
+// 	Grafana
 
 type Grafana struct {
 	spec          spec.GrafanaSpec
@@ -282,6 +374,9 @@ func (g *Grafana) getDirs() (string, string) {
 	return g.spec.RemoteCfgPath, g.spec.DataDir
 }
 
+// ================================================================================
+// 	AlertManager
+
 type AlertManager struct {
 	spec          spec.AlertManagerSpec
 	ContainerName string
@@ -347,6 +442,9 @@ func (a *AlertManager) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 func (a *AlertManager) getDirs() (string, string) {
 	return a.spec.RemoteCfgPath, a.spec.DataDir
 }
+
+// ================================================================================
+// 	HStreamExporter
 
 type HStreamExporter struct {
 	spec          spec.HStreamExporterSpec

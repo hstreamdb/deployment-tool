@@ -10,9 +10,9 @@ import (
 )
 
 type HStoreReadyCheckScript struct {
-	Host         string
-	AdminApiPort int
-	Timeout      int
+	Host    string
+	Port    int
+	Timeout int
 }
 
 func (m HStoreReadyCheckScript) GenScript() (string, error) {
@@ -32,7 +32,7 @@ func (m HStoreReadyCheckScript) GenScript() (string, error) {
 		return "", err
 	}
 
-	file := filepath.Join("template", "script", fmt.Sprintf("wait_store_node_ready_%s_%d.sh", m.Host, m.AdminApiPort))
+	file := filepath.Join("template", "script", fmt.Sprintf("wait_store_node_ready_%s_%d.sh", m.Host, m.Port))
 	return file, os.WriteFile(file, content.Bytes(), 0755)
 }
 

@@ -12,11 +12,6 @@ import (
 	"strings"
 )
 
-const (
-	// FIXME: no way to modify zk monitor port now
-	DefaultMetaStoreMonitorPort = 2181
-)
-
 type MetaStore struct {
 	metaStoreId          uint32
 	spec                 spec.MetaStoreSpec
@@ -43,7 +38,7 @@ func (m *MetaStore) Display() map[string]utils.DisplayedComponent {
 	store := utils.DisplayedComponent{
 		Name:          "MetaStore",
 		Host:          m.spec.Host,
-		Ports:         strconv.Itoa(2181),
+		Ports:         strconv.Itoa(m.spec.Port),
 		ContainerName: m.ContainerName,
 		Image:         m.spec.Image,
 		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
@@ -129,7 +124,7 @@ func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		return nil
 	}
 
-	checkReadyScript := script.MetaStoreReadyCheckScript{Host: m.spec.Host, Port: DefaultMetaStoreMonitorPort, Timeout: 600}
+	checkReadyScript := script.MetaStoreReadyCheckScript{Host: m.spec.Host, Port: m.spec.Port, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
 		panic("gen script error")

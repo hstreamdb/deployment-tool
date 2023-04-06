@@ -57,6 +57,7 @@ type GlobalCtx struct {
 	HServerEndPoints  string
 	PrometheusUrls    []string
 	HttpServerUrls    []string
+	ServiceAddr       map[string][]string
 }
 
 func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
@@ -78,6 +79,8 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	httpServerUrl := c.GetHttpServerUrl()
 	hserverEndpoints := c.GetHServerEndpoint()
 	prometheusUrls := c.GetPrometheusAddr()
+	// all service address in `host:port` form, except cadvisor and node-exporter
+	serviceAddr := c.GetAddress()
 
 	return &GlobalCtx{
 		User:                 c.Global.User,
@@ -102,6 +105,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		HServerEndPoints:         hserverEndpoints,
 		PrometheusUrls:           prometheusUrls,
 		HttpServerUrls:           httpServerUrl,
+		ServiceAddr:              serviceAddr,
 	}, nil
 }
 
@@ -113,6 +117,7 @@ type Services struct {
 	HAdmin          []*HAdmin
 	MetaStore       []*MetaStore
 	HStreamConsole  []*HStreamConsole
+	BlackBox        []*BlackBox
 	Prometheus      []*Prometheus
 	Grafana         []*Grafana
 	AlertManager    []*AlertManager
@@ -173,14 +178,23 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		hstreamExporter = append(hstreamExporter, NewHStreamExporter(v))
 	}
 
+	blackBox := make([]*BlackBox, 0, len(c.BlackBox))
+	for _, v := range c.BlackBox {
+		blackBox = append(blackBox, NewBlackBox(v))
+	}
+
 	alertManager := make([]*AlertManager, 0, len(c.AlertManager))
 	for _, v := range c.AlertManager {
 		alertManager = append(alertManager, NewAlertManager(v))
 	}
 
+	blackBoxAddr := ""
+	if len(blackBox) != 0 {
+		blackBoxAddr = fmt.Sprintf("%s:%d", blackBox[0].spec.Host, blackBox[0].spec.Port)
+	}
 	proms := make([]*Prometheus, 0, len(c.Prometheus))
 	for _, v := range c.Prometheus {
-		proms = append(proms, NewPrometheus(v, monitorSuites, c.GetHStreamExporterAddr(), c.GetAlertManagerAddr()))
+		proms = append(proms, NewPrometheus(v, monitorSuites, c.GetHStreamExporterAddr(), c.GetAlertManagerAddr(), blackBoxAddr))
 	}
 
 	grafana := make([]*Grafana, 0, len(c.Grafana))
@@ -231,6 +245,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		HStore:          hstore,
 		MetaStore:       metaStore,
 		HStreamConsole:  hstreamConsole,
+		BlackBox:        blackBox,
 		Prometheus:      proms,
 		Grafana:         grafana,
 		AlertManager:    alertManager,
@@ -380,7 +395,7 @@ func getAdminInfos(c spec.ComponentsSpec) []AdminInfo {
 	for _, v := range c.HAdmin {
 		infos = append(infos, AdminInfo{
 			Host:          v.Host,
-			Port:          v.AdminPort,
+			Port:          v.Port,
 			ContainerName: spec.AdminDefaultContainerName,
 		})
 	}
@@ -389,7 +404,7 @@ func getAdminInfos(c spec.ComponentsSpec) []AdminInfo {
 		if v.EnableAdmin {
 			infos = append(infos, AdminInfo{
 				Host:          v.Host,
-				Port:          v.AdminPort,
+				Port:          v.Port,
 				ContainerName: spec.StoreDefaultContainerName,
 			})
 		}

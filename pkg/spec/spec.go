@@ -22,6 +22,7 @@ type ComponentsSpec struct {
 	HAdmin          []HAdminSpec          `yaml:"hadmin"`
 	MetaStore       []MetaStoreSpec       `yaml:"meta_store"`
 	HStreamConsole  []HStreamConsoleSpec  `yaml:"hstream_console"`
+	BlackBox        []BlackBoxSpec        `yaml:"blackBox"`
 	Prometheus      []PrometheusSpec      `yaml:"prometheus"`
 	Grafana         []GrafanaSpec         `yaml:"grafana"`
 	AlertManager    []AlertManagerSpec    `yaml:"alertmanager"`
@@ -72,6 +73,24 @@ func (c *ComponentsSpec) GetHosts() []string {
 			continue
 		}
 		res = append(res, getHostsInner(field)...)
+	}
+	return res
+}
+
+// GetAddress return all services address. e.g. {hserver: [127.0.0.1:6570, 127.0.0.2:6570]}
+func (c *ComponentsSpec) GetAddress() map[string][]string {
+	v := reflect.Indirect(reflect.ValueOf(c))
+	t := v.Type()
+
+	res := map[string][]string{}
+	for i := 0; i < t.NumField(); i++ {
+		field := v.Field(i)
+		tag := t.Field(i).Tag
+		service := tag.Get("yaml")
+		if field.Type().Name() == globalCfgTypeName {
+			continue
+		}
+		res[service] = getAddrInner(field)
 	}
 	return res
 }
@@ -208,6 +227,30 @@ func getHostsInner(v reflect.Value) []string {
 	return res
 }
 
+func getAddrInner(v reflect.Value) []string {
+	t := v.Type()
+	res := []string{}
+	switch t.Kind() {
+	case reflect.Slice:
+		for i := 0; i < v.Len(); i++ {
+			if hosts := getAddrInner(v.Index(i)); hosts != nil {
+				res = append(res, hosts...)
+			}
+		}
+	case reflect.Struct:
+		host := v.FieldByName("Host")
+		if !host.IsValid() {
+			return res
+		}
+		port := v.FieldByName("Port")
+		if !port.IsValid() {
+			return res
+		}
+		res = append(res, fmt.Sprintf("%s:%d", host.String(), port.Int()))
+	}
+	return res
+}
+
 func getZkUrl(metaStore []MetaStoreSpec) string {
 	hosts := []string{}
 	for _, spc := range metaStore {
@@ -240,16 +283,16 @@ func checkConflictAdminPort(store []HStoreSpec, admin []HAdminSpec) {
 	adminAddress := make(map[string]struct{})
 	for _, v := range store {
 		if v.EnableAdmin {
-			addr := fmt.Sprintf("%s:%d", v.Host, v.AdminPort)
+			addr := fmt.Sprintf("%s:%d", v.Host, v.Port)
 			adminAddress[addr] = struct{}{}
 		}
 	}
 
 	for _, v := range admin {
-		addr := fmt.Sprintf("%s:%d", v.Host, v.AdminPort)
+		addr := fmt.Sprintf("%s:%d", v.Host, v.Port)
 		if _, ok := adminAddress[addr]; ok {
 			panic(fmt.Sprintf("there is a store instance monitor on %s:%d, use another admin port for hadmin",
-				v.Host, v.AdminPort))
+				v.Host, v.Port))
 		}
 	}
 }
@@ -284,6 +327,16 @@ func updateComponent(cfg GlobalCfg, field reflect.Value) error {
 			newCfg := MergeContainerCfg(cfg.ContainerCfg, field.Interface().(ContainerCfg))
 			field.Set(reflect.ValueOf(newCfg))
 			return nil
+		}
+
+		// Update meta store default port values according to image type
+		if field.Type().Name() == "MetaStoreSpec" && field.FieldByName("Port").Int() == 0 {
+			image := field.FieldByName("Image").String()
+			if strings.Contains(image, "rqlite") {
+				field.FieldByName("Port").SetInt(4001)
+			} else {
+				field.FieldByName("Port").SetInt(2181)
+			}
 		}
 
 		ref := reflect.New(field.Type())

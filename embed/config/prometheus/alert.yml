@@ -2,13 +2,13 @@ groups:
   - name: alert_rule
     rules:
       - alert: ContainerKilled
-        expr: time() - container_last_seen{name=~"deploy_.*"} > 60
+        expr: probe_success != 1
         labels:
           alert_level: critical
         for: 1m
         annotations:
-          description: '{{ $value }} seconds passed since the node: {{ $labels.instance }}, container: {{ $labels.name }} was last seen'
-          summary: 'node: {{ $labels.instance }}, container: {{ $labels.name }} has been killed'
+          description: 'tcp probe failed for container: {{ $labels.group }}, address: {{ $labels.instance }}'
+          summary: 'container: {{ $labels.group }}, address: {{ $labels.instance }} unreachable'
       - alert: NodeHighCpuUsage
         expr: (1 - sum(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) / sum(rate(node_cpu_seconds_total[1m])) by (instance)) * 100 > 80
         labels:

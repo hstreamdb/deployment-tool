@@ -35,6 +35,10 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(CheckClusterStatus)
 	ctx.run(SetUpHttpServerService)
 
+	if len(services.BlackBox) != 0 {
+		ctx.run(SetUpBlackBoxService)
+	}
+
 	if len(services.Prometheus) != 0 {
 		ctx.run(SetUpHStreamMonitorStack)
 		ctx.run(SetUpHStreamExporterService)
@@ -75,6 +79,10 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(RemoveHStreamMonitorStack)
 	}
 
+	if len(services.BlackBox) != 0 {
+		ctx.run(RemoveBlackBoxService)
+	}
+
 	ctx.run(RemoveHttpServerService)
 	ctx.run(RemoveHServerCluster)
 	ctx.run(RemoveHStoreCluster)
@@ -101,6 +109,10 @@ func StopCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(StopPrometheusService)
 		ctx.run(StopHStreamExporterService)
 		ctx.run(StopHStreamMonitorStack)
+	}
+
+	if len(services.BlackBox) != 0 {
+		ctx.run(StopBlackBoxService)
 	}
 
 	ctx.run(StopHttpServerService)
@@ -275,6 +287,18 @@ func RemoveHStreamExporterService(executor ext.Executor, services *service.Servi
 
 func StopHStreamExporterService(executor ext.Executor, services *service.Services) error {
 	return stopCluster(executor, services.Global, services.HStreamExporter)
+}
+
+func SetUpBlackBoxService(executor ext.Executor, services *service.Services) error {
+	return startCluster(executor, services.Global, services.BlackBox)
+}
+
+func RemoveBlackBoxService(executor ext.Executor, services *service.Services) error {
+	return removeCluster(executor, services.Global, services.BlackBox)
+}
+
+func StopBlackBoxService(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.BlackBox)
 }
 
 func SetUpPrometheusService(executor ext.Executor, services *service.Services) error {

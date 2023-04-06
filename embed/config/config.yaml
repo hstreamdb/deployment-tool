@@ -155,7 +155,7 @@ hadmin:
     # # HAdmin docker image
     # image: "hstreamdb/hstream"
     # # HAdmin listen port
-    # admin_port: 6440
+    # port: 6440
     # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hadmin"
     # # Root directory of HStore data files
@@ -171,8 +171,8 @@ hstore:
   - host: 10.1.0.10
     # # HStore docker image
     # image: "hstreamdb/hstream"
-    # # HStore admin port
-    # admin_port: 6440
+    # # HStore listen port
+    # port: 6440
     # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
     # # Root directory of HStore data files
@@ -194,8 +194,8 @@ hstore:
   - host: 10.1.0.11
     # # HStore docker image
     # image: "hstreamdb/hstream"
-    # # HStore admin port
-    # admin_port: 6440
+    # # HStore listen port
+    # port: 6440
     # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
     # # Root directory of HStore data files
@@ -215,8 +215,8 @@ hstore:
   - host: 10.1.0.12
     # # HStore docker image
     # image: "hstreamdb/hstream"
-    # # HStore admin port
-    # admin_port: 6440
+    # # HStore listen port
+    # port: 6440
     # # Root directory of HStore config files
     # remote_config_path: "/home/deploy/hstore"
     # # Root directory of HStore data files
@@ -312,6 +312,22 @@ http_server:
     # remote_config_path: "/home/deploy/http-server"
     # # Root directory of Http_Server data files
     # data_dir: "/home/deploy/data/http-server"
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+
+blackBox:
+  - host: 10.1.0.15
+    # # BlackBox docker image
+    # image: "prom/blackbox-exporter"
+    # # BlackBox service monitor port
+    # port: 9115
+    # # Root directory of BlackBox config files
+    # remote_config_path: "/home/deploy/blackbox"
+    # # Root directory of BlackBox data files
+    # data_dir: "/home/deploy/data/blackbox"
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G

@@ -6,6 +6,8 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/config"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -167,7 +169,8 @@ func (b *BlackBox) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	blackboxCfg := config.BlackBoxConfig{}
 	cfg, err := blackboxCfg.GenConfig()
 	if err != nil {
-		panic(fmt.Errorf("gen blackbox config error: %s", err.Error()))
+		log.Errorf("gen blackbox config error: %s", err.Error())
+		os.Exit(1)
 	}
 	position := utils.ScpDir(cfg, b.spec.RemoteCfgPath)
 
@@ -280,7 +283,8 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 	cfg, err := prometheusCfg.GenConfig()
 	if err != nil {
-		panic(fmt.Errorf("gen prometheusCfg error: %s", err.Error()))
+		log.Errorf("gen prometheusCfg error: %s", err.Error())
+		os.Exit(1)
 	}
 
 	position := utils.ScpDir(filepath.Dir(cfg), p.spec.RemoteCfgPath)
@@ -361,7 +365,8 @@ func (g *Grafana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	grafanaCfg := config.GrafanaConfig{}
 	cfg, err := grafanaCfg.GenConfig()
 	if err != nil {
-		panic(fmt.Errorf("gen grafanaCfg error: %s", err.Error()))
+		log.Errorf("gen grafanaCfg error: %s", err.Error())
+		os.Exit(1)
 	}
 	position := utils.ScpDir(cfg, g.spec.RemoteCfgPath)
 

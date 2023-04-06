@@ -6,6 +6,8 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
+	"os"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -140,7 +142,8 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	checkReadyScript := script.HServerReadyCheckScript{Host: h.spec.Host, Port: DefaultServerMonitorPort, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
-		panic(fmt.Sprintf("gen script error: %s\n", err.Error()))
+		log.Errorf("gen script error: %s", err.Error())
+		os.Exit(1)
 	}
 
 	scriptName := filepath.Base(file)
@@ -178,7 +181,8 @@ func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
 
 func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	if len(h.CheckReadyScriptPath) == 0 {
-		panic("empty checkReadyScriptPath")
+		log.Error("empty HServer checkReadyScriptPath")
+		os.Exit(1)
 	}
 
 	args := []string{"/usr/bin/env bash"}

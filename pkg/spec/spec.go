@@ -3,6 +3,8 @@ package spec
 import (
 	"fmt"
 	"github.com/creasty/defaults"
+	log "github.com/sirupsen/logrus"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -134,7 +136,8 @@ func (c *ComponentsSpec) GetHServerEndpoint() string {
 			for _, listener := range listeners {
 				parts := strings.Split(listener, "hstream://")
 				if len(parts) != 2 {
-					panic(fmt.Sprintf("invalied advertised listener: %s", listener))
+					log.Errorf("invalied advertised listener: %s", listener)
+					os.Exit(1)
 				}
 				endpoints = append(endpoints, parts[1])
 			}
@@ -291,8 +294,9 @@ func checkConflictAdminPort(store []HStoreSpec, admin []HAdminSpec) {
 	for _, v := range admin {
 		addr := fmt.Sprintf("%s:%d", v.Host, v.Port)
 		if _, ok := adminAddress[addr]; ok {
-			panic(fmt.Sprintf("there is a store instance monitor on %s:%d, use another admin port for hadmin",
-				v.Host, v.Port))
+			log.Errorf("there is a store instance monitor on %s:%d, use another admin port for hadmin",
+				v.Host, v.Port)
+			os.Exit(1)
 		}
 	}
 }

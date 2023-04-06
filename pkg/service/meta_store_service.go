@@ -6,6 +6,8 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -78,19 +80,22 @@ func (m *MetaStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func zkEnvArgs(idx uint32, metaStoreUrls string) []string {
 	if metaStoreUrls == "" {
-		panic("metaStoreUrls should not be empty")
+		log.Error("metaStoreUrls should not be empty")
+		os.Exit(1)
 	}
 
 	reg, err := regexp.Compile(":2181,?")
 	if err != nil {
-		panic(err)
+		log.Errorf("regexp compile err: %s", err.Error())
+		os.Exit(1)
 	}
 	urls := reg.Split(metaStoreUrls, -1)
 	zkUrls := make([]string, 0, len(urls))
 	for i, url := range urls {
 		if url == "" {
 			if i != len(urls)-1 {
-				panic(fmt.Sprintf("invalid metaStoreUrls %s", metaStoreUrls))
+				log.Errorf(fmt.Sprintf("invalid metaStoreUrls %s", metaStoreUrls))
+				os.Exit(1)
 			}
 			continue
 		}
@@ -127,7 +132,8 @@ func (m *MetaStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	checkReadyScript := script.MetaStoreReadyCheckScript{Host: m.spec.Host, Port: m.spec.Port, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
-		panic("gen script error")
+		log.Error("gen metastore check ready script error")
+		os.Exit(1)
 	}
 
 	scriptName := filepath.Base(file)
@@ -153,7 +159,8 @@ func (m *MetaStore) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 
 	if len(m.CheckReadyScriptPath) == 0 {
-		panic("empty checkReadyScriptPath")
+		log.Error("empty meta store checkReadyScriptPath")
+		os.Exit(1)
 	}
 
 	args := []string{"/usr/bin/env bash"}

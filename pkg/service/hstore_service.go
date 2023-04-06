@@ -6,6 +6,8 @@ import (
 	"github.com/hstreamdb/deployment-tool/pkg/spec"
 	"github.com/hstreamdb/deployment-tool/pkg/template/script"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
+	"os"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -141,7 +143,8 @@ func (h *HStore) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 	position, err := h.syncScript(cfgDir, []script.Script{mountScript, checkReadyScript}...)
 	if err != nil {
-		panic(fmt.Sprintf("gen script error: %s", err))
+		log.Errorf("gen hstore related script error: %s", err)
+		os.Exit(1)
 	}
 
 	if len(globalCtx.HStoreConfigInMetaStore) == 0 {
@@ -173,7 +176,8 @@ func (h *HStore) syncScript(cfgDir string, scpts ...script.Script) ([]executor.P
 
 func (h *HStore) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	if len(h.CheckReadyScriptPath) == 0 {
-		panic("empty checkReadyScriptPath")
+		log.Error("empty store checkReadyScriptPath")
+		os.Exit(1)
 	}
 
 	args := []string{"/usr/bin/env bash", h.CheckReadyScriptPath}

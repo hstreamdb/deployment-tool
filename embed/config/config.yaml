@@ -238,9 +238,8 @@ meta_store:
   - host: 10.1.0.10
     # # Meta-Store docker image
     # image: "zookeeper:3.6"
-    # # Meta-Store port, currently only works for rqlite. zk will
-    # # monitor on 2181
-    # port: 4001
+    # # Meta-Store listen port
+    # port: 2181
     # # Raft port used by rqlite
     # raft_port: 4002
     # # Root directory of Meta-Store config files
@@ -256,9 +255,8 @@ meta_store:
   - host: 10.1.0.11
     # # Meta-Store docker image
     # image: "zookeeper:3.6"
-    # # Meta-Store port, currently only works for rqlite. zk will
-    # # monitor on 2181
-    # port: 4001
+    # # Meta-Store listen port
+    # port: 2181
     # # Raft port used by rqlite
     # raft_port: 4002
     # # Root directory of Meta-Store config files
@@ -274,9 +272,8 @@ meta_store:
   - host: 10.1.0.12
     # # Meta-Store docker image
     # image: "zookeeper:3.6"
-    # # Meta-Store port, currently only works for rqlite. zk will
-    # # monitor on 2181
-    # port: 4001
+    # # Meta-Store listen port
+    # port: 2181
     # # Raft port used by rqlite
     # raft_port: 4002
     # # Root directory of Meta-Store config files

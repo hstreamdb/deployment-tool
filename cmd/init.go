@@ -49,6 +49,7 @@ func newInit() *cobra.Command {
 				return err
 			}
 
+			// TODO
 			kibanaFile := filepath.Join("config", "kibana", "export.ndjson")
 			if err = getFile(kibanaFile, "template/kibana/export.ndjson"); err != nil {
 				return err

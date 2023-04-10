@@ -1,18 +1,23 @@
 package spec
 
 const (
+	elasticDockerRegistry = "docker.elastic.co/"
+	elasticVersion        = ":7.10.2"
+)
+
+const (
 	ElasticSearchDefaultContainerName = "deploy_elastic_search"
-	ElasticSearchDefaultImage         = "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
+	ElasticSearchDefaultImage         = elasticDockerRegistry + "elasticsearch/elasticsearch-oss" + elasticVersion
 	ElasticSearchDefaultCfgDir        = "/hstream/deploy/elasticsearch"
 	ElasticSearchDefaultDataDir       = "/hstream/data/elasticsearch"
 
 	KibanaDefaultContainerName = "deploy_kibana"
-	KibanaDefaultImage         = "docker.elastic.co/kibana/kibana:8.5.0"
+	KibanaDefaultImage         = elasticDockerRegistry + "kibana/kibana-oss" + elasticVersion
 	KibanaDefaultCfgDir        = "/hstream/deploy/kibana"
 	KibanaDefaultDataDir       = "/hstream/data/kibana"
 
 	FilebeatDefaultContainerName = "deploy_filebeat"
-	FilebeatDefaultImage         = "docker.elastic.co/beats/filebeat:8.5.0"
+	FilebeatDefaultImage         = elasticDockerRegistry + "beats/filebeat-oss" + elasticVersion
 	FilebeatDefaultCfgDir        = "/hstream/deploy/filebeat"
 	FilebeatDefaultDataDir       = "/hstream/data/filebeat"
 )
@@ -25,6 +30,7 @@ type ElasticSearchSpec struct {
 	DataDir       string       `yaml:"data_dir"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	IsOss         *bool        `yaml:"is_oss,omitempty"`
 }
 
 func (es *ElasticSearchSpec) SetDefaultDataDir() {
@@ -47,6 +53,8 @@ type KibanaSpec struct {
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	DataDir       string       `yaml:"data_dir"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+
+	IsOss *bool `yaml:"is_oss,omitempty"`
 }
 
 func (k *KibanaSpec) SetDefaultDataDir() {

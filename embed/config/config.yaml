@@ -408,7 +408,7 @@ elasticsearch:
   # # Elasticsearch service monitor port
   # port: 9200
   # # Elasticsearch docker image
-  # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
+  # image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
   # # Root directory of Elasticsearch config files
   # remote_config_path: "/home/deploy/elasticsearch"
   # # Root directory of Elasticsearch data files
@@ -425,7 +425,7 @@ kibana:
   # # Kibana service monitor port
   # port: 5601
   # # Kibana docker image
-  # image: "docker.elastic.co/kibana/kibana:8.5.0"
+  # image: "docker.elastic.co/kibana/kibana-oss:7.10.2"
   # # Root directory of Kibana config files
   # remote_config_path: "/home/deploy/kibana"
   # # Root directory of Kibana data files
@@ -441,7 +441,7 @@ filebeat:
   # # The ip address of Filebeats
   - host: 10.1.0.10
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat:8.5.0"
+    # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
     # # Root directory of Filebeat data files
@@ -454,7 +454,7 @@ filebeat:
       # remove_when_exit: true
   - host: 10.1.0.11
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat:8.5.0"
+    # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
     # # Root directory of Filebeat data files
@@ -467,7 +467,7 @@ filebeat:
       # remove_when_exit: true
   - host: 10.1.0.12
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat:8.5.0"
+    # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
     # # Root directory of Filebeat config files
     # remote_config_path: "/home/deploy/filebeat"
     # # Root directory of Filebeat data files

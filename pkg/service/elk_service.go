@@ -358,8 +358,15 @@ func (f *Filebeat) getDirs() (string, string) {
 func enableServerShutdownTimeout(kibanaImageTag string) bool {
 	const assumeMsg = ", assume the version is higher than 7.13.0, set `ServerShutdownTimeout` to default value"
 
+	kibanaImageTag = strings.TrimSpace(kibanaImageTag)
+
 	if kibanaImageTag == "" {
 		log.Warn("Kibana image tag is empty" + assumeMsg)
+		return true
+	}
+
+	if kibanaImageTag == "latest" {
+		log.Warnf("Use custom Kibana tag `%s`"+assumeMsg, kibanaImageTag)
 		return true
 	}
 
@@ -380,8 +387,15 @@ func whichIndexPatternToUse(kibanaImageTag string) string {
 		assumeMsg    = "Can not parse Kibana image tag to version number: %s" + subAssumeMsg
 	)
 
+	kibanaImageTag = strings.TrimSpace(kibanaImageTag)
+
 	if kibanaImageTag == "" {
 		log.Warn("Kibana image tag is empty" + subAssumeMsg)
+		return available800
+	}
+
+	if kibanaImageTag == "latest" {
+		log.Warnf("Use custom Kibana tag `%s`"+subAssumeMsg, kibanaImageTag)
 		return available800
 	}
 
@@ -391,7 +405,7 @@ func whichIndexPatternToUse(kibanaImageTag string) string {
 		return available800
 	}
 	if ret {
-		return available760
+		return available800
 	}
 
 	ret, err = isVersionCompatible(kibanaImageTag, 7, 6, 0)

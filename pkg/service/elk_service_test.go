@@ -1,25 +1,20 @@
 package service
 
-import "testing"
+import (
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	"testing"
+)
 import "github.com/stretchr/testify/assert"
 
-const (
-	available800 = "8.0.0"
-	available760 = "7.6.0"
-)
-
 func Test_isVersionCompatible(t *testing.T) {
-	ret, err := isVersionCompatible("8.5.0", 8, 0, 0)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, true, ret)
+	ret := isVersionCompatible("8.5.0", utils.ElkVersion800)
+	assert.True(t, ret)
 
-	ret, err = isVersionCompatible("7.10.2", 7, 6, 0)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, true, ret)
+	ret = isVersionCompatible("7.10.2", utils.ElkVersion760)
+	assert.True(t, ret)
 
-	ret, err = isVersionCompatible("7.5.9", 7, 6, 0)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, false, ret)
+	ret = isVersionCompatible("7.5.9", utils.ElkVersion760)
+	assert.False(t, ret)
 }
 
 func Test_whichIndexPatternToUse(t *testing.T) {

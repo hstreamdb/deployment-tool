@@ -10,9 +10,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
+)
+
+var (
+	available800 = toStringWithoutV(utils.ElkVersion800)
+	available760 = toStringWithoutV(utils.ElkVersion760)
 )
 
 type ElasticSearch struct {
@@ -370,21 +374,13 @@ func enableServerShutdownTimeout(kibanaImageTag string) bool {
 		return true
 	}
 
-	ret, err := isVersionCompatible(kibanaImageTag, 7, 13, 0)
-	if err != nil {
-		log.Warnf("Can not parse Kibana image tag to version number: %s"+assumeMsg, err)
-		return true
-	}
+	ret := isVersionCompatible(kibanaImageTag, utils.ElkVersion7130)
 	return ret
 }
 
 func whichIndexPatternToUse(kibanaImageTag string) string {
 	const (
-		available800 = "8.0.0"
-		available760 = "7.6.0"
-
 		subAssumeMsg = ", assume the version is higher than 8.0.0, use the 8.0.0 compatible index patterns"
-		assumeMsg    = "Can not parse Kibana image tag to version number: %s" + subAssumeMsg
 	)
 
 	kibanaImageTag = strings.TrimSpace(kibanaImageTag)
@@ -399,20 +395,12 @@ func whichIndexPatternToUse(kibanaImageTag string) string {
 		return available800
 	}
 
-	ret, err := isVersionCompatible(kibanaImageTag, 8, 0, 0)
-	if err != nil {
-		log.Warnf(assumeMsg, err)
-		return available800
-	}
+	ret := isVersionCompatible(kibanaImageTag, utils.ElkVersion800)
 	if ret {
 		return available800
 	}
 
-	ret, err = isVersionCompatible(kibanaImageTag, 7, 6, 0)
-	if err != nil {
-		log.Warnf(assumeMsg, err)
-		return available800
-	}
+	ret = isVersionCompatible(kibanaImageTag, utils.ElkVersion760)
 	if !ret {
 		log.Fatalf("The version `%s` is not supported by current hdt. Please use an image version higher than %s or %s (for `-oss` users)",
 			kibanaImageTag,
@@ -422,22 +410,13 @@ func whichIndexPatternToUse(kibanaImageTag string) string {
 	return available760
 }
 
-func isVersionCompatible(version string, requiredMajor int, requiredMinor int, requiredPatch int) (bool, error) {
-	versionRegex, err := regexp.Compile(`^(\d+)\.(\d+)(?:\.(\d+))?$`)
-	matches := versionRegex.FindStringSubmatch(version)
+func isVersionCompatible(version string, requiredVersion utils.Version) bool {
+	return utils.CompareVersion(
+		utils.CreateVersion(version),
+		requiredVersion,
+	) != -1
+}
 
-	if len(matches) > 0 {
-		major, _ := strconv.Atoi(matches[1])
-		minor, _ := strconv.Atoi(matches[2])
-		patch := 0
-		if matches[3] != "" {
-			patch, _ = strconv.Atoi(matches[3])
-		}
-
-		if major > requiredMajor || (major == requiredMajor && minor >= requiredMinor) || (major == requiredMajor && minor == requiredMinor && patch >= requiredPatch) {
-			return true, err
-		}
-	}
-
-	return false, err
+func toStringWithoutV(notLatestVersion utils.Version) string {
+	return fmt.Sprintf("%d.%d.%d", notLatestVersion.Major, notLatestVersion.Minor, notLatestVersion.Patch)
 }

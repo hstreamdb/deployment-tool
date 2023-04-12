@@ -93,6 +93,13 @@ var (
 	// `--host` and `--address` to `--bind-address` and
 	// `--advertised-address`, `--compression` should be removed
 	Version0101 = Version{0, 10, 1, false}
+
+	// ElkVersion800 Kibana saved objects format for 8.*.*
+	ElkVersion800 = Version{8, 0, 0, false}
+	// ElkVersion760 Kibana saved objects format for 7.8.*
+	ElkVersion760 = Version{7, 6, 0, false}
+	// ElkVersion7130 Kibana `ServerShutdownTimeout` option
+	ElkVersion7130 = Version{7, 13, 0, false}
 )
 
 type Version struct {

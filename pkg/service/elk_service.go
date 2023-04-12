@@ -413,15 +413,13 @@ func whichIndexPatternToUse(kibanaImageTag string) string {
 		log.Warnf(assumeMsg, err)
 		return available800
 	}
-	if ret {
-		return available760
-	} else {
-		panic(fmt.Sprintf("The version `%s` is not supported by current hdt. Please use an image version higher than %s or %s (for `-oss` users)",
+	if !ret {
+		log.Fatalf("The version `%s` is not supported by current hdt. Please use an image version higher than %s or %s (for `-oss` users)",
 			kibanaImageTag,
 			available800,
-			available760))
+			available760)
 	}
-
+	return available760
 }
 
 func isVersionCompatible(version string, requiredMajor int, requiredMinor int, requiredPatch int) (bool, error) {

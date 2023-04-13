@@ -14,10 +14,31 @@ import (
 	"strings"
 )
 
+var (
+	available800 = toStringWithoutV(utils.ElkVersion800)
+	available760 = toStringWithoutV(utils.ElkVersion760)
+)
+
 type ElasticSearch struct {
 	spec            spec.ElasticSearchSpec
 	ContainerName   string
 	DisableSecurity bool
+}
+
+func isElasticSearchImageOss(esSpec spec.ElasticSearchSpec) bool {
+	if esSpec.IsOss != nil {
+		return *esSpec.IsOss
+	} else {
+		return strings.Contains(esSpec.Image, "elasticsearch-oss")
+	}
+}
+
+func isKibanaImageOss(k spec.KibanaSpec) bool {
+	if k.IsOss != nil {
+		return *k.IsOss
+	} else {
+		return strings.Contains(k.Image, "kibana-oss")
+	}
 }
 
 func NewElasticSearch(esSpec spec.ElasticSearchSpec) *ElasticSearch {
@@ -55,7 +76,7 @@ func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, es.spec.ContainerCfg, es.ContainerName, true)
-	if es.DisableSecurity {
+	if es.DisableSecurity && !isElasticSearchImageOss(es.spec) {
 		args = append(args, "-e xpack.security.enabled=false")
 		args = append(args, "-e xpack.security.http.ssl.enabled=false")
 	}
@@ -141,6 +162,20 @@ func (k *Kibana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{filepath.Join(k.spec.RemoteCfgPath, "kibana.yml"), "/usr/share/kibana/config/kibana.yml"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, k.spec.ContainerCfg, k.ContainerName, true, mountPoints...)
+
+	var imageTag string
+	imageSplit := strings.Split(k.spec.Image, ":")
+	if len(imageSplit) == 2 {
+		imageTag = imageSplit[1]
+	}
+	if enableServerShutdownTimeout(imageTag) {
+		args = append(args, "-e server.shutdownTimeout=5s")
+	}
+
+	if !isKibanaImageOss(k.spec) {
+		args = append(args, "-e monitoring.ui.container.elasticsearch.enabled=true")
+	}
+
 	args = append(args, k.spec.Image)
 
 	return &executor.ExecuteCtx{Target: k.spec.Host, Cmd: strings.Join(args, " ")}
@@ -175,8 +210,17 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 
 	remotePath := filepath.Join(k.spec.RemoteCfgPath, "export.ndjson")
+
+	var imageTag string
+	imageSplit := strings.Split(k.spec.Image, ":")
+	if len(imageSplit) == 2 {
+		imageTag = imageSplit[1]
+	}
+	postfix := whichIndexPatternToUse(imageTag)
+	localDir := fmt.Sprintf("template/kibana/export_%s.ndjson", postfix)
+
 	positions = append(positions, executor.Position{
-		LocalDir:  "template/kibana/export.ndjson",
+		LocalDir:  localDir,
 		RemoteDir: remotePath,
 	})
 
@@ -313,4 +357,66 @@ func (f *Filebeat) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 func (f *Filebeat) getDirs() (string, string) {
 	return f.spec.RemoteCfgPath, f.spec.DataDir
+}
+
+func enableServerShutdownTimeout(kibanaImageTag string) bool {
+	const assumeMsg = ", assume the version is higher than 7.13.0, set `ServerShutdownTimeout` to default value"
+
+	kibanaImageTag = strings.TrimSpace(kibanaImageTag)
+
+	if kibanaImageTag == "" {
+		log.Warn("Kibana image tag is empty" + assumeMsg)
+		return true
+	}
+
+	if kibanaImageTag == "latest" {
+		log.Warnf("Use custom Kibana tag `%s`"+assumeMsg, kibanaImageTag)
+		return true
+	}
+
+	ret := isVersionCompatible(kibanaImageTag, utils.ElkVersion7130)
+	return ret
+}
+
+func whichIndexPatternToUse(kibanaImageTag string) string {
+	const (
+		subAssumeMsg = ", assume the version is higher than 8.0.0, use the 8.0.0 compatible index patterns"
+	)
+
+	kibanaImageTag = strings.TrimSpace(kibanaImageTag)
+
+	if kibanaImageTag == "" {
+		log.Warn("Kibana image tag is empty" + subAssumeMsg)
+		return available800
+	}
+
+	if kibanaImageTag == "latest" {
+		log.Warnf("Use custom Kibana tag `%s`"+subAssumeMsg, kibanaImageTag)
+		return available800
+	}
+
+	ret := isVersionCompatible(kibanaImageTag, utils.ElkVersion800)
+	if ret {
+		return available800
+	}
+
+	ret = isVersionCompatible(kibanaImageTag, utils.ElkVersion760)
+	if !ret {
+		log.Fatalf("The version `%s` is not supported by current hdt. Please use an image version higher than %s or %s (for `-oss` users)",
+			kibanaImageTag,
+			available800,
+			available760)
+	}
+	return available760
+}
+
+func isVersionCompatible(version string, requiredVersion utils.Version) bool {
+	return utils.CompareVersion(
+		utils.CreateVersion(version),
+		requiredVersion,
+	) != -1
+}
+
+func toStringWithoutV(notLatestVersion utils.Version) string {
+	return fmt.Sprintf("%d.%d.%d", notLatestVersion.Major, notLatestVersion.Minor, notLatestVersion.Patch)
 }

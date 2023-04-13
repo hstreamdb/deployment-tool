@@ -44,16 +44,28 @@ func newInit() *cobra.Command {
 				return fmt.Errorf("write alert manager config file error: %s\n", err.Error())
 			}
 
-			logdeviceCfgFile := filepath.Join("config", "logdevice.config")
-			if err = getFile(logdeviceCfgFile, "template/logdevice.conf"); err != nil {
+			logDeviceCfgFile := filepath.Join("config", "logdevice.config")
+			if err = getFile(logDeviceCfgFile, "template/logdevice.conf"); err != nil {
 				return err
 			}
 
-			kibanaFile := filepath.Join("config", "kibana", "export.ndjson")
-			if err = getFile(kibanaFile, "template/kibana/export.ndjson"); err != nil {
+			const (
+				available800 = "8.0.0"
+				available760 = "7.6.0"
+			)
+
+			kibanaFile := filepath.Join("config", "kibana", fmt.Sprintf("export_%s.ndjson", available800))
+			if err = getFile(kibanaFile, fmt.Sprintf("template/kibana/export_%s.ndjson", available800)); err != nil {
 				return err
 			}
+
+			kibanaFile = filepath.Join("config", "kibana", fmt.Sprintf("export_%s.ndjson", available760))
+			if err = getFile(kibanaFile, fmt.Sprintf("template/kibana/export_%s.ndjson", available760)); err != nil {
+				return err
+			}
+
 			return nil
+
 		},
 	}
 	return cmd

@@ -397,6 +397,6 @@ func updateComponent(cfg GlobalCfg, field reflect.Value) error {
 }
 
 func skipUpdate(field reflect.Value) bool {
-	tp := field.Type().Name()
+	tp := reflect.TypeOf(field).Name()
 	return tp == globalCfgTypeName
 }

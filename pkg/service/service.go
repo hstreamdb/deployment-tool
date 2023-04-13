@@ -302,7 +302,7 @@ func updateStoreConfig(ctx *GlobalCtx) (string, error) {
 	if err = json.Unmarshal(content, cfg); err != nil {
 		return "", err
 	}
-	cfg.updateLogReplic(ctx.MetaReplica)
+	cfg.updateLogReplicate(ctx.MetaReplica)
 
 	if cfg.Zookeeper != nil && cfg.Rqlite != nil {
 		return "", fmt.Errorf("can't set both zookeeper and rqlite fields in config file")
@@ -348,7 +348,7 @@ type storeCfg struct {
 }
 
 // FIXME: will panic if no replicate_across or node field exist.
-func (s *storeCfg) updateLogReplic(replica int) {
+func (s *storeCfg) updateLogReplicate(replica int) {
 	cfgValue := reflect.Indirect(reflect.ValueOf(s))
 	for j := 0; j < cfgValue.NumField(); j++ {
 		switch cfgValue.Type().Field(j).Name {

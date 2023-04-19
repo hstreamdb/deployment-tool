@@ -68,6 +68,8 @@ func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/mnt", "/mnt"},
+		{"/var/run/docker.sock", "/var/run/docker.sock"},
+		{"/tmp", "/tmp"},
 		{h.spec.DataDir, h.spec.DataDir},
 		{"/data/crash", "/data/crash"},
 		{h.spec.RemoteCfgPath, h.spec.RemoteCfgPath},

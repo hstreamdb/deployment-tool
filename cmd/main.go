@@ -27,16 +27,15 @@ func main() {
 				return cmd.Help()
 			case "server":
 				cmd = cmpt.NewServerCmd()
-				if err := cmd.Execute(); err != nil {
-					log.Error(err)
-					os.Exit(1)
-				}
 			case "console":
 				cmd = cmpt.NewConsoleCmd()
-				if err := cmd.Execute(); err != nil {
-					log.Error(err)
-					os.Exit(1)
-				}
+			case "hstream-exporter":
+				cmd = cmpt.NewHStreamExporterCmd()
+			}
+
+			if err := cmd.Execute(); err != nil {
+				log.Error(err)
+				os.Exit(1)
 			}
 			return nil
 		},

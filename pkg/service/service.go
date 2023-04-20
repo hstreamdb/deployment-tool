@@ -161,12 +161,14 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	sort.Strings(hosts)
 	hosts = slices.Compact(hosts)
 	monitorSuites := make([]*MonitorSuite, 0, len(hosts))
-	excludedHosts := getExcludedMonitorHosts(c)
-	for _, host := range hosts {
-		if slices.Contains(excludedHosts, host) {
-			continue
+	if len(c.Prometheus) != 0 {
+		excludedHosts := getExcludedMonitorHosts(c)
+		for _, host := range hosts {
+			if slices.Contains(excludedHosts, host) {
+				continue
+			}
+			monitorSuites = append(monitorSuites, NewMonitorSuite(host, c.Monitor))
 		}
-		monitorSuites = append(monitorSuites, NewMonitorSuite(host, c.Monitor))
 	}
 
 	httpServer := make([]*HttpServer, 0, len(c.HttpServer))

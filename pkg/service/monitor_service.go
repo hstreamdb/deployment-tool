@@ -203,16 +203,21 @@ func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite,
 	for _, suite := range monitorSuites {
 		hosts = append(hosts, suite.Host)
 	}
-	return &Prometheus{
+
+	res := &Prometheus{
 		spec:                promSpec,
 		ContainerName:       spec.PrometheusDefaultContainerName,
 		MonitoredHosts:      hosts,
-		NodeExporterPort:    monitorSuites[0].spec.NodeExporterPort,
-		CadvisorPort:        monitorSuites[0].spec.CadvisorPort,
 		HStreamExporterAddr: hstreamExporterAddr,
 		AlertManagerAddr:    alertAddr,
 		BlackBoxAddr:        blackBoxAddr,
 	}
+
+	if len(monitorSuites) != 0 {
+		res.NodeExporterPort = monitorSuites[0].spec.NodeExporterPort
+		res.CadvisorPort = monitorSuites[0].spec.CadvisorPort
+	}
+	return res
 }
 
 func (p *Prometheus) GetServiceName() string {

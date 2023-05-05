@@ -247,6 +247,7 @@ func (p *Prometheus) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (p *Prometheus) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{p.spec.RemoteCfgPath, "/etc/prometheus"},
+		{p.spec.DataDir, "/prometheus"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, p.spec.ContainerCfg, p.ContainerName, true, mountPoints...)
 	args = append(args, p.spec.Image)

@@ -17,6 +17,7 @@ type GlobalCfg struct {
 	DisableStoreNetworkCfgPath bool         `yaml:"disable_store_network_config_path"`
 	EsConfigPath               string       `yaml:"elastic_search_config_path"`
 	EnableDscpReflection       bool         `yaml:"enable_dscp_reflection"`
+	DisableMonitorSuite        bool         `yaml:"disable_monitor_suite"`
 	ContainerCfg               ContainerCfg `yaml:"container_config"`
 }
 

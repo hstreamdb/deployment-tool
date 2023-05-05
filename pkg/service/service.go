@@ -161,7 +161,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	sort.Strings(hosts)
 	hosts = slices.Compact(hosts)
 	monitorSuites := make([]*MonitorSuite, 0, len(hosts))
-	if len(c.Prometheus) != 0 {
+	if !c.Global.DisableMonitorSuite && len(c.Prometheus) != 0 {
 		excludedHosts := getExcludedMonitorHosts(c)
 		if slices.Contains(hosts, "127.0.0.1") && slices.Contains(hosts, "0.0.0.0") {
 			idx := slices.Index(hosts, "0.0.0.0")

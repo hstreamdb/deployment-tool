@@ -20,6 +20,7 @@ rule_files:
   - "alert.yml"
 
 scrape_configs:
+{{- if .NodeExporterAddress }}
   - job_name: "node_exporter_task"
     scrape_interval: 30s
     static_configs:
@@ -35,7 +36,9 @@ scrape_configs:
         separator: ':'
         regex: '(.*):.*'
         replacement: "${1}"
+{{- end }}
 
+{{- if .CadVisorAddress }}
   - job_name: "cadvisor_task"
     scrape_interval: 30s
     static_configs:
@@ -51,6 +54,7 @@ scrape_configs:
         separator: ':'
         regex: '(.*):.*'
         replacement: "${1}"
+{{- end }}
 
 {{- if .BlackBoxAddress }}
   - job_name: "blackbox"

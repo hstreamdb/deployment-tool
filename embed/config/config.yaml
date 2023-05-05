@@ -24,6 +24,8 @@ global:
   # # Only enable for linux kernel which support dscp reflection(linux kernel version
   # # greater and equal than 4.x)
   # enable_dscp_reflection: false
+  # # When set to true, hdt won't start any node_exporter or cadvisor instance
+  # disable_monitor_suite: false
   # # Global container configuration
   # container_config:
     # cpu_limit: 2.00

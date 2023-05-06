@@ -250,7 +250,7 @@ func (p *Prometheus) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{p.spec.DataDir, "/prometheus"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, p.spec.ContainerCfg, p.ContainerName, true, mountPoints...)
-	args = append(args, p.spec.Image)
+	args = append(args, "--user ${UID}", p.spec.Image)
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

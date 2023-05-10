@@ -26,12 +26,14 @@ global:
   # enable_dscp_reflection: false
   # # When set to true, hdt won't start any node_exporter or cadvisor instance
   # disable_monitor_suite: false
-  # # Global container configuration
+  # # Global container configuration, can be updated by each component's container_config field.
+  # # Note for options field, the component's options field will overwrite the global's
   # container_config:
     # cpu_limit: 2.00
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
+    # options: ""
 
 monitor:
   # # Node exporter port
@@ -56,6 +58,7 @@ monitor:
     # memory_limit: 8G
     # disable_restart: true
     # remove_when_exit: true
+    # options: ""
 
 hserver:
   - host: 10.1.0.10
@@ -89,6 +92,7 @@ hserver:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.11
     # # HServer docker image
     # image: "hstreamdb/hstream"
@@ -120,6 +124,7 @@ hserver:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.12
     # # HServer docker image
     # image: "hstreamdb/hstream"
@@ -151,6 +156,7 @@ hserver:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 hadmin:
   - host: 10.1.0.10
@@ -168,6 +174,7 @@ hadmin:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 hstore:
   - host: 10.1.0.10
@@ -193,6 +200,7 @@ hstore:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.11
     # # HStore docker image
     # image: "hstreamdb/hstream"
@@ -214,6 +222,7 @@ hstore:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.12
     # # HStore docker image
     # image: "hstreamdb/hstream"
@@ -235,6 +244,7 @@ hstore:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 meta_store:
   - host: 10.1.0.10
@@ -254,6 +264,7 @@ meta_store:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.11
     # # Meta-Store docker image
     # image: "zookeeper:3.6"
@@ -271,6 +282,7 @@ meta_store:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.12
     # # Meta-Store docker image
     # image: "zookeeper:3.6"
@@ -288,6 +300,7 @@ meta_store:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 hstream_console:
   - host: 10.1.0.15
@@ -300,6 +313,7 @@ hstream_console:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 http_server:
   - host: 10.1.0.15
@@ -316,6 +330,7 @@ http_server:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 blackBox:
   - host: 10.1.0.15
@@ -332,6 +347,7 @@ blackBox:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 prometheus:
   - host: 10.1.0.15
@@ -349,6 +365,7 @@ prometheus:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 grafana:
   - host: 10.1.0.15
@@ -366,77 +383,82 @@ grafana:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
 
 alertmanager:
   - host: 10.0.1.15
-  # # Alertmanager docker image
-  # image: "prom/alertmanager"
-  # # Alertmanager service monitor port
-  # port: 9093
-  # # Root directory of Alertmanager config files
-  # remote_config_path: "/home/deploy/alertmanager"
-  # # Root directory of Alertmanager data files
-  # data_dir: "/home/deploy/data/alertmanager"
-  # # Alertmanager container configuration
-  # container_config:
-    # cpu_limit: 2.00
-    # memory_limit: 8G
-    # disable_restart: true
-    # remove_when_exit: true
+    # # Alertmanager docker image
+    # image: "prom/alertmanager"
+    # # Alertmanager service monitor port
+    # port: 9093
+    # # Root directory of Alertmanager config files
+    # remote_config_path: "/home/deploy/alertmanager"
+    # # Root directory of Alertmanager data files
+    # data_dir: "/home/deploy/data/alertmanager"
+    # # Alertmanager container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
 
 hstream_exporter:
   - host: 10.1.0.15
-  # # HStream_Exporter docker image
-  # image: "hstreamdb/hstream-exporter"
-  # # HStream_Exporter service monitor port
-  # port: 9250
-  # # HStream_Exporter log leve: [debug|info|warning|error|fatal|panic]
-  # log_level: info
-  # # Root directory of HStream_Exporter config files
-  # remote_config_path: "/home/deploy/hstream-exporter"
-  # # Root directory of HStream_Exporter data files
-  # data_dir: "/home/deploy/data/hstream-exporter"
-  # container_config:
-    # cpu_limit: 2.00
-    # memory_limit: 8G
-    # disable_restart: true
-    # remove_when_exit: true
+    # # HStream_Exporter docker image
+    # image: "hstreamdb/hstream-exporter"
+    # # HStream_Exporter service monitor port
+    # port: 9250
+    # # HStream_Exporter log leve: [debug|info|warning|error|fatal|panic]
+    # log_level: info
+    # # Root directory of HStream_Exporter config files
+    # remote_config_path: "/home/deploy/hstream-exporter"
+    # # Root directory of HStream_Exporter data files
+    # data_dir: "/home/deploy/data/hstream-exporter"
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
 
 elasticsearch:
   - host: 10.1.0.15
-  # # Elasticsearch service monitor port
-  # port: 9200
-  # # Elasticsearch docker image
-  # image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
-  # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
-  # # Root directory of Elasticsearch config files
-  # remote_config_path: "/home/deploy/elasticsearch"
-  # # Root directory of Elasticsearch data files
-  # data_dir: "/home/deploy/data/elasticsearch"
-  # # Elasticsearch container configuration
-  # container_config:
-    # cpu_limit: 2.00
-    # memory_limit: 8G
-    # disable_restart: true
-    # remove_when_exit: true
+    # # Elasticsearch service monitor port
+    # port: 9200
+    # # Elasticsearch docker image
+    # image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
+    # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
+    # # Root directory of Elasticsearch config files
+    # remote_config_path: "/home/deploy/elasticsearch"
+    # # Root directory of Elasticsearch data files
+    # data_dir: "/home/deploy/data/elasticsearch"
+    # # Elasticsearch container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
 
 kibana:
   - host: 10.1.0.15
-  # # Kibana service monitor port
-  # port: 5601
-  # # Kibana docker image
-  # image: "docker.elastic.co/kibana/kibana-oss:7.10.2"
-  # image: "docker.elastic.co/kibana/kibana:8.5.0"
-  # # Root directory of Kibana config files
-  # remote_config_path: "/home/deploy/kibana"
-  # # Root directory of Kibana data files
-  # data_dir: "/home/deploy/data/kibana"
-  # # Kibana container configuration
-  # container_config:
-    # cpu_limit: 2.00
-    # memory_limit: 8G
-    # disable_restart: true
-    # remove_when_exit: true
+    # # Kibana service monitor port
+    # port: 5601
+    # # Kibana docker image
+    # image: "docker.elastic.co/kibana/kibana-oss:7.10.2"
+    # image: "docker.elastic.co/kibana/kibana:8.5.0"
+    # # Root directory of Kibana config files
+    # remote_config_path: "/home/deploy/kibana"
+    # # Root directory of Kibana data files
+    # data_dir: "/home/deploy/data/kibana"
+    # # Kibana container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
 
 filebeat:
   # # The ip address of Filebeats
@@ -454,6 +476,7 @@ filebeat:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.11
     # # Filebeat docker image
     # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
@@ -468,6 +491,7 @@ filebeat:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""
   - host: 10.1.0.12
     # # Filebeat docker image
     # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
@@ -482,3 +506,4 @@ filebeat:
       # memory_limit: 8G
       # disable_restart: true
       # remove_when_exit: true
+      # options: ""

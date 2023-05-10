@@ -43,36 +43,43 @@ func TestMergeContainerCfg(t *testing.T) {
 			rhs: ContainerCfg{
 				DisableRestart: false,
 				Memory:         "2G",
+				Options:        "--log-driver none",
 			},
 			want: ContainerCfg{
 				DisableRestart: false,
 				Memory:         "2G",
+				Options:        "--log-driver none",
 			},
 		},
 		"empty rhs": {
 			lhs: ContainerCfg{
 				DisableRestart: false,
 				Memory:         "2G",
+				Options:        "--log-driver none",
 			},
 			rhs: ContainerCfg{},
 			want: ContainerCfg{
 				DisableRestart: false,
 				Memory:         "2G",
+				Options:        "--log-driver none",
 			},
 		},
 		"merge two": {
 			lhs: ContainerCfg{
 				Memory:         "2G",
 				DisableRestart: false,
+				Options:        "--log-driver none, --log-opt mode=non-blocking",
 			},
 			rhs: ContainerCfg{
 				Memory:         "4G",
 				RemoveWhenExit: false,
+				Options:        "--label production_status=testing",
 			},
 			want: ContainerCfg{
 				Memory:         "4G",
 				DisableRestart: false,
 				RemoveWhenExit: false,
+				Options:        "--label production_status=testing",
 			},
 		},
 	}

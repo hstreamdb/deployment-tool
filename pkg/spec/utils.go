@@ -31,6 +31,10 @@ func MergeContainerCfg(lhs, rhs ContainerCfg) ContainerCfg {
 	if rhs.DisableRestart {
 		lhs.DisableRestart = rhs.DisableRestart
 	}
+
+	if len(rhs.Options) != 0 {
+		lhs.Options = rhs.Options
+	}
 	return lhs
 }
 

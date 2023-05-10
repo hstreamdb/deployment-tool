@@ -26,6 +26,7 @@ type ContainerCfg struct {
 	Memory         string `yaml:"memory_limit"`
 	RemoveWhenExit bool   `yaml:"remove_when_exit"`
 	DisableRestart bool   `yaml:"disable_restart"`
+	Options        string `yaml:"options"`
 }
 
 func (c ContainerCfg) GetCmd() string {
@@ -41,6 +42,9 @@ func (c ContainerCfg) GetCmd() string {
 	}
 	if len(c.Memory) != 0 {
 		args = append(args, fmt.Sprintf("--memory=%s", c.Memory))
+	}
+	if len(c.Options) != 0 {
+		args = append(args, c.Options)
 	}
 	return strings.Join(args, " ")
 }

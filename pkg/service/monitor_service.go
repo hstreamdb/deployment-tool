@@ -251,6 +251,8 @@ func (p *Prometheus) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, p.spec.ContainerCfg, p.ContainerName, true, mountPoints...)
 	args = append(args, "--user ${UID}", p.spec.Image)
+	args = append(args, fmt.Sprintf("--storage.tsdb.retention.time=%s", p.spec.RetentionTime))
+	args = append(args, "--config.file=/etc/prometheus/prometheus.yml")
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

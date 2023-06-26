@@ -96,6 +96,7 @@ type PrometheusSpec struct {
 	Port          int          `yaml:"port" default:"9090"`
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`
+	RetentionTime string       `yaml:"retention_time" default:"15d"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }

@@ -50,8 +50,6 @@ monitor:
   # remote_config_path: "/home/deploy/monitor"
   # # root directory for all monitor related data files.
   # data_dir: "/home/deploy/data/monitor"
-  # # Set up grafana without login
-  grafana_disable_login: true
   # # Global container configuration for monitor stacks.
   # container_config:
     # cpu_limit: 2.00
@@ -379,6 +377,8 @@ grafana:
     # remote_config_path: "/home/deploy/grafana"
     # # Root directory of Grafana data files
     # data_dir: "/home/deploy/data/grafana"
+    # # Set up grafana without login
+    disable_login: true
     # # Grafana container configuration
     # container_config:
       # cpu_limit: 2.00

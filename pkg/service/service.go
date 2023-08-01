@@ -206,7 +206,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 
 	grafana := make([]*Grafana, 0, len(c.Grafana))
 	for _, v := range c.Grafana {
-		grafana = append(grafana, NewGrafana(v, c.Monitor.GrafanaDisableLogin))
+		grafana = append(grafana, NewGrafana(v))
 	}
 
 	elasticSearch := make([]*ElasticSearch, 0, len(c.ElasticSearch))

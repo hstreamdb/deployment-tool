@@ -312,11 +312,10 @@ func (p *Prometheus) getDirs() (string, string) {
 type Grafana struct {
 	spec          spec.GrafanaSpec
 	ContainerName string
-	DisableLogin  bool
 }
 
-func NewGrafana(graSpec spec.GrafanaSpec, disableLogin bool) *Grafana {
-	return &Grafana{spec: graSpec, ContainerName: spec.GrafanaDefaultContainerName, DisableLogin: disableLogin}
+func NewGrafana(graSpec spec.GrafanaSpec) *Grafana {
+	return &Grafana{spec: graSpec, ContainerName: spec.GrafanaDefaultContainerName}
 }
 
 func (g *Grafana) GetServiceName() string {
@@ -350,7 +349,7 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{g.spec.DataDir, "/var/lib/grafana"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, g.spec.ContainerCfg, g.ContainerName, true, mountPoints...)
-	if g.DisableLogin {
+	if g.spec.DisableLogin {
 		args = append(args, "-e GF_AUTH_ANONYMOUS_ORG_ROLE=Admin",
 			"-e GF_AUTH_ANONYMOUS_ENABLED=true", "-e GF_AUTH_DISABLE_LOGIN_FORM=true")
 	}

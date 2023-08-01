@@ -38,15 +38,14 @@ const (
 // 	monitor spec
 
 type MonitorSpec struct {
-	NodeExporterImage   string       `yaml:"node_exporter_image"`
-	NodeExporterPort    int          `yaml:"node_exporter_port" default:"9100"`
-	CadvisorImage       string       `yaml:"cadvisor_image"`
-	CadvisorPort        int          `yaml:"cadvisor_port" default:"7000"`
-	ExcludedHosts       []string     `yaml:"excluded_hosts"`
-	RemoteCfgPath       string       `yaml:"remote_config_path"`
-	DataDir             string       `yaml:"data_dir"`
-	GrafanaDisableLogin bool         `yaml:"grafana_disable_login"`
-	ContainerCfg        ContainerCfg `yaml:"container_config"`
+	NodeExporterImage string       `yaml:"node_exporter_image"`
+	NodeExporterPort  int          `yaml:"node_exporter_port" default:"9100"`
+	CadvisorImage     string       `yaml:"cadvisor_image"`
+	CadvisorPort      int          `yaml:"cadvisor_port" default:"7000"`
+	ExcludedHosts     []string     `yaml:"excluded_hosts"`
+	RemoteCfgPath     string       `yaml:"remote_config_path"`
+	DataDir           string       `yaml:"data_dir"`
+	ContainerCfg      ContainerCfg `yaml:"container_config"`
 }
 
 func (m *MonitorSpec) SetDefaultDataDir() {
@@ -122,6 +121,7 @@ type GrafanaSpec struct {
 	Port          int          `yaml:"port" default:"3000"`
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`
+	DisableLogin  bool         `yaml:"disable_login"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }

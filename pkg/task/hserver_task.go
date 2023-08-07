@@ -47,9 +47,6 @@ func (s *HServerInit) Run(executor ext.Executor) error {
 		return nil
 	}
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
-	res, err := executor.Execute(target, executorCtx.Cmd)
-	if err != nil {
-		return fmt.Errorf("%s-%s", err.Error(), res)
-	}
-	return nil
+	_, err := executor.Execute(target, executorCtx.Cmd)
+	return err
 }

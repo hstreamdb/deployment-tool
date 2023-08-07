@@ -91,7 +91,6 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	} else {
 		args = append(args, "--host", h.spec.Host)
 		args = append(args, "--address", h.spec.AdvertisedAddress)
-		args = append(args, "--compression", h.spec.Opts.Compression)
 	}
 
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
@@ -100,32 +99,47 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		args = append(args, "--config-path", h.ServerConfigPath)
 	}
 
+	if h.spec.Opts == nil {
+		h.spec.Opts = make(map[string]string)
+	}
+
 	if needSeedNodes(version) {
-		args = append(args, "--seed-nodes", globalCtx.SeedNodes)
+		if _, ok := h.spec.Opts["seed-nodes"]; !ok {
+			h.spec.Opts["seed-nodes"] = globalCtx.SeedNodes
+		}
 	}
 
 	if utils.CompareVersion(version, utils.Version096) > 0 {
 		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
-		args = append(args, "--metastore-uri", metaStoreUrl)
+		h.spec.Opts["metastore-uri"] = metaStoreUrl
 	} else if utils.CompareVersion(version, utils.Version095) > 0 {
 		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
-		args = append(args, "--meta-store", metaStoreUrl)
+		h.spec.Opts["meta-store"] = metaStoreUrl
 	} else {
-		args = append(args, "--zkuri", globalCtx.MetaStoreUrls)
+		h.spec.Opts["zkuri"] = globalCtx.MetaStoreUrls
 	}
 
 	if len(h.StoreConfigPath) != 0 {
-		args = append(args, "--store-config", h.StoreConfigPath)
+		h.spec.Opts["store-config"] = h.StoreConfigPath
 	} else {
-		args = append(args, "--store-config", globalCtx.HStoreConfigInMetaStore)
+		h.spec.Opts["store-config"] = globalCtx.HStoreConfigInMetaStore
 	}
 
-	args = append(args, fmt.Sprintf("--server-id %d", h.serverId))
-	args = append(args, "--store-log-level", h.spec.Opts.StoreLogLevel)
-	args = append(args, "--log-level", h.spec.Opts.ServerLogLevel)
-	args = append(args, fmt.Sprintf("--checkpoint-replica %d", globalCtx.MetaReplica))
+	if _, ok := h.spec.Opts["server-id"]; !ok {
+		h.spec.Opts["server-id"] = strconv.Itoa(int(h.serverId))
+	}
+	if _, ok := h.spec.Opts["checkpoint-replica"]; !ok {
+		h.spec.Opts["checkpoint-replica"] = strconv.Itoa(globalCtx.MetaReplica)
+	}
 	admin := globalCtx.HAdminInfos[0]
 	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", admin.Host, admin.Port))
+	for k, v := range h.spec.Opts {
+		if k == "enable-tls" {
+			args = append(args, "--enable-tls")
+		} else {
+			args = append(args, fmt.Sprintf("--%s %s", k, v))
+		}
+	}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -165,6 +179,21 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		position = append(position, executor.Position{LocalDir: globalCtx.LocalHStoreConfigFile, RemoteDir: storePath})
 		h.StoreConfigPath = storePath
 	}
+	if _, ok := h.spec.Opts["tls-key-path"]; ok {
+		tlsKeyPath := path.Join(cfgDir, path.Base(h.spec.Opts["tls-key-path"]))
+		position = append(position, executor.Position{LocalDir: h.spec.Opts["tls-key-path"], RemoteDir: tlsKeyPath})
+		h.spec.Opts["tls-key-path"] = tlsKeyPath
+	}
+	if _, ok := h.spec.Opts["tls-cert-path"]; ok {
+		certPath := path.Join(cfgDir, path.Base(h.spec.Opts["tls-cert-path"]))
+		position = append(position, executor.Position{LocalDir: h.spec.Opts["tls-cert-path"], RemoteDir: certPath})
+		h.spec.Opts["tls-cert-path"] = certPath
+	}
+	if _, ok := h.spec.Opts["tls-ca-path"]; ok {
+		caPath := path.Join(cfgDir, path.Base(h.spec.Opts["tls-ca-path"]))
+		position = append(position, executor.Position{LocalDir: h.spec.Opts["tls-ca-path"], RemoteDir: caPath})
+		h.spec.Opts["tls-ca-path"] = caPath
+	}
 
 	return &executor.TransferCtx{
 		Target: h.spec.Host, Position: position,
@@ -175,7 +204,19 @@ func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
 	_, version := parseImage(h.spec.Image)
 	if utils.CompareVersion(version, utils.Version090) >= 0 {
 		args := []string{"docker exec -t", spec.ServerDefaultContainerName}
-		args = append(args, "/usr/local/bin/hadmin", "server", "--host", h.spec.Host, "init")
+		if _, ok := h.spec.Opts["enable-tls"]; ok {
+			if _, ok = h.spec.Opts["tls-ca-path"]; !ok {
+				log.Errorf("tls-ca-path should not be empty when enable tls set.")
+				os.Exit(1)
+			}
+
+			args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port))
+			args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "init")
+		} else {
+			args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), "init")
+		}
 		return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 	}
 	return nil

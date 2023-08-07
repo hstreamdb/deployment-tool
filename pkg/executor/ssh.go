@@ -45,6 +45,7 @@ func (s *SSHExecutor) Execute(address, cmd string) (string, error) {
 	session.Stdout = &stdoutBuf
 	session.Stderr = &stderrBuf
 	if err = session.Run(cmd); err != nil {
+		log.Errorf("[%s]: execute %s error: %s", address, cmd, err.Error())
 		return stderrBuf.String(), err
 	}
 	return stdoutBuf.String(), nil

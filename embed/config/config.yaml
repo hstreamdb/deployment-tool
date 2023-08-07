@@ -72,14 +72,17 @@ hserver:
     # port: 6570
     # # HServer internal port
     # internal_port: 6571
-    # # HServer configuration
-    # server_config:
-      # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
-      # server_log_level: info
-      # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
-      # store_log_level: info
-      # # Specific server compression algorithm, valid values: [none|lz4|lz4hc]
-      # compression: lz4
+    # # HServer start parameter
+    server_param:
+      # HServer log level, valid values: [critical|error|warning|notify|info|debug]
+      log-level: info
+      # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      store-log-level: info
+      # Specific tls related param
+      # tls-key-path: /path/to/the/server.key.pem
+      # tls-cert-path: /path/to/the/signed.server.cert.pem
+      # tls-ca-path: /path/to/the/ca.cert.pem
+      # enable-tls: true
     # # Root directory of HServer config files
     # remote_config_path: "/home/deploy/hserver"
     # # Root directory of HServer data files
@@ -104,14 +107,17 @@ hserver:
     # port: 6570
     # # HServer internal port
     # internal_port: 6571
-    # # HServer configuration
-    # server_config:
-      # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
-      # server_log_level: info
-      # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
-      # store_log_level: info
-      # # Specific server compression algorithm, valid values: [none|lz4|lz4hc]
-      # compression: lz4
+    # # HServer start parameter
+    server_param:
+      # HServer log level, valid values: [critical|error|warning|notify|info|debug]
+      log-level: info
+      # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      store-log-level: info
+      # Specific tls related param
+      # tls-key-path: /path/to/the/server.key.pem
+      # tls-cert-path: /path/to/the/signed.server.cert.pem
+      # tls-ca-path: /path/to/the/ca.cert.pem
+      # enable-tls: true
     # # Root directory of HServer config files
     # remote_config_path: "/home/deploy/hserver"
     # # Root directory of HServer data files
@@ -136,14 +142,17 @@ hserver:
     # port: 6570
     # # HServer internal port
     # internal_port: 6571
-    # # HServer configuration
-    # server_config:
-      # # HServer log level, valid values: [critical|error|warning|notify|info|debug]
-      # server_log_level: info
-      # # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
-      # store_log_level: info
-      # # Specific server compression algorithm, valid values: [none|lz4|lz4hc]
-      # compression: lz4
+    # # HServer start parameter
+    server_param:
+      # HServer log level, valid values: [critical|error|warning|notify|info|debug]
+      log-level: info
+      # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      store-log-level: info
+      # Specific tls related param
+      # tls-key-path: /path/to/the/server.key.pem
+      # tls-cert-path: /path/to/the/signed.server.cert.pem
+      # tls-ca-path: /path/to/the/ca.cert.pem
+      # enable-tls: true
     # # Root directory of HServer config files
     # remote_config_path: "/home/deploy/hserver"
     # # Root directory of HServer data files

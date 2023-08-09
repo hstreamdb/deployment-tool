@@ -282,6 +282,7 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	allServiceAddr["node-exporter"] = nodeAddr
 	allServiceAddr["cadvisor"] = cadAddr
 	prometheusCfg := config.PrometheusConfig{
+		ClusterId:              globalCtx.ClusterId,
 		NodeExporterAddress:    nodeAddr,
 		CadVisorAddress:        cadAddr,
 		HStreamExporterAddress: p.HStreamExporterAddr,

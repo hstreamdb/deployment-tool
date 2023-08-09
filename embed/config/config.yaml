@@ -5,6 +5,8 @@ global:
   # key_path: "~/.ssh/hstream-aliyun.pem"
   # # SSH service monitor port
   ssh_port: 22
+  # # Unique identification of the cluster
+  cluster_id: "hstreamdb"
   # # Replication factors of store metadata
   # meta_replica: 1
   # # Local path to MetaStore config file

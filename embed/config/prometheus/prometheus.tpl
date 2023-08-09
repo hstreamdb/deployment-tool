@@ -30,6 +30,7 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'node_exporter'
+        cluster: '{{ .ClusterId }}'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
@@ -48,6 +49,7 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'cadvisor'
+        cluster: '{{ .ClusterId }}'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
@@ -57,6 +59,7 @@ scrape_configs:
 {{- end }}
 
 {{- if .BlackBoxAddress }}
+{{ $clusterId := .ClusterId }}
   - job_name: "blackbox"
     scrape_interval: 30s
     metrics_path: /probe
@@ -71,6 +74,7 @@ scrape_configs:
         {{- end }}
         labels:
           group: '{{ $key }}'
+          cluster: '{{ $clusterId }}'
     {{- end }}
     {{- end }}
     relabel_configs:
@@ -89,3 +93,6 @@ scrape_configs:
       {{- range .HStreamExporterAddress }}
       - '{{.}}'
       {{- end }}
+      labels:
+        group: 'hstream-exporter'
+        cluster: '{{ .ClusterId }}'

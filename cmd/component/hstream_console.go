@@ -13,7 +13,7 @@ func NewConsoleCmd() *cobra.Command {
 			cmd.SetArgs(args[1:])
 			return nil
 		},
-		//SilenceErrors:      true,
+		SilenceErrors:      true,
 		DisableFlagParsing: true,
 		SilenceUsage:       true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -37,9 +37,10 @@ func NewConsoleCmd() *cobra.Command {
 func newStartConsoleCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
-		Use:          "start",
-		Short:        "Start HStream Console",
-		SilenceUsage: true,
+		Use:           "start",
+		Short:         "Start HStream Console",
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {
@@ -60,9 +61,10 @@ func newStartConsoleCmd() *cobra.Command {
 func newRemoveConsoleCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
-		Use:          "remove",
-		Short:        "Remove HStream Console",
-		SilenceUsage: true,
+		Use:           "remove",
+		Short:         "Remove HStream Console",
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {

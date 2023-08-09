@@ -13,9 +13,9 @@ func NewHStreamExporterCmd() *cobra.Command {
 			cmd.SetArgs(args[1:])
 			return nil
 		},
-		//SilenceErrors:      true,
 		DisableFlagParsing: true,
 		SilenceUsage:       true,
+		SilenceErrors:      true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) <= 1 {
 				return cmd.Help()
@@ -37,9 +37,10 @@ func NewHStreamExporterCmd() *cobra.Command {
 func newStartExporterCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
-		Use:          "start",
-		Short:        "Start HStream Exporter Cluster",
-		SilenceUsage: true,
+		Use:           "start",
+		Short:         "Start HStream Exporter Cluster",
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {
@@ -60,9 +61,10 @@ func newStartExporterCmd() *cobra.Command {
 func newRemoveExporterCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
-		Use:          "remove",
-		Short:        "Remove HStream Exporter Cluster",
-		SilenceUsage: true,
+		Use:           "remove",
+		Short:         "Remove HStream Exporter Cluster",
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {

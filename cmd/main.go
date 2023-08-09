@@ -13,8 +13,8 @@ func main() {
 		Args: func(cmd *cobra.Command, args []string) error {
 			return nil
 		},
-		Short: "Deploy HStreamDB cluster.",
-		//SilenceErrors: true,
+		Short:              "Deploy HStreamDB cluster.",
+		SilenceErrors:      true,
 		SilenceUsage:       true,
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -41,7 +41,9 @@ func main() {
 		},
 	}
 
-	log.SetFormatter(&log.TextFormatter{})
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
 	log.SetOutput(rootCmd.OutOrStdout())
 	log.SetLevel(log.InfoLevel)
 

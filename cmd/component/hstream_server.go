@@ -13,7 +13,7 @@ func NewServerCmd() *cobra.Command {
 			cmd.SetArgs(args[1:])
 			return nil
 		},
-		//SilenceErrors:      true,
+		SilenceErrors:      true,
 		DisableFlagParsing: true,
 		SilenceUsage:       true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -37,9 +37,10 @@ func NewServerCmd() *cobra.Command {
 func newStartServerCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
-		Use:          "start",
-		Short:        "Start HStream Server Cluster",
-		SilenceUsage: true,
+		Use:           "start",
+		Short:         "Start HStream Server Cluster",
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {
@@ -60,9 +61,10 @@ func newStartServerCmd() *cobra.Command {
 func newRemoveServerCmd() *cobra.Command {
 	opts := commonOpts{}
 	cmd := &cobra.Command{
-		Use:          "remove",
-		Short:        "Remove HStream Server Cluster",
-		SilenceUsage: true,
+		Use:           "remove",
+		Short:         "Remove HStream Server Cluster",
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			services, executor, err := getServices(cmd, opts)
 			if err != nil {

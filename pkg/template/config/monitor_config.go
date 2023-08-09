@@ -12,6 +12,7 @@ import (
 )
 
 type PrometheusConfig struct {
+	ClusterId              string
 	NodeExporterAddress    []string
 	CadVisorAddress        []string
 	HStreamExporterAddress []string

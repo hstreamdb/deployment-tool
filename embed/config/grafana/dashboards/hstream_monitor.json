@@ -65,6 +65,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -126,7 +127,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(irate(hstream_exporter_stream_append_in_bytes{server_host=~\"$host\"}[$interval])) by(server_host)",
+          "expr": "sum(irate(hstream_exporter_stream_append_in_bytes{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by(server_host)",
           "format": "time_series",
           "instant": false,
           "legendFormat": "{{server_host}}-append",
@@ -139,7 +140,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_stream_append_in_bytes[$interval]))",
+          "expr": "sum(irate(hstream_exporter_stream_append_in_bytes{cluster=~\"$clusterId\"}[$interval]))",
           "hide": false,
           "legendFormat": "total-append-speed",
           "range": true,
@@ -173,6 +174,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -233,7 +235,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_stream_append_total{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(irate(hstream_exporter_stream_append_total{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-qps",
           "range": true,
           "refId": "A"
@@ -244,7 +246,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_stream_append_total[$interval]))",
+          "expr": "sum(irate(hstream_exporter_stream_append_total{cluster=~\"$clusterId\"}[$interval]))",
           "hide": false,
           "legendFormat": "total-qps",
           "range": true,
@@ -278,6 +280,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -338,7 +341,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "hstream_exporter_stream_append_latency{server_host=~\"$host\"}",
+          "expr": "hstream_exporter_stream_append_latency{server_host=~\"$host\", cluster=~\"$clusterId\"}",
           "legendFormat": "{{server_host}}-{{quantile}}",
           "range": true,
           "refId": "A"
@@ -380,6 +383,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -440,7 +444,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(hstream_exporter_stream_append_failed{server_host=~\"$host\"}[$interval])) by (server_host) / sum(rate(hstream_exporter_stream_append_total{server_host=~\"$host\"}[$interval])) by (server_host) * 100",
+          "expr": "sum(rate(hstream_exporter_stream_append_failed{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host) / sum(rate(hstream_exporter_stream_append_total{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host) * 100",
           "legendFormat": "{{server_host}}",
           "range": true,
           "refId": "A"
@@ -451,7 +455,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(hstream_exporter_stream_append_failed[$interval])) / sum(rate(hstream_exporter_stream_append_total[$interval])) * 100",
+          "expr": "sum(rate(hstream_exporter_stream_append_failed{cluster=~\"$clusterId\"}[$interval])) / sum(rate(hstream_exporter_stream_append_total{cluster=~\"$clusterId\"}[$interval])) * 100",
           "hide": false,
           "legendFormat": "total",
           "range": true,
@@ -498,6 +502,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -558,7 +563,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-send-speed",
           "range": true,
           "refId": "A"
@@ -569,7 +574,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes[$interval]))",
+          "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes{cluster=~\"$clusterId\"}[$interval]))",
           "hide": false,
           "legendFormat": "total-send-speed",
           "range": true,
@@ -603,6 +608,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -663,7 +669,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_received_acks{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(irate(hstream_exporter_subscription_received_acks{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-ack",
           "range": true,
           "refId": "A"
@@ -674,7 +680,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_received_acks[$interval]))",
+          "expr": "sum(irate(hstream_exporter_subscription_received_acks{cluster=~\"$clusterId\"}[$interval]))",
           "hide": false,
           "legendFormat": "total-ack",
           "range": true,
@@ -708,6 +714,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -768,7 +775,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_request_messages{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(irate(hstream_exporter_subscription_request_messages{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-sub-req",
           "range": true,
           "refId": "A"
@@ -779,7 +786,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_request_messages[$interval]))",
+          "expr": "sum(irate(hstream_exporter_subscription_request_messages{cluster=~\"$clusterId\"}[$interval]))",
           "hide": false,
           "legendFormat": "total-sub-req",
           "range": true,
@@ -813,6 +820,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -873,7 +881,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_response_messages{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(irate(hstream_exporter_subscription_response_messages{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-sub-response",
           "range": true,
           "refId": "A"
@@ -884,7 +892,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_response_messages[$interval]))",
+          "expr": "sum(irate(hstream_exporter_subscription_response_messages{cluster=~\"$clusterId\"}[$interval]))",
           "hide": false,
           "legendFormat": "total-sub-response",
           "range": true,
@@ -918,6 +926,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -978,7 +987,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_resend_records{server_host=~\"$host\"}[$interval])) by (server_host)",
+          "expr": "sum(irate(hstream_exporter_subscription_resend_records{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
           "legendFormat": "{{server_host}}-sub-resend",
           "range": true,
           "refId": "A"
@@ -989,7 +998,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(irate(hstream_exporter_subscription_resend_records[$interval]))",
+          "expr": "sum(irate(hstream_exporter_subscription_resend_records{cluster=~\"$clusterId\"}[$interval]))",
           "hide": false,
           "legendFormat": "total-resend",
           "range": true,
@@ -1036,6 +1045,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1102,7 +1112,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(1 - sum(rate(node_cpu_seconds_total{instance=~\"$host\", mode=\"idle\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\"}[$interval])) by (instance)) * 100",
+          "expr": "(1 - sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", mode=\"idle\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)) * 100",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{instance}}-total",
@@ -1115,7 +1125,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", mode=\"system\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\"}[$interval])) by (instance) * 100",
+          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", mode=\"system\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance) * 100",
           "hide": false,
           "legendFormat": "{{instance}}-system",
           "range": true,
@@ -1127,7 +1137,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", mode=\"user\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\"}[$interval])) by (instance) * 100",
+          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", mode=\"user\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance) * 100",
           "hide": false,
           "legendFormat": "{{instance}}-user",
           "range": true,
@@ -1170,6 +1180,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1235,7 +1246,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(1 - sum(node_memory_MemAvailable_bytes{instance=~\"$host\"}) by(instance) / sum(node_memory_MemTotal_bytes{instance=~\"$host\"}) by(instance)) * 100",
+          "expr": "(1 - sum(node_memory_MemAvailable_bytes{instance=~\"$host\", cluster=~\"$clusterId\"}) by(instance) / sum(node_memory_MemTotal_bytes{instance=~\"$host\", cluster=~\"$clusterId\"}) by(instance)) * 100",
           "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
@@ -1277,6 +1288,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1298,7 +1310,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1341,7 +1354,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum by(instance) (irate(node_network_receive_bytes_total{instance=~\"$host\", device=~\"eth.*\"}[$interval]))",
+          "expr": "sum by(instance) (irate(node_network_receive_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\", device=~\"eth.*\"}[$interval]))",
           "hide": false,
           "legendFormat": "{{instance}}-receive",
           "range": true,
@@ -1354,7 +1367,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum by(instance) (irate(node_network_transmit_bytes_total{instance=~\"$host\", device=~\"eth.*\"}[$interval]))",
+          "expr": "sum by(instance) (irate(node_network_transmit_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\", device=~\"eth.*\"}[$interval]))",
           "hide": false,
           "legendFormat": "{{instance}}-transmit",
           "range": true,
@@ -1397,6 +1410,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1418,7 +1432,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1461,7 +1476,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_disk_read_bytes_total{instance=~\"$host\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_read_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "hide": false,
           "legendFormat": "{{instance}}-read",
           "range": true,
@@ -1474,7 +1489,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_disk_written_bytes_total{instance=~\"$host\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_written_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "hide": false,
           "legendFormat": "{{instance}}-write",
           "range": true,
@@ -1530,6 +1545,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1551,7 +1567,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1594,7 +1611,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", name=\"deploy_hserver\"}[$interval])) BY (instance, name) * 100)",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hserver\"}[$interval])) BY (instance, name) * 100)",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{instance}}-server",
@@ -1607,7 +1624,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", name=\"deploy_hstore\"}[$interval])) BY (instance, name) * 100)",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hstore\"}[$interval])) BY (instance, name) * 100)",
           "hide": false,
           "legendFormat": "{{instance}}-store",
           "range": true,
@@ -1619,7 +1636,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", name=\"deploy_meta\"}[$interval])) BY (instance, name) * 100)",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_meta\"}[$interval])) BY (instance, name) * 100)",
           "hide": false,
           "legendFormat": "{{instance}}-meta",
           "range": true,
@@ -1662,6 +1679,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1683,7 +1701,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1726,7 +1745,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", name=\"deploy_hserver\"}) BY (instance, name))",
+          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hserver\"}) BY (instance, name))",
           "hide": false,
           "legendFormat": "{{instance}}-server",
           "range": true,
@@ -1739,7 +1758,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", name=\"deploy_hstore\"}) BY (instance, name))",
+          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hstore\"}) BY (instance, name))",
           "hide": false,
           "legendFormat": "{{instance}}-store",
           "range": true,
@@ -1751,7 +1770,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", name=\"deploy_meta\"}) BY (instance, name))",
+          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_meta\"}) BY (instance, name))",
           "hide": false,
           "legendFormat": "{{instance}}-meta",
           "range": true,
@@ -1772,7 +1791,7 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 37,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1841,6 +1860,36 @@
         "refresh": 2,
         "skipUrlSync": false,
         "type": "interval"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "TNX2D3rnk"
+        },
+        "definition": "label_values(cluster)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "clusterId",
+        "options": [],
+        "query": {
+          "query": "label_values(cluster)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },

@@ -7,15 +7,16 @@ import (
 
 func NewServerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "server",
+		Use:   "hdt server <command>",
 		Short: "Manage HStream Server instance.",
 		Args: func(cmd *cobra.Command, args []string) error {
 			cmd.SetArgs(args[1:])
 			return nil
 		},
-		SilenceErrors:      true,
-		DisableFlagParsing: true,
-		SilenceUsage:       true,
+		SilenceErrors:         true,
+		DisableFlagParsing:    true,
+		SilenceUsage:          true,
+		DisableFlagsInUseLine: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) <= 1 {
 				return cmd.Help()
@@ -30,6 +31,7 @@ func NewServerCmd() *cobra.Command {
 	}
 	cmd.AddCommand(newStartServerCmd())
 	cmd.AddCommand(newRemoveServerCmd())
+	cmd.SetUsageTemplate(UsageTpl)
 
 	return cmd
 }

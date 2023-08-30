@@ -357,7 +357,7 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 
 	if g.spec.DisableLogin {
-		args = append(args, "-e GF_AUTH_ANONYMOUS_ORG_ROLE=Admin",
+		args = append(args, "-e GF_AUTH_ANONYMOUS_ORG_ROLE=Admin", "-e GF_SECURITY_ALLOW_EMBEDDING=true",
 			"-e GF_AUTH_ANONYMOUS_ENABLED=true", "-e GF_AUTH_DISABLE_LOGIN_FORM=true")
 	}
 
@@ -365,7 +365,7 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		args = append(args, fmt.Sprintf("-e %s=%s", k, v))
 	}
 
-	args = append(args, "-u root", g.spec.Image)
+	args = append(args, "-u $(id -u)", g.spec.Image)
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

@@ -350,10 +350,20 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{g.spec.DataDir, "/var/lib/grafana"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, g.spec.ContainerCfg, g.ContainerName, true, mountPoints...)
+
+	if g.spec.Options == nil {
+		g.spec.Options = make(map[string]string)
+	}
+
 	if g.spec.DisableLogin {
 		args = append(args, "-e GF_AUTH_ANONYMOUS_ORG_ROLE=Admin",
 			"-e GF_AUTH_ANONYMOUS_ENABLED=true", "-e GF_AUTH_DISABLE_LOGIN_FORM=true")
 	}
+
+	for k, v := range g.spec.Options {
+		args = append(args, fmt.Sprintf("-e %s=%s", k, v))
+	}
+
 	args = append(args, "-u root", g.spec.Image)
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }

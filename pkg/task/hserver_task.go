@@ -4,6 +4,7 @@ import (
 	"fmt"
 	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
 	"github.com/hstreamdb/deployment-tool/pkg/service"
+	log "github.com/sirupsen/logrus"
 )
 
 type HServerClusterCtx struct {
@@ -48,5 +49,8 @@ func (s *HServerInit) Run(executor ext.Executor) error {
 	}
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, s.ctx.SSHPort)
 	_, err := executor.Execute(target, executorCtx.Cmd)
-	return err
+	if err != nil {
+		log.Warningf("init hserver err, need to double check server status, err: %s", err.Error())
+	}
+	return nil
 }

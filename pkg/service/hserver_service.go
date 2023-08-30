@@ -155,7 +155,7 @@ func (h *HServer) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	checkReadyScript := script.HServerReadyCheckScript{Host: h.spec.Host, Port: DefaultServerMonitorPort, Timeout: 600}
+	checkReadyScript := script.HServerReadyCheckScript{Host: h.spec.Host, Port: h.spec.Port, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
 		log.Errorf("gen script error: %s", err.Error())

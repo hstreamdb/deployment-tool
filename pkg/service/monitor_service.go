@@ -495,7 +495,7 @@ func (h *HStreamExporter) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (h *HStreamExporter) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true)
 	args = append(args, h.spec.Image)
-	args = append(args, "hstream-exporter", "--addr", "hstream://"+globalCtx.HStreamServerUrls)
+	args = append(args, "hstream-exporter", "--addr", "hstream://"+h.spec.ServerAddress)
 	args = append(args, fmt.Sprintf("--listen-addr 0.0.0.0:%d", h.spec.Port))
 	args = append(args, fmt.Sprintf("--log-level %s", h.spec.LogLevel))
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}

@@ -424,6 +424,8 @@ hstream_exporter:
     # port: 9250
     # # HStream_Exporter log leve: [debug|info|warning|error|fatal|panic]
     # log_level: info
+    # # HServer address
+    # server_address: ""
     # # Root directory of HStream_Exporter config files
     # remote_config_path: "/home/deploy/hstream-exporter"
     # # Root directory of HStream_Exporter data files

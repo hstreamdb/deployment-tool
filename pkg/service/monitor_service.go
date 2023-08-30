@@ -84,7 +84,8 @@ func (m *MonitorSuite) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	startCadvisor := spec.GetDockerExecCmd(globalCtx.containerCfg, m.spec.ContainerCfg, m.CadvisorContainerName, false, cardvisorMountP...)
 	args = append(args, startCadvisor...)
 	args = append(args, fmt.Sprintf("-p %d:8080", m.spec.CadvisorPort))
-	args = append(args, "--detach=true", "--privileged=true", "--device /dev/kmsg")
+	//args = append(args, "--detach=true", "--privileged=true", "--device /dev/kmsg")
+	args = append(args, "--detach=true", "--device /dev/kmsg")
 	args = append(args, m.spec.CadvisorImage)
 	return &executor.ExecuteCtx{Target: m.Host, Cmd: strings.Join(args, " ")}
 }

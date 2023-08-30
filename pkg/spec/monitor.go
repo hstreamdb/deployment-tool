@@ -116,14 +116,15 @@ func (p *PrometheusSpec) SetDefaultRemoteCfgPath() {
 // 	grafana
 
 type GrafanaSpec struct {
-	Host          string       `yaml:"host"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Port          int          `yaml:"port" default:"3000"`
-	Image         string       `yaml:"image"`
-	DataDir       string       `yaml:"data_dir"`
-	DisableLogin  bool         `yaml:"disable_login"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	Host          string            `yaml:"host"`
+	SSHPort       int               `yaml:"ssh_port" default:"22"`
+	Port          int               `yaml:"port" default:"3000"`
+	Image         string            `yaml:"image"`
+	DataDir       string            `yaml:"data_dir"`
+	DisableLogin  bool              `yaml:"disable_login"`
+	RemoteCfgPath string            `yaml:"remote_config_path"`
+	Options       map[string]string `yaml:"option"`
+	ContainerCfg  ContainerCfg      `yaml:"container_config"`
 }
 
 func (g *GrafanaSpec) SetDefaultDataDir() {

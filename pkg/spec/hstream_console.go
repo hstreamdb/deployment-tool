@@ -8,13 +8,14 @@ const (
 )
 
 type HStreamConsoleSpec struct {
-	Host          string       `yaml:"host"`
-	Port          int          `yaml:"port" default:"5177"`
-	Image         string       `yaml:"image"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	DataDir       string       `yaml:"data_dir"`
-	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	Host          string            `yaml:"host"`
+	Port          int               `yaml:"port" default:"5177"`
+	Image         string            `yaml:"image"`
+	SSHPort       int               `yaml:"ssh_port" default:"22"`
+	Option        map[string]string `yaml:"options"`
+	RemoteCfgPath string            `yaml:"remote_config_path"`
+	DataDir       string            `yaml:"data_dir"`
+	ContainerCfg  ContainerCfg      `yaml:"container_config"`
 }
 
 func (h *HStreamConsoleSpec) SetDefaultDataDir() {

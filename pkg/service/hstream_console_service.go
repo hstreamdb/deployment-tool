@@ -52,6 +52,13 @@ func (h *HStreamConsole) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{h.spec.RemoteCfgPath + "/application.properties", "/hstream/application.properties"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
+	if h.spec.Option == nil {
+		h.spec.Option = make(map[string]string)
+	}
+	for k, v := range h.spec.Option {
+		args = append(args, fmt.Sprintf("-e %s=%s", k, v))
+	}
+
 	args = append(args, h.spec.Image)
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }

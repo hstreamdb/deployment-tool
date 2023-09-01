@@ -317,6 +317,11 @@ hstream_console:
     # image: "hstreamdb/hstream-console"
     # # HStream-console service monitor port
     # port: 5177
+    # # Console configure options
+    # options:
+      # AUTH_ADMIN_ENABLE: "false"
+      # AUTH_ADMIN_USERNAME: "admin"
+      # AUTH_ADMIN_PASSWORD: ""
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G

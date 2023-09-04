@@ -245,7 +245,10 @@ func (p *Prometheus) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{p.spec.DataDir, "/prometheus"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, p.spec.ContainerCfg, p.ContainerName, true, mountPoints...)
-	args = append(args, "--user ${UID}", p.spec.Image)
+	// FIXME: set user to root to make sure files under /prometheus can be created and written correctly.
+	// Refer to: https://github.com/prometheus/prometheus/issues/5976
+	// Find another way to give correct permission to /prometheus
+	args = append(args, "--user root", p.spec.Image)
 	args = append(args, fmt.Sprintf("--storage.tsdb.retention.time=%s", p.spec.RetentionTime))
 	args = append(args, "--config.file=/etc/prometheus/prometheus.yml")
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
@@ -358,8 +361,7 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	for k, v := range g.spec.Options {
 		args = append(args, fmt.Sprintf("-e %s=%s", k, v))
 	}
-
-	args = append(args, "-u $(id -u)", g.spec.Image)
+	args = append(args, "-u root", g.spec.Image)
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

@@ -167,13 +167,7 @@ func (b *BlackBox) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (b *BlackBox) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	blackboxCfg := config.BlackBoxConfig{}
-	cfg, err := blackboxCfg.GenConfig()
-	if err != nil {
-		log.Errorf("gen blackbox config error: %s", err.Error())
-		os.Exit(1)
-	}
-	position := utils.ScpDir(cfg, b.spec.RemoteCfgPath)
+	position := utils.ScpDir("template/blackbox/blackbox.yml", b.spec.RemoteCfgPath)
 
 	return &executor.TransferCtx{
 		Target: b.spec.Host, Position: position,
@@ -357,7 +351,7 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 
 	if g.spec.DisableLogin {
-		args = append(args, "-e GF_AUTH_ANONYMOUS_ORG_ROLE=Admin", "-e GF_SECURITY_ALLOW_EMBEDDING=true",
+		args = append(args, "-e GF_AUTH_ANONYMOUS_ORG_ROLE=Admin",
 			"-e GF_AUTH_ANONYMOUS_ENABLED=true", "-e GF_AUTH_DISABLE_LOGIN_FORM=true")
 	}
 
@@ -381,13 +375,7 @@ func (g *Grafana) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (g *Grafana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	grafanaCfg := config.GrafanaConfig{}
-	cfg, err := grafanaCfg.GenConfig()
-	if err != nil {
-		log.Errorf("gen grafanaCfg error: %s", err.Error())
-		os.Exit(1)
-	}
-	position := utils.ScpDir(cfg, g.spec.RemoteCfgPath)
+	position := utils.ScpDir("template/grafana", g.spec.RemoteCfgPath)
 
 	return &executor.TransferCtx{
 		Target: g.spec.Host, Position: position,

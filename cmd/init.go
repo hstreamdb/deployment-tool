@@ -1,14 +1,17 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/hstreamdb/deployment-tool/embed"
 	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
-	"text/template"
+)
+
+const (
+	available800 = "8.0.0"
+	available760 = "7.6.0"
 )
 
 func newInit() *cobra.Command {
@@ -30,63 +33,43 @@ func newInit() *cobra.Command {
 				return err
 			}
 
-			configFile := filepath.Join("config", "config.yaml")
-			if err := getFile(configFile, "template/config.yaml"); err != nil {
-				return err
+			fileMaps := map[string]string{
+				filepath.Join("config", "config.yaml"):                             "template/config.yaml",
+				filepath.Join("config", "alertmanager.yml"):                        "template/alertmanager/alertmanager.yml",
+				filepath.Join("config", "logdevice.config"):                        "template/logdevice.conf",
+				filepath.Join("config/blackbox", "blackbox.yml"):                   "template/blackbox/blackbox.yml",
+				filepath.Join("config/grafana/dashboards", "dashboard.yml"):        "template/grafana/dashboards/dashboard.yml",
+				filepath.Join("config/grafana/dashboards", "hstream_monitor.json"): "template/grafana/dashboards/hstream_monitor.json",
+				filepath.Join("config/grafana/datasources", "datasource.yml"):      "template/grafana/datasources/datasource.yml",
+				filepath.Join("config/kibana", "export_7.6.0.ndjson"):              "template/kibana/export_7.6.0.ndjson",
+				filepath.Join("config/kibana", "export_8.0.0.ndjson"):              "template/kibana/export_8.0.0.ndjson",
+				filepath.Join("config/prometheus", "alert.yml"):                    "template/prometheus/alert.yml",
+				filepath.Join("config/prometheus", "cluster.yml"):                  "template/prometheus/cluster.yml",
+				filepath.Join("config/prometheus", "disks.yml"):                    "template/prometheus/disks.yml",
+				filepath.Join("config/prometheus", "zk.yml"):                       "template/prometheus/zk.yml",
 			}
-
-			alertManagerFile := filepath.Join("config", "alertmanager.yml")
-			content, err := embed.ReadConfig(alertManagerFile)
-			if err != nil {
-				return fmt.Errorf("get alert manager config file error: %s\n", err.Error())
-			}
-			if err = os.WriteFile("template/alertmanager/alertmanager.yml", content, 0644); err != nil {
-				return fmt.Errorf("write alert manager config file error: %s\n", err.Error())
-			}
-
-			logDeviceCfgFile := filepath.Join("config", "logdevice.config")
-			if err = getFile(logDeviceCfgFile, "template/logdevice.conf"); err != nil {
-				return err
-			}
-
-			const (
-				available800 = "8.0.0"
-				available760 = "7.6.0"
-			)
-
-			kibanaFile := filepath.Join("config", "kibana", fmt.Sprintf("export_%s.ndjson", available800))
-			if err = getFile(kibanaFile, fmt.Sprintf("template/kibana/export_%s.ndjson", available800)); err != nil {
-				return err
-			}
-
-			kibanaFile = filepath.Join("config", "kibana", fmt.Sprintf("export_%s.ndjson", available760))
-			if err = getFile(kibanaFile, fmt.Sprintf("template/kibana/export_%s.ndjson", available760)); err != nil {
-				return err
-			}
-
-			return nil
-
+			return getFiles(fileMaps)
 		},
 	}
 	return cmd
 }
 
-func getFile(fp string, target string) error {
-	tpl, err := embed.ReadConfig(fp)
-	if err != nil {
-		return fmt.Errorf("get %s template error: %s\n", fp, err.Error())
+func getFiles(fileMap map[string]string) error {
+	for k, v := range fileMap {
+		if err := getFile(k, v); err != nil {
+			return err
+		}
 	}
-	cfg, err := template.New("DefaultConfig").Parse(string(tpl))
+	return nil
+}
+
+func getFile(origin string, target string) error {
+	tpl, err := embed.ReadConfig(origin)
 	if err != nil {
-		return fmt.Errorf("render %s template error: %s\n", fp, err.Error())
+		return fmt.Errorf("get %s file error: %s\n", origin, err.Error())
 	}
 
-	content := bytes.NewBufferString("")
-	if err := cfg.Execute(content, nil); err != nil {
-		return err
-	}
-
-	if err := os.WriteFile(target, content.Bytes(), 0664); err != nil {
+	if err = os.WriteFile(target, tpl, 0664); err != nil {
 		return fmt.Errorf("write %s error: %s\n", target, err.Error())
 	}
 	return nil

@@ -407,7 +407,7 @@ grafana:
       # options: ""
 
 alertmanager:
-  - host: 10.0.1.15
+  - host: 10.1.0.15
     # # Alertmanager docker image
     # image: "prom/alertmanager"
     # # Alertmanager service monitor port

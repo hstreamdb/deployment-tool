@@ -686,7 +686,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "node_uname_info{instance=~\"$host\", cluster=~\"$clusterId\"} - 0",
+          "expr": "node_uname_info{instance=~\"$host\", hstream_cluster=~\"$clusterId\"} - 0",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -700,7 +700,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(time() - node_boot_time_seconds{instance=~\"$host\", cluster=~\"$clusterId\"})by(instance)",
+          "expr": "sum(time() - node_boot_time_seconds{instance=~\"$host\", hstream_cluster=~\"$clusterId\"})by(instance)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -714,7 +714,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_memory_MemTotal_bytes{instance=~\"$host\", cluster=~\"$clusterId\"} - 0",
+          "expr": "node_memory_MemTotal_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\"} - 0",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -728,7 +728,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "count(node_cpu_seconds_total{instance=~\"$host\", mode='system', cluster=~\"$clusterId\"}) by (instance)",
+          "expr": "count(node_cpu_seconds_total{instance=~\"$host\", mode='system', hstream_cluster=~\"$clusterId\"}) by (instance)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -742,7 +742,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_load5{instance=~\"$host\", cluster=~\"$clusterId\"}",
+          "expr": "node_load5{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -755,7 +755,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(1 - avg(rate(node_cpu_seconds_total{instance=~\"$host\", mode=\"idle\", cluster=~\"$clusterId\"}[$interval])) by (instance)) * 100",
+          "expr": "(1 - avg(rate(node_cpu_seconds_total{instance=~\"$host\", mode=\"idle\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)) * 100",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -769,7 +769,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(1 - (node_memory_MemAvailable_bytes{instance=~\"$host\", cluster=~\"$clusterId\"} / (node_memory_MemTotal_bytes{instance=~\"$host\", cluster=~\"$clusterId\"})))* 100",
+          "expr": "(1 - (node_memory_MemAvailable_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\"} / (node_memory_MemTotal_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\"})))* 100",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -783,7 +783,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "max((node_filesystem_size_bytes{instance=~\"$host\",cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}-node_filesystem_free_bytes{instance=~\"$host\",cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}) *100/(node_filesystem_avail_bytes {instance=~\"$host\",cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}+(node_filesystem_size_bytes{instance=~\"$host\",cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}-node_filesystem_free_bytes{instance=~\"$host\",cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"})))by(instance)",
+          "expr": "max((node_filesystem_size_bytes{instance=~\"$host\",hstream_cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}-node_filesystem_free_bytes{instance=~\"$host\",hstream_cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}) *100/(node_filesystem_avail_bytes {instance=~\"$host\",hstream_cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}+(node_filesystem_size_bytes{instance=~\"$host\",hstream_cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"}-node_filesystem_free_bytes{instance=~\"$host\",hstream_cluster=~\"$clusterId\",fstype=~\"ext.?|xfs\"})))by(instance)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -797,7 +797,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "max(rate(node_disk_read_bytes_total{instance=~\"$host\",cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "max(rate(node_disk_read_bytes_total{instance=~\"$host\",hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -811,7 +811,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "max(rate(node_disk_written_bytes_total{instance=~\"$host\",cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "max(rate(node_disk_written_bytes_total{instance=~\"$host\",hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -825,7 +825,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_netstat_Tcp_CurrEstab{instance=~\"$host\",cluster=~\"$clusterId\"} - 0",
+          "expr": "node_netstat_Tcp_CurrEstab{instance=~\"$host\",hstream_cluster=~\"$clusterId\"} - 0",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -839,7 +839,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_sockstat_TCP_tw{instance=~\"$host\",cluster=~\"$clusterId\"} - 0",
+          "expr": "node_sockstat_TCP_tw{instance=~\"$host\",hstream_cluster=~\"$clusterId\"} - 0",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -853,7 +853,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "max(rate(node_network_receive_bytes_total{instance=~\"$host\",cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "max(rate(node_network_receive_bytes_total{instance=~\"$host\",hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -867,7 +867,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "max(rate(node_network_transmit_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "max(rate(node_network_transmit_bytes_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1008,7 +1008,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum(irate(hstream_exporter_stream_append_in_bytes{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by(server_host)",
+              "expr": "sum(irate(hstream_exporter_stream_append_in_bytes{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by(server_host)",
               "format": "time_series",
               "instant": false,
               "legendFormat": "{{server_host}}-append",
@@ -1021,7 +1021,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_stream_append_in_bytes{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_stream_append_in_bytes{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-append-speed",
               "range": true,
@@ -1116,7 +1116,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_stream_append_total{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
+              "expr": "sum(irate(hstream_exporter_stream_append_total{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host)",
               "legendFormat": "{{server_host}}-qps",
               "range": true,
               "refId": "A"
@@ -1127,7 +1127,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_stream_append_total{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_stream_append_total{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-qps",
               "range": true,
@@ -1222,7 +1222,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "hstream_exporter_stream_append_latency{server_host=~\"$host\", cluster=~\"$clusterId\"}",
+              "expr": "hstream_exporter_stream_append_latency{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}",
               "legendFormat": "{{server_host}}-{{quantile}}",
               "range": true,
               "refId": "A"
@@ -1325,7 +1325,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(rate(hstream_exporter_stream_append_failed{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host) / sum(rate(hstream_exporter_stream_append_total{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host) * 100",
+              "expr": "sum(rate(hstream_exporter_stream_append_failed{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host) / sum(rate(hstream_exporter_stream_append_total{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host) * 100",
               "legendFormat": "{{server_host}}",
               "range": true,
               "refId": "A"
@@ -1336,7 +1336,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(rate(hstream_exporter_stream_append_failed{cluster=~\"$clusterId\"}[$interval])) / sum(rate(hstream_exporter_stream_append_total{cluster=~\"$clusterId\"}[$interval])) * 100",
+              "expr": "sum(rate(hstream_exporter_stream_append_failed{hstream_cluster=~\"$clusterId\"}[$interval])) / sum(rate(hstream_exporter_stream_append_total{hstream_cluster=~\"$clusterId\"}[$interval])) * 100",
               "hide": false,
               "legendFormat": "total",
               "range": true,
@@ -1432,7 +1432,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum(irate(hstream_exporter_stream_read_in_bytes{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by(server_host)",
+              "expr": "sum(irate(hstream_exporter_stream_read_in_bytes{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by(server_host)",
               "format": "time_series",
               "instant": false,
               "legendFormat": "{{server_host}}-read",
@@ -1445,7 +1445,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_stream_read_in_bytes{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_stream_read_in_bytes{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-read-speed",
               "range": true,
@@ -1540,7 +1540,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "hstream_exporter_stream_read_latency{server_host=~\"$host\", cluster=~\"$clusterId\"}",
+              "expr": "hstream_exporter_stream_read_latency{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}",
               "legendFormat": "{{server_host}}-{{quantile}}",
               "range": true,
               "refId": "A"
@@ -1657,7 +1657,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
+              "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host)",
               "legendFormat": "{{server_host}}-send-speed",
               "range": true,
               "refId": "A"
@@ -1668,7 +1668,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_subscription_send_out_bytes{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-send-speed",
               "range": true,
@@ -1763,7 +1763,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_received_acks{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
+              "expr": "sum(irate(hstream_exporter_subscription_received_acks{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host)",
               "legendFormat": "{{server_host}}-ack",
               "range": true,
               "refId": "A"
@@ -1774,7 +1774,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_received_acks{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_subscription_received_acks{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-ack",
               "range": true,
@@ -1869,7 +1869,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_request_messages{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
+              "expr": "sum(irate(hstream_exporter_subscription_request_messages{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host)",
               "legendFormat": "{{server_host}}-sub-req",
               "range": true,
               "refId": "A"
@@ -1880,7 +1880,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_request_messages{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_subscription_request_messages{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-sub-req",
               "range": true,
@@ -1975,7 +1975,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_response_messages{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
+              "expr": "sum(irate(hstream_exporter_subscription_response_messages{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host)",
               "legendFormat": "{{server_host}}-sub-response",
               "range": true,
               "refId": "A"
@@ -1986,7 +1986,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_response_messages{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_subscription_response_messages{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-sub-response",
               "range": true,
@@ -2081,7 +2081,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_resend_records{server_host=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (server_host)",
+              "expr": "sum(irate(hstream_exporter_subscription_resend_records{server_host=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (server_host)",
               "legendFormat": "{{server_host}}-sub-resend",
               "range": true,
               "refId": "A"
@@ -2092,7 +2092,7 @@
                 "uid": "TNX2D3rnk"
               },
               "editorMode": "code",
-              "expr": "sum(irate(hstream_exporter_subscription_resend_records{cluster=~\"$clusterId\"}[$interval]))",
+              "expr": "sum(irate(hstream_exporter_subscription_resend_records{hstream_cluster=~\"$clusterId\"}[$interval]))",
               "hide": false,
               "legendFormat": "total-resend",
               "range": true,
@@ -2210,7 +2210,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(1 - sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", mode=\"idle\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)) * 100",
+          "expr": "(1 - sum(rate(node_cpu_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", mode=\"idle\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)) * 100",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{instance}}-total",
@@ -2223,7 +2223,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", mode=\"system\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance) * 100",
+          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", mode=\"system\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance) * 100",
           "hide": false,
           "legendFormat": "{{instance}}-system",
           "range": true,
@@ -2235,7 +2235,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", mode=\"user\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance) * 100",
+          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", mode=\"user\"}[$interval])) by (instance) / sum(rate(node_cpu_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance) * 100",
           "hide": false,
           "legendFormat": "{{instance}}-user",
           "range": true,
@@ -2344,7 +2344,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(1 - sum(node_memory_MemAvailable_bytes{instance=~\"$host\", cluster=~\"$clusterId\"}) by(instance) / sum(node_memory_MemTotal_bytes{instance=~\"$host\", cluster=~\"$clusterId\"}) by(instance)) * 100",
+          "expr": "(1 - sum(node_memory_MemAvailable_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}) by(instance) / sum(node_memory_MemTotal_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}) by(instance)) * 100",
           "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
@@ -2457,7 +2457,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_network_transmit_queue_length{instance=~\"$host\", cluster=~\"$clusterId\"}",
+          "expr": "node_network_transmit_queue_length{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{instance}} - {{ device }} -   Interface transmit queue length",
@@ -2564,7 +2564,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_sockstat_TCP_alloc{instance=~\"$host\", cluster=~\"$clusterId\"}",
+          "expr": "node_sockstat_TCP_alloc{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2579,7 +2579,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_sockstat_TCP_inuse{instance=~\"$host\", cluster=~\"$clusterId\"}",
+          "expr": "node_sockstat_TCP_inuse{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2594,7 +2594,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_sockstat_TCP_mem{instance=~\"$host\", cluster=~\"$clusterId\"}",
+          "expr": "node_sockstat_TCP_mem{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}",
           "format": "time_series",
           "hide": true,
           "interval": "",
@@ -2610,7 +2610,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_sockstat_TCP_orphan{instance=~\"$host\", cluster=~\"$clusterId\"}",
+          "expr": "node_sockstat_TCP_orphan{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2625,7 +2625,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "node_sockstat_TCP_tw{instance=~\"$host\", cluster=~\"$clusterId\"}",
+          "expr": "node_sockstat_TCP_tw{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2741,7 +2741,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum by(instance) (irate(node_network_receive_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\", device=~\"eth.*\"}[$interval]))",
+          "expr": "sum by(instance) (irate(node_network_receive_bytes_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", device=~\"eth.*\"}[$interval]))",
           "hide": false,
           "legendFormat": "{{instance}}-receive",
           "range": true,
@@ -2754,7 +2754,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum by(instance) (irate(node_network_transmit_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\", device=~\"eth.*\"}[$interval]))",
+          "expr": "sum by(instance) (irate(node_network_transmit_bytes_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", device=~\"eth.*\"}[$interval]))",
           "hide": false,
           "legendFormat": "{{instance}}-transmit",
           "range": true,
@@ -3087,7 +3087,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_disk_io_time_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_io_time_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -3203,7 +3203,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_disk_read_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_read_bytes_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "hide": false,
           "legendFormat": "{{instance}}-read",
           "range": true,
@@ -3216,7 +3216,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_disk_written_bytes_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_written_bytes_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "hide": false,
           "legendFormat": "{{instance}}-write",
           "range": true,
@@ -3397,7 +3397,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_disk_read_time_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance) / sum(rate(node_disk_reads_completed_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_read_time_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance) / sum(rate(node_disk_reads_completed_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -3593,7 +3593,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(node_disk_reads_completed_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_reads_completed_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "time_series",
           "hide": false,
           "interval": "",
@@ -3609,7 +3609,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_disk_writes_completed_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$interval])) by (instance)",
+          "expr": "sum(rate(node_disk_writes_completed_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$interval])) by (instance)",
           "format": "time_series",
           "hide": false,
           "interval": "",
@@ -4019,7 +4019,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "irate(node_disk_io_time_weighted_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\"}[$__rate_interval])",
+          "expr": "irate(node_disk_io_time_weighted_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\"}[$__rate_interval])",
           "interval": "",
           "intervalFactor": 4,
           "legendFormat": "{{instance}} - {{device}}",
@@ -4134,7 +4134,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hserver\"}[$interval])) BY (instance, name) * 100)",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=\"deploy_hserver\"}[$interval])) BY (instance, name) * 100)",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{instance}}-server",
@@ -4147,7 +4147,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hstore\"}[$interval])) BY (instance, name) * 100)",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=\"deploy_hstore\"}[$interval])) BY (instance, name) * 100)",
           "hide": false,
           "legendFormat": "{{instance}}-store",
           "range": true,
@@ -4159,7 +4159,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_meta\"}[$interval])) BY (instance, name) * 100)",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=\"deploy_meta\"}[$interval])) BY (instance, name) * 100)",
           "hide": false,
           "legendFormat": "{{instance}}-meta",
           "range": true,
@@ -4171,7 +4171,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", cluster=~\"$clusterId\", name=~\"IOTASK.*\"}[$interval])) BY (instance, name) * 100)",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=~\"IOTASK.*\"}[$interval])) BY (instance, name) * 100)",
           "hide": false,
           "instant": false,
           "legendFormat": "{{instance}}-{{name}}",
@@ -4281,7 +4281,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hserver\"}) BY (instance, name))",
+          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=\"deploy_hserver\"}) BY (instance, name))",
           "hide": false,
           "legendFormat": "{{instance}}-server",
           "range": true,
@@ -4294,7 +4294,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_hstore\"}) BY (instance, name))",
+          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=\"deploy_hstore\"}) BY (instance, name))",
           "hide": false,
           "legendFormat": "{{instance}}-store",
           "range": true,
@@ -4306,7 +4306,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", cluster=~\"$clusterId\", name=\"deploy_meta\"}) BY (instance, name))",
+          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=\"deploy_meta\"}) BY (instance, name))",
           "hide": false,
           "legendFormat": "{{instance}}-meta",
           "range": true,
@@ -4318,7 +4318,7 @@
             "uid": "TNX2D3rnk"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", cluster=~\"$clusterId\", name=~\"IOTASK.*\"}) BY (instance, name))",
+          "expr": "(sum(container_memory_working_set_bytes{instance=~\"$host\", hstream_cluster=~\"$clusterId\", name=~\"IOTASK.*\"}) BY (instance, name))",
           "hide": false,
           "instant": false,
           "legendFormat": "{{instance}}-{{name}}",
@@ -4424,14 +4424,14 @@
           "type": "prometheus",
           "uid": "TNX2D3rnk"
         },
-        "definition": "label_values(cluster)",
+        "definition": "label_values(hstream_cluster)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "clusterId",
         "options": [],
         "query": {
-          "query": "label_values(cluster)",
+          "query": "label_values(hstream_cluster)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,

@@ -30,7 +30,7 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'node_exporter'
-        cluster: '{{ .ClusterId }}'
+        hstream_cluster: '{{ .ClusterId }}'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
@@ -49,7 +49,7 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'cadvisor'
-        cluster: '{{ .ClusterId }}'
+        hstream_cluster: '{{ .ClusterId }}'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
@@ -74,7 +74,7 @@ scrape_configs:
         {{- end }}
         labels:
           group: '{{ $key }}'
-          cluster: '{{ $clusterId }}'
+          hstream_cluster: '{{ $clusterId }}'
     {{- end }}
     {{- end }}
     relabel_configs:
@@ -95,4 +95,4 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'hstream-exporter'
-        cluster: '{{ .ClusterId }}'
+        hstream_cluster: '{{ .ClusterId }}'

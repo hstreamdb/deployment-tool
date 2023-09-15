@@ -319,6 +319,7 @@ hstream_console:
     # port: 5177
     # # Console configure options
     # options:
+      # MONITOR_PROMETHEUS_URL: ""
       # AUTH_ADMIN_ENABLE: "false"
       # AUTH_ADMIN_USERNAME: "admin"
       # AUTH_ADMIN_PASSWORD: ""

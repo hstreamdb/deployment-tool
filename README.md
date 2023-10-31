@@ -76,9 +76,6 @@ meta_store:
   - host: 172.24.47.173
   - host: 172.24.47.174
   - host: 172.24.47.175
-  
-http_server:
-  - host: 172.24.47.172
 
 prometheus:
   - host: 172.24.47.172

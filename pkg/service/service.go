@@ -59,7 +59,6 @@ type GlobalCtx struct {
 	HStreamServerUrls string
 	HServerEndPoints  string
 	PrometheusUrls    []string
-	HttpServerUrls    []string
 	ServiceAddr       map[string][]string
 }
 
@@ -79,7 +78,6 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	}
 
 	hserverUrl := c.GetHServerUrl()
-	httpServerUrl := c.GetHttpServerUrl()
 	hserverEndpoints := c.GetHServerEndpoint()
 	prometheusUrls := c.GetPrometheusAddr()
 	// all service address in `host:port` form, except cadvisor and node-exporter
@@ -109,7 +107,6 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		HStreamServerUrls:        hserverUrl,
 		HServerEndPoints:         hserverEndpoints,
 		PrometheusUrls:           prometheusUrls,
-		HttpServerUrls:           httpServerUrl,
 		ServiceAddr:              serviceAddr,
 	}, nil
 }
@@ -127,7 +124,6 @@ type Services struct {
 	Grafana         []*Grafana
 	AlertManager    []*AlertManager
 	HStreamExporter []*HStreamExporter
-	HttpServer      []*HttpServer
 	ElasticSearch   []*ElasticSearch
 	Kibana          []*Kibana
 	Filebeat        []*Filebeat
@@ -177,11 +173,6 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 			}
 			monitorSuites = append(monitorSuites, NewMonitorSuite(host, c.Monitor))
 		}
-	}
-
-	httpServer := make([]*HttpServer, 0, len(c.HttpServer))
-	for idx, v := range c.HttpServer {
-		httpServer = append(httpServer, NewHttpServer(uint32(idx+1), v))
 	}
 
 	hstreamExporter := make([]*HStreamExporter, 0, len(c.HStreamExporter))
@@ -261,7 +252,6 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		Grafana:         grafana,
 		AlertManager:    alertManager,
 		HStreamExporter: hstreamExporter,
-		HttpServer:      httpServer,
 		ElasticSearch:   elasticSearch,
 		Kibana:          kibana,
 		Filebeat:        filebeat,

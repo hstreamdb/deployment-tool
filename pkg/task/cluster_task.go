@@ -33,7 +33,6 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(Bootstrap)
 	ctx.run(SetUpHServerCluster)
 	ctx.run(CheckClusterStatus)
-	ctx.run(SetUpHttpServerService)
 
 	if len(services.BlackBox) != 0 {
 		ctx.run(SetUpBlackBoxService)
@@ -83,7 +82,6 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(RemoveBlackBoxService)
 	}
 
-	ctx.run(RemoveHttpServerService)
 	ctx.run(RemoveHServerCluster)
 	ctx.run(RemoveHStoreCluster)
 	ctx.run(RemoveHAdminCluster)
@@ -115,7 +113,6 @@ func StopCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(StopBlackBoxService)
 	}
 
-	ctx.run(StopHttpServerService)
 	ctx.run(StopHServerCluster)
 	ctx.run(StopHStoreCluster)
 	ctx.run(StopHAdminCluster)
@@ -251,18 +248,6 @@ func RemoveHStreamConsole(executor ext.Executor, services *service.Services) err
 
 func StopHStreamConsole(executor ext.Executor, services *service.Services) error {
 	return stopCluster(executor, services.Global, services.HStreamConsole)
-}
-
-func SetUpHttpServerService(executor ext.Executor, services *service.Services) error {
-	return startCluster(executor, services.Global, services.HttpServer)
-}
-
-func RemoveHttpServerService(executor ext.Executor, services *service.Services) error {
-	return removeCluster(executor, services.Global, services.HttpServer)
-}
-
-func StopHttpServerService(executor ext.Executor, services *service.Services) error {
-	return stopCluster(executor, services.Global, services.HttpServer)
 }
 
 func SetUpHStreamMonitorStack(executor ext.Executor, services *service.Services) error {

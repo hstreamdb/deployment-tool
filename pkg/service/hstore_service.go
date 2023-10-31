@@ -19,7 +19,7 @@ const (
 	DefaultAdminApiPort = 6440
 	// DefaultServerListenPort TCP port on which the server listens for non-SSL clients
 	DefaultServerListenPort = 16111
-	BootStrapCmd            = "nodes-config bootstrap --metadata-replicate-across "
+	BootStrapCmd            = "nodes-config bootstrap"
 )
 
 type HStore struct {
@@ -101,6 +101,9 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		role = "sequencer"
 	}
 	args = append(args, fmt.Sprintf("--roles %s", role))
+	if len(h.spec.Location) != 0 {
+		args = append(args, fmt.Sprintf("--location %s", h.spec.Location))
+	}
 	if h.spec.EnableAdmin {
 		args = append(args, "--enable-maintenance-manager",
 			"--enable-safety-check-periodic-metadata-update",
@@ -298,7 +301,19 @@ func Bootstrap(globalCtx *GlobalCtx, adminCtx AdminInfo) *executor.ExecuteCtx {
 	args = append(args, adminCtx.ContainerName, "hadmin store")
 	args = append(args, fmt.Sprintf("--port %d", adminCtx.Port))
 	args = append(args, BootStrapCmd)
-	args = append(args, fmt.Sprintf("node:%d", globalCtx.MetaReplica))
+	if len(globalCtx.MetaReplicaAcross) != 0 {
+		parts := strings.Split(globalCtx.MetaReplicaAcross, ",")
+		if len(parts) < 1 {
+			log.Error("invalid meta_replica_across format")
+			os.Exit(1)
+		}
+
+		for _, part := range parts {
+			args = append(args, fmt.Sprintf("--metadata-replicate-across %s", part))
+		}
+	} else {
+		args = append(args, fmt.Sprintf("--metadata-replicate-across node:%d", globalCtx.MetaReplica))
+	}
 	return &executor.ExecuteCtx{Target: adminCtx.Host, Cmd: strings.Join(args, " ")}
 }
 

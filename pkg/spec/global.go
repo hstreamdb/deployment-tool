@@ -11,6 +11,7 @@ type GlobalCfg struct {
 	SSHPort                    int          `yaml:"ssh_port" default:"22"`
 	ClusterId                  string       `yaml:"cluster_id"`
 	MetaReplica                int          `yaml:"meta_replica" default:"1"`
+	MetaReplicaAcross          string       `yaml:"meta_replica_across"`
 	MetaStoreConfigPath        string       `yaml:"meta_store_config_path"`
 	HStoreConfigPath           string       `yaml:"hstore_config_path"`
 	HServerConfigPath          string       `yaml:"hserver_config_path"`

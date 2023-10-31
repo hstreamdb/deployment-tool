@@ -21,6 +21,7 @@ type HStoreSpec struct {
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	DataDir       string       `yaml:"data_dir"`
 	Role          string       `yaml:"role" default:"Both"`
+	Location      string       `yaml:"location"`
 	EnableAdmin   bool         `yaml:"enable_admin"`
 	Port          int          `yaml:"port" default:"6440"`
 	StoreOps      StoreOps     `yaml:",inline"`

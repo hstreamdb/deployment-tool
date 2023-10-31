@@ -9,6 +9,8 @@ global:
   cluster_id: "hstreamdb"
   # # Replication factors of store metadata
   # meta_replica: 1
+  # # Define cross-domain replication for meta logs, the format is [LocationScope1:Replica1,LocationScope2:Replica2,...]
+  # meta_replica_across: "node:1"
   # # Local path to MetaStore config file
   # meta_store_config_path: ""
   # # Local path to HStore config file
@@ -84,6 +86,7 @@ hserver:
       # tls-key-path: /path/to/the/server.key.pem
       # tls-cert-path: /path/to/the/signed.server.cert.pem
       # tls-ca-path: /path/to/the/ca.cert.pem
+      # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
     # # Root directory of HServer config files
     # remote_config_path: "/home/hstream/deploy/hserver"
@@ -119,6 +122,7 @@ hserver:
       # tls-key-path: /path/to/the/server.key.pem
       # tls-cert-path: /path/to/the/signed.server.cert.pem
       # tls-ca-path: /path/to/the/ca.cert.pem
+      # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
     # # Root directory of HServer config files
     # remote_config_path: "/home/hstream/deploy/hserver"
@@ -154,6 +158,7 @@ hserver:
       # tls-key-path: /path/to/the/server.key.pem
       # tls-cert-path: /path/to/the/signed.server.cert.pem
       # tls-ca-path: /path/to/the/ca.cert.pem
+      # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
     # # Root directory of HServer config files
     # remote_config_path: "/home/hstream/deploy/hserver"
@@ -199,6 +204,9 @@ hstore:
     # disk: 1
     # # Total shards
     # shards: 2
+    # # Location used for store data placement, its value is
+    # # a string with format `region.datacenter.cluster.row.rack`.
+    # location: ""
     # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
     # # When Enable_admin is turned on, the instance can receive and process admin requests
@@ -223,6 +231,9 @@ hstore:
     # disk: 1
     # # Total shards
     # shards: 2
+    # # Location used for store data placement, its value is
+    # # a string with format `region.datacenter.cluster.row.rack`.
+    # location: ""
     # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
     # # HStore container configuration
@@ -245,6 +256,9 @@ hstore:
     # disk: 1
     # # Total shards
     # shards: 2
+    # # Location used for store data placement, its value is
+    # # a string with format `region.datacenter.cluster.row.rack`.
+    # location: ""
     # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
     # # HStore container configuration
@@ -323,6 +337,7 @@ hstream_console:
       # AUTH_ADMIN_ENABLE: "false"
       # AUTH_ADMIN_USERNAME: "admin"
       # AUTH_ADMIN_PASSWORD: ""
+      # PLAIN_HSTREAM_PRIVATEADDRESS: ""
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G

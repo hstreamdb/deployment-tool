@@ -30,6 +30,7 @@ type GlobalCtx struct {
 	SSHPort              int
 	ClusterId            string
 	MetaReplica          int
+	MetaReplicaAcross    string
 	EnableGrpcHs         bool
 	RemoteCfgPath        string
 	DataDir              string
@@ -90,6 +91,7 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		SSHPort:              c.Global.SSHPort,
 		ClusterId:            c.Global.ClusterId,
 		MetaReplica:          c.Global.MetaReplica,
+		MetaReplicaAcross:    c.Global.MetaReplicaAcross,
 		EnableGrpcHs:         c.Global.EnableHsGrpc,
 		EnableDscpReflection: c.Global.EnableDscpReflection,
 		containerCfg:         c.Global.ContainerCfg,
@@ -371,12 +373,6 @@ func (s *storeCfg) updateLogReplicate(replica int) {
 				replicateCfg := logCfg.MapIndex(reflect.ValueOf("replicate_across")).Elem()
 				replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
 			}
-			cfgValue.Field(j).Set(v)
-		case "MetadataLogs":
-			field := cfgValue.Field(j)
-			v := reflect.Indirect(field)
-			replicateCfg := v.MapIndex(reflect.ValueOf("replicate_across")).Elem()
-			replicateCfg.SetMapIndex(reflect.ValueOf("node"), reflect.ValueOf(replica))
 			cfgValue.Field(j).Set(v)
 		}
 	}

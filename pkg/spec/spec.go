@@ -29,7 +29,6 @@ type ComponentsSpec struct {
 	Grafana         []GrafanaSpec         `yaml:"grafana"`
 	AlertManager    []AlertManagerSpec    `yaml:"alertmanager"`
 	HStreamExporter []HStreamExporterSpec `yaml:"hstream_exporter"`
-	HttpServer      []HttpServerSpec      `yaml:"http_server"`
 	ElasticSearch   []ElasticSearchSpec   `yaml:"elasticsearch"`
 	Kibana          []KibanaSpec          `yaml:"kibana"`
 	Filebeat        []FilebeatSpec        `yaml:"filebeat"`
@@ -144,14 +143,6 @@ func (c *ComponentsSpec) GetHServerEndpoint() string {
 		}
 	}
 	return strings.Join(endpoints, ",")
-}
-
-func (c *ComponentsSpec) GetHttpServerUrl() []string {
-	hosts := []string{}
-	for _, spec := range c.HttpServer {
-		hosts = append(hosts, fmt.Sprintf("%s:%d", spec.Host, spec.Port))
-	}
-	return hosts
 }
 
 func (c *ComponentsSpec) GetHStreamExporterAddr() []string {

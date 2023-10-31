@@ -345,23 +345,6 @@ hstream_console:
       # remove_when_exit: true
       # options: ""
 
-http_server:
-  - host: 10.1.0.15
-    # # Http_Server docker image
-    # image: "hstreamdb/http-server"
-    # # Http_Server service monitor port
-    # port: 8081
-    # # Root directory of Http_Server config files
-    # remote_config_path: "/home/hstream/deploy/http-server"
-    # # Root directory of Http_Server data files
-    # data_dir: "/home/hstream/data/http-server"
-    # container_config:
-      # cpu_limit: 2.00
-      # memory_limit: 8G
-      # disable_restart: true
-      # remove_when_exit: true
-      # options: ""
-
 blackBox:
   - host: 10.1.0.15
     # # BlackBox docker image

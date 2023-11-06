@@ -15,12 +15,12 @@ import (
 )
 
 const (
-	DefaultServerMonitorPort = 6570
+	DefaultKafkaServerMonitorPort = 6570
 )
 
-type HServer struct {
+type HServerKafka struct {
 	serverId             uint32
-	spec                 spec.HServerSpec
+	spec                 spec.HServerKafkaSpec
 	Host                 string
 	Port                 int
 	ContainerName        string
@@ -29,34 +29,34 @@ type HServer struct {
 	StoreConfigPath      string
 }
 
-func NewHServer(id uint32, serverSpec spec.HServerSpec) *HServer {
-	return &HServer{
+func NewHServerKafka(id uint32, serverSpec spec.HServerKafkaSpec) *HServerKafka {
+	return &HServerKafka{
 		serverId:      id,
 		spec:          serverSpec,
 		Host:          serverSpec.Host,
 		Port:          serverSpec.Port,
-		ContainerName: spec.ServerDefaultContainerName,
+		ContainerName: spec.KafkaServerDefaultContainerName,
 	}
 }
 
-func (h *HServer) GetServiceName() string {
-	return "server"
+func (h *HServerKafka) GetServiceName() string {
+	return "kafkaServer"
 }
 
-func (h *HServer) Display() map[string]utils.DisplayedComponent {
+func (h *HServerKafka) Display() map[string]utils.DisplayedComponent {
 	cfgDir, dataDir := h.getDirs()
-	hserver := utils.DisplayedComponent{
-		Name:          "HServer",
+	HServerKafka := utils.DisplayedComponent{
+		Name:          "HServerKafka",
 		Host:          h.spec.Host,
 		Ports:         strconv.Itoa(h.spec.Port),
 		ContainerName: h.ContainerName,
 		Image:         h.spec.Image,
 		Paths:         strings.Join([]string{cfgDir, dataDir}, ","),
 	}
-	return map[string]utils.DisplayedComponent{"hserver": hserver}
+	return map[string]utils.DisplayedComponent{"hserverKafka": HServerKafka}
 }
 
-func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+func (h *HServerKafka) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := h.getDirs()
 	args := append([]string{}, "mkdir -p", cfgDir, dataDir, cfgDir+"/script", "/data/crash", "-m 0775")
 	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s /data/crash",
@@ -64,7 +64,7 @@ func (h *HServer) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+func (h *HServerKafka) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	mountPoints := []spec.MountPoints{
 		{"/mnt", "/mnt"},
 		{"/var/run/docker.sock", "/var/run/docker.sock"},
@@ -75,25 +75,19 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, h.spec.ContainerCfg, h.ContainerName, true, mountPoints...)
-	serverBinPath := spec.ServerDefaultBinPath
+	serverBinPath := spec.KafkaServerDefaultBinPath
 	if globalCtx.EnableGrpcHs {
-		serverBinPath = spec.ServerGrpcHaskellBinPath
+		log.Errorln("grpc-hs is not supported in kafka server")
+		os.Exit(1)
 	}
 	args = append(args, []string{h.spec.Image, serverBinPath}...)
-	_, version := parseImage(h.spec.Image)
-	if utils.CompareVersion(version, utils.Version0101) > 0 {
-		args = append(args, "--bind-address", "0.0.0.0")
-		args = append(args, "--advertised-address", h.spec.Host)
-		if len(h.spec.AdvertisedListener) != 0 {
-			args = append(args, "--advertised-listeners", h.spec.AdvertisedListener)
-		}
-	} else {
-		args = append(args, "--host", h.spec.Host)
-		args = append(args, "--address", h.spec.AdvertisedAddress)
+	args = append(args, "--bind-address", "0.0.0.0")
+	args = append(args, "--advertised-address", h.spec.Host)
+	if len(h.spec.AdvertisedListener) != 0 {
+		args = append(args, "--advertised-listeners", h.spec.AdvertisedListener)
 	}
 
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
-	args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
 	if len(h.ServerConfigPath) != 0 {
 		args = append(args, "--config-path", h.ServerConfigPath)
 	}
@@ -102,21 +96,14 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		h.spec.Opts = make(map[string]string)
 	}
 
-	if needSeedNodes(version) {
-		if _, ok := h.spec.Opts["seed-nodes"]; !ok {
-			h.spec.Opts["seed-nodes"] = globalCtx.SeedNodes
-		}
-	}
+	//if needSeedNodes(version) {
+	//	if _, ok := h.spec.Opts["seed-nodes"]; !ok {
+	//		h.spec.Opts["seed-nodes"] = globalCtx.SeedNodes
+	//	}
+	//}
 
-	if utils.CompareVersion(version, utils.Version096) > 0 {
-		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
-		h.spec.Opts["metastore-uri"] = metaStoreUrl
-	} else if utils.CompareVersion(version, utils.Version095) > 0 {
-		metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
-		h.spec.Opts["meta-store"] = metaStoreUrl
-	} else {
-		h.spec.Opts["zkuri"] = globalCtx.MetaStoreUrls
-	}
+	metaStoreUrl := getMetaStoreUrl(globalCtx.MetaStoreType, globalCtx.MetaStoreUrls)
+	h.spec.Opts["metastore-uri"] = metaStoreUrl
 
 	if len(h.StoreConfigPath) != 0 {
 		h.spec.Opts["store-config"] = h.StoreConfigPath
@@ -127,11 +114,6 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	if _, ok := h.spec.Opts["server-id"]; !ok {
 		h.spec.Opts["server-id"] = strconv.Itoa(int(h.serverId))
 	}
-	if _, ok := h.spec.Opts["checkpoint-replica"]; !ok {
-		h.spec.Opts["checkpoint-replica"] = strconv.Itoa(globalCtx.MetaReplica)
-	}
-	admin := globalCtx.HAdminInfos[0]
-	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", admin.Host, admin.Port))
 	for k, v := range h.spec.Opts {
 		if k == "enable-tls" {
 			args = append(args, "--enable-tls")
@@ -142,18 +124,18 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (h *HServer) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := []string{"docker rm -f", spec.ServerDefaultContainerName}
+func (h *HServerKafka) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", spec.KafkaServerDefaultContainerName}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (h *HServer) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := []string{"docker rm -f", spec.ServerDefaultContainerName, "&& rm -rf",
+func (h *HServerKafka) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", spec.KafkaServerDefaultContainerName, "&& rm -rf",
 		h.spec.DataDir, h.spec.RemoteCfgPath}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+func (h *HServerKafka) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	checkReadyScript := script.HServerReadyCheckScript{Host: h.spec.Host, Port: h.spec.Port, Timeout: 600}
 	file, err := checkReadyScript.GenScript()
 	if err != nil {
@@ -168,9 +150,9 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	position := []executor.Position{
 		{LocalDir: file, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("chmod +x %s", remoteScriptPath)},
 	}
-	if len(globalCtx.LocalHServerConfigFile) != 0 {
+	if len(globalCtx.LocalHServerKafkaConfigFile) != 0 {
 		serverPath := path.Join(cfgDir, "config.yaml")
-		position = append(position, executor.Position{LocalDir: globalCtx.LocalHServerConfigFile, RemoteDir: serverPath})
+		position = append(position, executor.Position{LocalDir: globalCtx.LocalHServerKafkaConfigFile, RemoteDir: serverPath})
 		h.ServerConfigPath = serverPath
 	}
 	if len(globalCtx.HStoreConfigInMetaStore) == 0 {
@@ -199,41 +181,8 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 	}
 }
 
-func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
-	_, version := parseImage(h.spec.Image)
-	if utils.CompareVersion(version, utils.Version090) >= 0 {
-		args := []string{"docker exec -t", spec.ServerDefaultContainerName}
-		if _, ok := h.spec.Opts["enable-tls"]; ok {
-			if _, ok = h.spec.Opts["tls-ca-path"]; !ok {
-				log.Errorf("tls-ca-path should not be empty when enable tls set.")
-				os.Exit(1)
-			}
-
-			args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
-			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port))
-			args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "init")
-		} else {
-			args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
-			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), "init")
-		}
-		return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
-	}
-	return nil
-}
-
-func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	if len(h.CheckReadyScriptPath) == 0 {
-		log.Error("empty HServer checkReadyScriptPath")
-		os.Exit(1)
-	}
-
-	args := []string{"/usr/bin/env bash"}
-	args = append(args, h.CheckReadyScriptPath)
-	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
-}
-
-func (h *HServer) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
-	args := []string{"docker exec -t", spec.ServerDefaultContainerName}
+func (h *HServerKafka) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker exec -t", spec.KafkaServerDefaultContainerName}
 	if _, ok := h.spec.Opts["enable-tls"]; ok {
 		if _, ok = h.spec.Opts["tls-ca-path"]; !ok {
 			log.Errorf("tls-ca-path should not be empty when enable tls set.")
@@ -242,18 +191,33 @@ func (h *HServer) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 		args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
 		args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port))
-		args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "node status")
+		args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "init")
 	} else {
 		args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
-		args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), "node status")
+		args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), "init")
 	}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
-func (h *HServer) GetHost() string {
+func (h *HServerKafka) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	if len(h.CheckReadyScriptPath) == 0 {
+		log.Error("empty HServerKafka checkReadyScriptPath")
+		os.Exit(1)
+	}
+
+	args := []string{"/usr/bin/env bash"}
+	args = append(args, h.CheckReadyScriptPath)
+	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (h *HServerKafka) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	return nil
+}
+
+func (h *HServerKafka) GetHost() string {
 	return h.spec.Host
 }
 
-func (h *HServer) getDirs() (string, string) {
+func (h *HServerKafka) getDirs() (string, string) {
 	return h.spec.RemoteCfgPath, h.spec.DataDir
 }

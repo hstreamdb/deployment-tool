@@ -21,15 +21,19 @@ global:
   # disable_store_network_config_path: true
   # # Local path to HServer config file
   # hserver_config_path: ""
-  # # use grpc-haskell framework
-  # enable_grpc_haskell: false
   # # Local path to ElasticSearch config file
   # elastic_search_config_path: ""
+  # # Local path to HServerKafka config file
+  # hserver_kafka_config_path: ""
+  # # use grpc-haskell framework
+  # enable_grpc_haskell: false
   # # Only enable for linux kernel which support dscp reflection(linux kernel version
   # # greater and equal than 4.x)
   # enable_dscp_reflection: false
   # # When set to true, hdt won't start any node_exporter or cadvisor instance
   # disable_monitor_suite: false
+  # # Use Kafka server
+  # enable_kafka: false
   # # Global container configuration, can be updated by each component's container_config field.
   # # Note for options field, the component's options field will overwrite the global's
   # container_config:
@@ -61,6 +65,116 @@ monitor:
     # disable_restart: true
     # remove_when_exit: true
     # options: ""
+
+hserver_kafka:
+  - host: 10.1.0.10
+    # # HServer docker image
+    # image: "hstreamdb/hstream"
+    # # The listener is an adderss that a server advertises to its clients so they can connect to the server.
+    # # Each listener is specified as "listener_name:hstream://host_name:port_number". The listener_name is
+    # # a name that identifies the listener, and the "host_name" and "port_number" are the IP address and
+    # # port number that reachable from the client's network. Multi listener will split by comma.
+    # # For example: public_ip:hstream://39.101.190.70:6582
+    # advertised_listener: ""
+    # # HServer listen port
+    # port: 6570
+    # # HServer internal port
+    # internal_port: 6571
+    # # HServer start parameter
+    server_param:
+      # HServer log level, valid values: [critical|error|warning|notify|info|debug]
+      log-level: info
+      # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      store-log-level: info
+      # Specific tls related param
+      # tls-key-path: /path/to/the/server.key.pem
+      # tls-cert-path: /path/to/the/signed.server.cert.pem
+      # tls-ca-path: /path/to/the/ca.cert.pem
+      # listeners-security-protocol-map: "public_ip:tls"
+      # enable-tls: true
+    # # Root directory of HServer config files
+    # remote_config_path: "/home/hstream/deploy/hserver_kafka"
+    # # Root directory of HServer data files
+    # data_dir: "/home/hstream/data/hserver_kafka"
+    # # HServer container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
+  - host: 10.1.0.11
+    # # HServer docker image
+    # image: "hstreamdb/hstream"
+    # # The listener is an adderss that a server advertises to its clients so they can connect to the server.
+    # # Each listener is specified as "listener_name:hstream://host_name:port_number". The listener_name is
+    # # a name that identifies the listener, and the "host_name" and "port_number" are the IP address and
+    # # port number that reachable from the client's network. Multi listener will split by comma.
+    # # For example: public_ip:hstream://39.101.190.71:6582
+    # advertised_listener: ""
+    # # HServer listen port
+    # port: 6570
+    # # HServer internal port
+    # internal_port: 6571
+    # # HServer start parameter
+    server_param:
+      # HServer log level, valid values: [critical|error|warning|notify|info|debug]
+      log-level: info
+      # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      store-log-level: info
+      # Specific tls related param
+      # tls-key-path: /path/to/the/server.key.pem
+      # tls-cert-path: /path/to/the/signed.server.cert.pem
+      # tls-ca-path: /path/to/the/ca.cert.pem
+      # listeners-security-protocol-map: "public_ip:tls"
+      # enable-tls: true
+    # # Root directory of HServer config files
+    # remote_config_path: "/home/hstream/deploy/hserver_kafka"
+    # # Root directory of HServer data files
+    # data_dir: "/home/hstream/data/hserver_kafka"
+    # # HServer container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
+  - host: 10.1.0.12
+    # # HServer docker image
+    # image: "hstreamdb/hstream"
+    # # The listener is an adderss that a server advertises to its clients so they can connect to the server.
+    # # Each listener is specified as "listener_name:hstream://host_name:port_number". The listener_name is
+    # # a name that identifies the listener, and the "host_name" and "port_number" are the IP address and
+    # # port number that reachable from the client's network. Multi listener will split by comma.
+    # # For example: public_ip:hstream://39.101.190.72:6582
+    # advertised_listener: ""
+    # # HServer listen port
+    # port: 6570
+    # # HServer internal port
+    # internal_port: 6571
+    # # HServer start parameter
+    server_param:
+      # HServer log level, valid values: [critical|error|warning|notify|info|debug]
+      log-level: info
+      # HStore log level, valid values: [critical|error|warning|notify|info|debug|spew]
+      store-log-level: info
+      # Specific tls related param
+      # tls-key-path: /path/to/the/server.key.pem
+      # tls-cert-path: /path/to/the/signed.server.cert.pem
+      # tls-ca-path: /path/to/the/ca.cert.pem
+      # listeners-security-protocol-map: "public_ip:tls"
+      # enable-tls: true
+    # # Root directory of HServer config files
+    # remote_config_path: "/home/hstream/deploy/hserver_kafka"
+    # # Root directory of HServer data files
+    # data_dir: "/home/hstream/data/hserver_kafka"
+    # # HServer container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
 
 hserver:
   - host: 10.1.0.10

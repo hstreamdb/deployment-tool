@@ -29,16 +29,16 @@ func (b *BootstrapCtx) Run(executor ext.Executor) error {
 	return fmt.Errorf("bootstrap error")
 }
 
-type CheckClusterStatusCtx struct {
+type CheckClusterStatusCtx[S ServerType] struct {
 	ctx            *service.GlobalCtx
-	serverServices []*service.HServer
+	serverServices []S
 }
 
-func (c *CheckClusterStatusCtx) String() string {
+func (c *CheckClusterStatusCtx[S]) String() string {
 	return "Task: check cluster status"
 }
 
-func (c *CheckClusterStatusCtx) Run(executor ext.Executor) error {
+func (c *CheckClusterStatusCtx[S]) Run(executor ext.Executor) error {
 	success := false
 	for _, admin := range c.ctx.HAdminInfos {
 		executorCtx := service.AdminStoreCmd(c.ctx, admin, "status")
@@ -61,17 +61,12 @@ func (c *CheckClusterStatusCtx) Run(executor ext.Executor) error {
 		return nil
 	}
 
-	for _, admin := range c.ctx.HAdminInfos {
-		executorCtx := service.AdminServerCmd(c.ctx, admin, c.serverServices[0].Host, c.serverServices[0].Port, "status")
-		target := fmt.Sprintf("%s:%d", executorCtx.Target, c.ctx.SSHPort)
-		res, err := executor.Execute(target, executorCtx.Cmd)
-		if err != nil {
-			log.Errorf("get server status with %s error: %s, res: %s", target, err, res)
-			continue
-		}
-		fmt.Printf("=== HServer Status ===\n%s\n", res)
-		return nil
+	executorCtx := c.serverServices[0].GetStatus(c.ctx)
+	target := fmt.Sprintf("%s:%d", executorCtx.Target, c.ctx.SSHPort)
+	res, err := executor.Execute(target, executorCtx.Cmd)
+	if err != nil {
+		return fmt.Errorf("%s-%s", err.Error(), res)
 	}
-
-	return fmt.Errorf("can't get server status")
+	fmt.Printf("=== HServer Status ===\n%s\n", res)
+	return nil
 }

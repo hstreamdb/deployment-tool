@@ -324,13 +324,3 @@ func AdminStoreCmd(globalCtx *GlobalCtx, adminCtx AdminInfo, cmd string) *execut
 	args = append(args, cmd)
 	return &executor.ExecuteCtx{Target: adminCtx.Host, Cmd: strings.Join(args, " ")}
 }
-
-func AdminServerCmd(globalCtx *GlobalCtx, adminCtx AdminInfo, serverHost string,
-	serverPort int, cmd string) *executor.ExecuteCtx {
-	args := []string{"docker exec -t"}
-	args = append(args, adminCtx.ContainerName, "hadmin server")
-	args = append(args, "--host", serverHost)
-	args = append(args, fmt.Sprintf("--port %d", serverPort))
-	args = append(args, cmd)
-	return &executor.ExecuteCtx{Target: adminCtx.Host, Cmd: strings.Join(args, " ")}
-}

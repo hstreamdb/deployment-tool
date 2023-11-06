@@ -76,7 +76,7 @@ func (m *MonitorSuite) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 	cardvisorMountP := []spec.MountPoints{
 		{Local: "/", Remote: "/rootfs:ro"},
-		{Local: "/var/run", Remote: "/var/run:ro"},
+		{Local: "/var/run", Remote: "/var/run"},
 		{Local: "/sys", Remote: "/sys:ro"},
 		{Local: "/var/lib/docker/", Remote: "/var/lib/docker:ro"},
 		{Local: "/dev/disk/", Remote: "/dev/disk:ro"},
@@ -248,7 +248,7 @@ func (p *Prometheus) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	// FIXME: set user to root to make sure files under /prometheus can be created and written correctly.
 	// Refer to: https://github.com/prometheus/prometheus/issues/5976
 	// Find another way to give correct permission to /prometheus
-	args = append(args, "--user root", p.spec.Image)
+	args = append(args, "--user $(id -u)", p.spec.Image)
 	args = append(args, fmt.Sprintf("--storage.tsdb.retention.time=%s", p.spec.RetentionTime))
 	args = append(args, "--config.file=/etc/prometheus/prometheus.yml")
 	return &executor.ExecuteCtx{Target: p.spec.Host, Cmd: strings.Join(args, " ")}
@@ -361,7 +361,7 @@ func (g *Grafana) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	for k, v := range g.spec.Options {
 		args = append(args, fmt.Sprintf("-e %s=%s", k, v))
 	}
-	args = append(args, "-u root", g.spec.Image)
+	args = append(args, "--user $(id -u)", g.spec.Image)
 	return &executor.ExecuteCtx{Target: g.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

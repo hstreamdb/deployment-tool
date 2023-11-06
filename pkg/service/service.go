@@ -53,6 +53,8 @@ type GlobalCtx struct {
 	LocalHStoreConfigFile string
 	// the origin server config file in local
 	LocalHServerConfigFile string
+	// the origin kafka server config file in local
+	LocalHServerKafkaConfigFile string
 	// the origin elastic search config file in local
 	LocalEsConfigFile string
 	HAdminInfos       []AdminInfo
@@ -94,20 +96,21 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		EnableDscpReflection: c.Global.EnableDscpReflection,
 		containerCfg:         c.Global.ContainerCfg,
 
-		Hosts:                    hosts,
-		MetaStoreUrls:            metaStoreUrl,
-		MetaStoreType:            metaStoreTp,
-		MetaStoreCount:           len(c.MetaStore),
-		HStoreConfigInMetaStore:  cfgInMetaStore,
-		LocalMetaStoreConfigFile: c.Global.MetaStoreConfigPath,
-		LocalHStoreConfigFile:    c.Global.HStoreConfigPath,
-		LocalHServerConfigFile:   c.Global.HServerConfigPath,
-		LocalEsConfigFile:        c.Global.EsConfigPath,
-		HAdminInfos:              admins,
-		HStreamServerUrls:        hserverUrl,
-		HServerEndPoints:         hserverEndpoints,
-		PrometheusUrls:           prometheusUrls,
-		ServiceAddr:              serviceAddr,
+		Hosts:                       hosts,
+		MetaStoreUrls:               metaStoreUrl,
+		MetaStoreType:               metaStoreTp,
+		MetaStoreCount:              len(c.MetaStore),
+		HStoreConfigInMetaStore:     cfgInMetaStore,
+		LocalMetaStoreConfigFile:    c.Global.MetaStoreConfigPath,
+		LocalHStoreConfigFile:       c.Global.HStoreConfigPath,
+		LocalHServerConfigFile:      c.Global.HServerConfigPath,
+		LocalHServerKafkaConfigFile: c.Global.HServerKafkaConfigPath,
+		LocalEsConfigFile:           c.Global.EsConfigPath,
+		HAdminInfos:                 admins,
+		HStreamServerUrls:           hserverUrl,
+		HServerEndPoints:            hserverEndpoints,
+		PrometheusUrls:              prometheusUrls,
+		ServiceAddr:                 serviceAddr,
 	}, nil
 }
 
@@ -115,6 +118,7 @@ type Services struct {
 	Global          *GlobalCtx
 	MonitorSuite    []*MonitorSuite
 	HServer         []*HServer
+	HServerKafka    []*HServerKafka
 	HStore          []*HStore
 	HAdmin          []*HAdmin
 	MetaStore       []*MetaStore
@@ -130,11 +134,25 @@ type Services struct {
 }
 
 func NewServices(c spec.ComponentsSpec) (*Services, error) {
-	seedNodes := make([]string, 0, len(c.HServer))
-	hserver := make([]*HServer, 0, len(c.HServer))
-	for idx, v := range c.HServer {
-		hserver = append(hserver, NewHServer(uint32(idx+1), v))
-		seedNodes = append(seedNodes, fmt.Sprintf("%s:%d", v.Host, v.InternalPort))
+	var (
+		seedNodes   []string
+		hserver     []*HServer
+		kafkaServer []*HServerKafka
+	)
+
+	if c.Global.EnableKafka {
+		seedNodes = make([]string, 0, len(c.HServerKafka))
+		kafkaServer = make([]*HServerKafka, 0, len(c.HServerKafka))
+		for idx, v := range c.HServerKafka {
+			kafkaServer = append(kafkaServer, NewHServerKafka(uint32(idx+1), v))
+		}
+	} else {
+		seedNodes = make([]string, 0, len(c.HServer))
+		hserver = make([]*HServer, 0, len(c.HServer))
+		for idx, v := range c.HServer {
+			hserver = append(hserver, NewHServer(uint32(idx+1), v))
+			seedNodes = append(seedNodes, fmt.Sprintf("%s:%d", v.Host, v.InternalPort))
+		}
 	}
 
 	hadmin := make([]*HAdmin, 0, len(c.HAdmin))
@@ -243,6 +261,7 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		Global:          globalCtx,
 		MonitorSuite:    monitorSuites,
 		HServer:         hserver,
+		HServerKafka:    kafkaServer,
 		HAdmin:          hadmin,
 		HStore:          hstore,
 		MetaStore:       metaStore,

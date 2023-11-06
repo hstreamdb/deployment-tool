@@ -48,7 +48,7 @@ func newStartServerCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return task.SetUpHServerCluster(executor, services)
+			return task.SetUpServerCluster(executor, services)
 		},
 	}
 
@@ -72,7 +72,7 @@ func newRemoveServerCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return task.RemoveHServerCluster(executor, services)
+			return task.RemoveServerCluster(executor, services)
 		},
 	}
 

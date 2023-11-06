@@ -15,11 +15,13 @@ type GlobalCfg struct {
 	MetaStoreConfigPath        string       `yaml:"meta_store_config_path"`
 	HStoreConfigPath           string       `yaml:"hstore_config_path"`
 	HServerConfigPath          string       `yaml:"hserver_config_path"`
+	HServerKafkaConfigPath     string       `yaml:"hserver_kafka_config_path"`
 	EnableHsGrpc               bool         `yaml:"enable_grpc_haskell"`
 	DisableStoreNetworkCfgPath bool         `yaml:"disable_store_network_config_path"`
 	EsConfigPath               string       `yaml:"elastic_search_config_path"`
 	EnableDscpReflection       bool         `yaml:"enable_dscp_reflection"`
 	DisableMonitorSuite        bool         `yaml:"disable_monitor_suite"`
+	EnableKafka                bool         `yaml:"enable_kafka"`
 	ContainerCfg               ContainerCfg `yaml:"container_config"`
 }
 

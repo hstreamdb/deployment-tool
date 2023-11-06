@@ -20,6 +20,7 @@ type ComponentsSpec struct {
 	Global          GlobalCfg             `yaml:"global"`
 	Monitor         MonitorSpec           `yaml:"monitor"`
 	HServer         []HServerSpec         `yaml:"hserver"`
+	HServerKafka    []HServerKafkaSpec    `yaml:"hserver_kafka"`
 	HStore          []HStoreSpec          `yaml:"hstore"`
 	HAdmin          []HAdminSpec          `yaml:"hadmin"`
 	MetaStore       []MetaStoreSpec       `yaml:"meta_store"`

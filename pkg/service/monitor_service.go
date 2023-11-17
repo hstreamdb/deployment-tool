@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -280,6 +281,15 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 	allServiceAddr["node-exporter"] = nodeAddr
 	allServiceAddr["cadvisor"] = cadAddr
+	metaZkAddress := []string{}
+	if globalCtx.MetaStoreType == spec.ZK {
+		metaZkAddress = allServiceAddr["meta_store"]
+		reg := regexp.MustCompile("(.*):.*")
+		for i, addr := range metaZkAddress {
+			metaZkAddress[i] = reg.ReplaceAllString(addr, "$1:7070")
+		}
+		delete(allServiceAddr, "meta_store")
+	}
 	prometheusCfg := config.PrometheusConfig{
 		ClusterId:              globalCtx.ClusterId,
 		NodeExporterAddress:    nodeAddr,
@@ -288,6 +298,7 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		AlertManagerAddress:    p.AlertManagerAddr,
 		BlackBoxAddress:        p.BlackBoxAddr,
 		BlackBoxTargets:        allServiceAddr,
+		MetaZkAddress:          metaZkAddress,
 	}
 	cfg, err := prometheusCfg.GenConfig()
 	if err != nil {

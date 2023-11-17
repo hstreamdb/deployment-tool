@@ -58,6 +58,25 @@ scrape_configs:
         replacement: "${1}"
 {{- end }}
 
+{{- if .MetaZkAddress }}
+  - job_name: "meta_zk_task"
+    scrape_interval: 30s
+    static_configs:
+    - targets:
+      {{- range .MetaZkAddress }}
+      - '{{.}}'
+      {{- end }}
+      labels:
+        group: 'meta_store'
+        hstream_cluster: '{{ .ClusterId }}'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        separator: ':'
+        regex: '(.*):.*'
+        replacement: "${1}"
+{{- end }}
+
 {{- if .BlackBoxAddress }}
 {{ $clusterId := .ClusterId }}
   - job_name: "blackbox"
@@ -86,6 +105,7 @@ scrape_configs:
         replacement: {{ .BlackBoxAddress }}
 {{- end }}
 
+{{- if .HStreamExporterAddress }}
   - job_name: "hstream_metrics"
     scrape_interval: 5s
     static_configs:
@@ -96,3 +116,4 @@ scrape_configs:
       labels:
         group: 'hstream-exporter'
         hstream_cluster: '{{ .ClusterId }}'
+{{- end }}

@@ -16,6 +16,7 @@ type PrometheusConfig struct {
 	AlertManagerAddress    []string
 	BlackBoxAddress        string
 	BlackBoxTargets        map[string][]string
+	MetaZkAddress          []string
 }
 
 func (p *PrometheusConfig) GenConfig() (string, error) {

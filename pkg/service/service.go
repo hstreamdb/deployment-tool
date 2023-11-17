@@ -149,8 +149,12 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 	} else {
 		seedNodes = make([]string, 0, len(c.HServer))
 		hserver = make([]*HServer, 0, len(c.HServer))
+		authToken := ""
+		if len(c.Global.AuthToken) != 0 {
+			authToken = c.Global.AuthToken
+		}
 		for idx, v := range c.HServer {
-			hserver = append(hserver, NewHServer(uint32(idx+1), v))
+			hserver = append(hserver, NewHServer(uint32(idx+1), authToken, v))
 			seedNodes = append(seedNodes, fmt.Sprintf("%s:%d", v.Host, v.InternalPort))
 		}
 	}

@@ -76,7 +76,8 @@ func (m *MonitorSuite) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 	cardvisorMountP := []spec.MountPoints{
 		{Local: "/", Remote: "/rootfs:ro"},
-		{Local: "/var/run", Remote: "/var/run"},
+		// for suse, seems should use /var/run, see: https://github.com/google/cadvisor/issues/2671#issuecomment-851346288
+		{Local: "/var/run", Remote: "/var/run:ro"},
 		{Local: "/sys", Remote: "/sys:ro"},
 		{Local: "/var/lib/docker/", Remote: "/var/lib/docker:ro"},
 		{Local: "/dev/disk/", Remote: "/dev/disk:ro"},

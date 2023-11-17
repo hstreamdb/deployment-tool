@@ -34,6 +34,8 @@ global:
   # disable_monitor_suite: false
   # # Use Kafka server
   # enable_kafka: false
+  # # Basic auth token, encode user:password with base64
+  # auth_token: ""
   # # Global container configuration, can be updated by each component's container_config field.
   # # Note for options field, the component's options field will overwrite the global's
   # container_config:

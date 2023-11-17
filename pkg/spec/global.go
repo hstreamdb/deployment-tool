@@ -22,6 +22,7 @@ type GlobalCfg struct {
 	EnableDscpReflection       bool         `yaml:"enable_dscp_reflection"`
 	DisableMonitorSuite        bool         `yaml:"disable_monitor_suite"`
 	EnableKafka                bool         `yaml:"enable_kafka"`
+	AuthToken                  string       `yaml:"auth_token"`
 	ContainerCfg               ContainerCfg `yaml:"container_config"`
 }
 

@@ -23,18 +23,20 @@ type HServer struct {
 	spec                 spec.HServerSpec
 	Host                 string
 	Port                 int
+	AuthToken            string
 	ContainerName        string
 	CheckReadyScriptPath string
 	ServerConfigPath     string
 	StoreConfigPath      string
 }
 
-func NewHServer(id uint32, serverSpec spec.HServerSpec) *HServer {
+func NewHServer(id uint32, token string, serverSpec spec.HServerSpec) *HServer {
 	return &HServer{
 		serverId:      id,
 		spec:          serverSpec,
 		Host:          serverSpec.Host,
 		Port:          serverSpec.Port,
+		AuthToken:     token,
 		ContainerName: spec.ServerDefaultContainerName,
 	}
 }
@@ -214,6 +216,9 @@ func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
 			args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "init")
 		} else {
 			args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+			if len(h.AuthToken) != 0 {
+				args = append(args, "--token", h.AuthToken)
+			}
 			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), "init")
 		}
 		return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
@@ -245,6 +250,9 @@ func (h *HServer) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "node status")
 	} else {
 		args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+		if len(h.AuthToken) != 0 {
+			args = append(args, "--token", h.AuthToken)
+		}
 		args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), "node status")
 	}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}

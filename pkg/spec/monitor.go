@@ -149,6 +149,8 @@ type AlertManagerSpec struct {
 	Image         string       `yaml:"image"`
 	DataDir       string       `yaml:"data_dir"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
+	AuthUser      string       `yaml:"auth_user"`
+	AuthPassword  string       `yaml:"auth_password"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 

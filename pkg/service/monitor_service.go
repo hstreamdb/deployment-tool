@@ -406,7 +406,6 @@ func (g *Grafana) getDirs() (string, string) {
 type AlertManager struct {
 	spec          spec.AlertManagerSpec
 	ContainerName string
-	DisableLogin  bool
 }
 
 func NewAlertManager(graSpec spec.AlertManagerSpec) *AlertManager {
@@ -442,7 +441,10 @@ func (a *AlertManager) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		{a.spec.RemoteCfgPath, "/etc/alertmanager"},
 	}
 	args := spec.GetDockerExecCmd(globalCtx.containerCfg, a.spec.ContainerCfg, a.ContainerName, true, mountPoints...)
-	args = append(args, a.spec.Image)
+	args = append(args, a.spec.Image, "--config.file=/etc/alertmanager/alertmanager.yml")
+	if len(a.spec.AuthUser) != 0 && len(a.spec.AuthPassword) != 0 {
+		args = append(args, "--web.config.file=/etc/alertmanager/web.yaml")
+	}
 	return &executor.ExecuteCtx{Target: a.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
@@ -458,7 +460,15 @@ func (a *AlertManager) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (a *AlertManager) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	position := utils.ScpDir(filepath.Dir("template/alertmanager/alertmanager.yml"), a.spec.RemoteCfgPath)
+	if len(a.spec.AuthUser) != 0 && len(a.spec.AuthPassword) != 0 {
+		basicAuth := promBasicAuthConfig{Username: a.spec.AuthUser, Password: a.spec.AuthPassword}
+		_, err := basicAuth.GenConfig("alertManager")
+		if err != nil {
+			log.Errorf("gen alertManager auth config error: %s", err.Error())
+			os.Exit(1)
+		}
+	}
+	position := utils.ScpDir("template/alertmanager", a.spec.RemoteCfgPath)
 
 	return &executor.TransferCtx{
 		Target: a.spec.Host, Position: position,
@@ -531,4 +541,41 @@ func (h *HStreamExporter) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx
 
 func (h *HStreamExporter) getDirs() (string, string) {
 	return h.spec.RemoteCfgPath, h.spec.DataDir
+}
+
+// ================================================================================
+// 	Utils
+
+type promBasicAuthConfig struct {
+	Username string
+	Password string
+}
+
+const BasicAuthTemplate = `
+basic_auth_users:
+  %s: "%s"
+`
+
+const (
+	AlertManagerAuthCfgPath = "template/alertmanager/web.yaml"
+)
+
+func (p *promBasicAuthConfig) GenConfig(component string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	authCfg := fmt.Sprintf(BasicAuthTemplate, p.Username, string(hashedPassword))
+	content, err := yaml.Marshal(authCfg)
+	if err != nil {
+		return "", err
+	}
+
+	switch component {
+	case "alertManager":
+		return AlertManagerAuthCfgPath, os.WriteFile(AlertManagerAuthCfgPath, content, 0664)
+	default:
+		return "", fmt.Errorf("un-supported component: %s", component)
+	}
 }

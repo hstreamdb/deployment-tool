@@ -90,12 +90,23 @@ func (b *BlackBoxSpec) SetDefaultRemoteCfgPath() {
 // 	prometheus
 
 type PrometheusSpec struct {
-	Host          string       `yaml:"host"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Port          int          `yaml:"port" default:"9090"`
-	Image         string       `yaml:"image"`
-	DataDir       string       `yaml:"data_dir"`
-	RetentionTime string       `yaml:"retention_time" default:"15d"`
+	Host            string `yaml:"host"`
+	SSHPort         int    `yaml:"ssh_port" default:"22"`
+	Port            int    `yaml:"port" default:"9090"`
+	Image           string `yaml:"image"`
+	DataDir         string `yaml:"data_dir"`
+	RetentionTime   string `yaml:"retention_time" default:"15d"`
+	BlackBoxConfigs struct {
+		Address string `yaml:"address"`
+	} `yaml:"blackbox_exporter_configs"`
+	HStreamExporterConfigs []struct {
+		Address string `yaml:"address"`
+	} `yaml:"hstream_exporter_configs"`
+	AlertManagerConfigs []struct {
+		Address      string `yaml:"address"`
+		AuthUser     string `yaml:"auth_user"`
+		AuthPassword string `yaml:"auth_password"`
+	} `yaml:"alertmanager_configs"`
 	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }

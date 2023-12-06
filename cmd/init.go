@@ -22,6 +22,7 @@ func newInit() *cobra.Command {
 			if err := utils.MakeDirs([]utils.DirCfg{
 				{Path: "template/script", Perm: 0755},
 				{Path: "template/prometheus", Perm: 0755},
+				{Path: "template/prometheus_common", Perm: 0755},
 				{Path: "template/blackbox", Perm: 0755},
 				{Path: "template/grafana/dashboards", Perm: 0755},
 				{Path: "template/grafana/datasources", Perm: 0755},
@@ -43,10 +44,10 @@ func newInit() *cobra.Command {
 				filepath.Join("config/grafana/datasources", "datasource.yml"):      "template/grafana/datasources/datasource.yml",
 				filepath.Join("config/kibana", "export_7.6.0.ndjson"):              "template/kibana/export_7.6.0.ndjson",
 				filepath.Join("config/kibana", "export_8.0.0.ndjson"):              "template/kibana/export_8.0.0.ndjson",
-				filepath.Join("config/prometheus", "alert.yml"):                    "template/prometheus/alert.yml",
-				filepath.Join("config/prometheus", "cluster.yml"):                  "template/prometheus/cluster.yml",
-				filepath.Join("config/prometheus", "disks.yml"):                    "template/prometheus/disks.yml",
-				filepath.Join("config/prometheus", "zk.yml"):                       "template/prometheus/zk.yml",
+				filepath.Join("config/prometheus", "alert.yml"):                    "template/prometheus_common/alert.yml",
+				filepath.Join("config/prometheus", "cluster.yml"):                  "template/prometheus_common/cluster.yml",
+				filepath.Join("config/prometheus", "disks.yml"):                    "template/prometheus_common/disks.yml",
+				filepath.Join("config/prometheus", "zk.yml"):                       "template/prometheus_common/zk.yml",
 			}
 			return getFiles(fileMaps)
 		},

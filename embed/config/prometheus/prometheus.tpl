@@ -5,13 +5,20 @@ global:
   external_labels:
     monitor: "hstream-monitor"
 
+{{ if .AlertManagerConfig }}
+{{- range .AlertManagerConfig }}
 alerting:
   alertmanagers:
     - static_configs:
         - targets:
-          {{- range .AlertManagerAddress }}
-          - '{{.}}'
-          {{- end }}
+          - '{{ .Address }}'
+      {{- if .AuthUser }}
+      basic_auth:
+        username: '{{ .AuthUser }}'
+        password: '{{ .AuthPassword }}'
+      {{- end }}
+{{- end }}
+{{- end }}
 
 rule_files:
   - "disks.yml"

@@ -1,7 +1,7 @@
 groups:
   - name: alert_rule
     rules:
-      - alert: ContainerKilled
+      - alert: hstream_node_down
         expr: probe_success != 1
         labels:
           alert_level: critical
@@ -9,7 +9,7 @@ groups:
         annotations:
           description: 'tcp probe failed for container: {{ $labels.group }}, address: {{ $labels.instance }}'
           summary: 'container: {{ $labels.group }}, address: {{ $labels.instance }} unreachable'
-      - alert: NodeHighCpuUsage
+      - alert: hstream_node_high_cpu_usage
         expr: (1 - sum(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) / sum(rate(node_cpu_seconds_total[1m])) by (instance)) * 100 > 80
         labels:
           alert_level: warning
@@ -17,7 +17,7 @@ groups:
         annotations:
           description: '{{ $labels.instance }} cpu usage is above 80%, current value: {{ $value }}'
           summary: '{{ $labels.instance }}: High Cpu Usage detected.'
-      - alert: NodeMemoryCpuUsage
+      - alert: hstream_node_high_memory_usage
         expr: (1 - sum(node_memory_MemAvailable_bytes) by(instance) / sum(node_memory_MemTotal_bytes) by(instance)) * 100 > 80
         labels:
           alert_level: warning
@@ -25,3 +25,19 @@ groups:
         annotations:
           description: '{{ $labels.instance }} memory usage is above 80%, current value: {{ $value }}'
           summary: '{{ $labels.instance }}: High Memory Usage detected.'
+      - alert: hstream_node_high_disk_usage
+        expr: (1- sum(node_filesystem_free_bytes) by (instance, device, mountpoint) / sum(node_filesystem_size_bytes) by (instance, device, mountpoint)) * 100 > 70
+        labels:
+          alert_level: warning
+        for: 1m
+        annotations:
+          description: '{{ $labels.instance }} disk usage is above 70%, mount point {{ $labels.mountpoint }}, device {{ $labels.device }}, current value: {{ $value }}'
+          summary: '{{ $labels.instance }}: High Disk Usage detected.'
+      - alert: hstream_connector_down
+        expr: avg (hstream_exporter_connector_is_alive) by (connector) == 0
+        labels:
+          alert_level: critical
+        for: 1m
+        annotations:
+          description: 'connector {{ $labels.connector }} is down'
+          summary: 'connector {{ $labels.connector }} is down'

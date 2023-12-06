@@ -2,18 +2,28 @@ package config
 
 import (
 	"bytes"
-	"github.com/hstreamdb/deployment-tool/embed"
+	"fmt"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"github.com/hstreamdb/deployment-tool/embed"
 )
 
+type AlertManagerConfig struct {
+	Address      string
+	AuthUser     string
+	AuthPassword string
+}
+
 type PrometheusConfig struct {
+	PromHost               string
 	ClusterId              string
 	NodeExporterAddress    []string
 	CadVisorAddress        []string
 	HStreamExporterAddress []string
-	AlertManagerAddress    []string
+	AlertManagerConfig     []AlertManagerConfig
 	BlackBoxAddress        string
 	BlackBoxTargets        map[string][]string
 	MetaZkAddress          []string
@@ -36,6 +46,12 @@ func (p *PrometheusConfig) GenConfig() (string, error) {
 		return "", err
 	}
 
-	file := filepath.Join("template", "prometheus", "prometheus.yml")
+	dst := filepath.Join("template", "prometheus", fmt.Sprintf("prometheus_%s", p.PromHost))
+
+	if err = utils.CpDir("template/prometheus_common", dst); err != nil {
+		return "", err
+	}
+
+	file := filepath.Join(dst, "prometheus.yml")
 	return file, os.WriteFile(file, content.Bytes(), 0664)
 }

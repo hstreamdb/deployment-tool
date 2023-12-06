@@ -2,16 +2,19 @@ package service
 
 import (
 	"fmt"
-	"github.com/hstreamdb/deployment-tool/pkg/executor"
-	"github.com/hstreamdb/deployment-tool/pkg/spec"
-	"github.com/hstreamdb/deployment-tool/pkg/template/config"
-	"github.com/hstreamdb/deployment-tool/pkg/utils"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/template/config"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/yaml.v3"
 )
 
 type MonitorSuite struct {
@@ -77,7 +80,7 @@ func (m *MonitorSuite) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 
 	cardvisorMountP := []spec.MountPoints{
 		{Local: "/", Remote: "/rootfs:ro"},
-		// for suse, seems should use /var/run, see: https://github.com/google/cadvisor/issues/2671#issuecomment-851346288
+		// for suse, should use /var/run, see: https://github.com/google/cadvisor/issues/2671#issuecomment-851346288
 		{Local: "/var/run", Remote: "/var/run:ro"},
 		{Local: "/sys", Remote: "/sys:ro"},
 		{Local: "/var/lib/docker/", Remote: "/var/lib/docker:ro"},
@@ -185,6 +188,7 @@ func (b *BlackBox) getDirs() (string, string) {
 
 type Prometheus struct {
 	spec                spec.PrometheusSpec
+	Host                string
 	ContainerName       string
 	MonitoredHosts      []string
 	NodeExporterPort    int
@@ -203,6 +207,7 @@ func NewPrometheus(promSpec spec.PrometheusSpec, monitorSuites []*MonitorSuite,
 
 	res := &Prometheus{
 		spec:                promSpec,
+		Host:                promSpec.Host,
 		ContainerName:       spec.PrometheusDefaultContainerName,
 		MonitoredHosts:      hosts,
 		HStreamExporterAddr: hstreamExporterAddr,
@@ -268,7 +273,11 @@ func (p *Prometheus) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	allServiceAddr := globalCtx.ServiceAddr
+	var allServiceAddr = make(map[string][]string, len(globalCtx.ServiceAddr))
+	for k, v := range globalCtx.ServiceAddr {
+		allServiceAddr[k] = make([]string, len(v))
+		copy(allServiceAddr[k], v)
+	}
 
 	nodeAddr := make([]string, 0, len(p.MonitoredHosts))
 	cadAddr := make([]string, 0, len(p.MonitoredHosts))
@@ -290,13 +299,48 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		}
 		delete(allServiceAddr, "meta_store")
 	}
+
+	hstreamExporterAddrs := p.HStreamExporterAddr
+	if len(p.spec.HStreamExporterConfigs) != 0 {
+		address := make([]string, 0, len(p.spec.HStreamExporterConfigs))
+		for _, cfg := range p.spec.HStreamExporterConfigs {
+			address = append(address, cfg.Address)
+		}
+		hstreamExporterAddrs = address
+	}
+
+	alertManagerCfgs := []config.AlertManagerConfig{}
+	if len(p.spec.AlertManagerConfigs) != 0 {
+		for _, cfg := range p.spec.AlertManagerConfigs {
+			alert := config.AlertManagerConfig{
+				Address:      cfg.Address,
+				AuthUser:     cfg.AuthUser,
+				AuthPassword: cfg.AuthPassword,
+			}
+			alertManagerCfgs = append(alertManagerCfgs, alert)
+		}
+	} else if len(p.AlertManagerAddr) != 0 {
+		for _, cfg := range p.AlertManagerAddr {
+			alert := config.AlertManagerConfig{
+				Address: cfg,
+			}
+			alertManagerCfgs = append(alertManagerCfgs, alert)
+		}
+	}
+
+	blackBoxAddrs := p.BlackBoxAddr
+	if len(p.spec.BlackBoxConfigs.Address) != 0 {
+		blackBoxAddrs = p.spec.BlackBoxConfigs.Address
+	}
+
 	prometheusCfg := config.PrometheusConfig{
 		ClusterId:              globalCtx.ClusterId,
+		PromHost:               p.spec.Host,
 		NodeExporterAddress:    nodeAddr,
 		CadVisorAddress:        cadAddr,
-		HStreamExporterAddress: p.HStreamExporterAddr,
-		AlertManagerAddress:    p.AlertManagerAddr,
-		BlackBoxAddress:        p.BlackBoxAddr,
+		HStreamExporterAddress: hstreamExporterAddrs,
+		AlertManagerConfig:     alertManagerCfgs,
+		BlackBoxAddress:        blackBoxAddrs,
 		BlackBoxTargets:        allServiceAddr,
 		MetaZkAddress:          metaZkAddress,
 	}
@@ -306,7 +350,7 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		os.Exit(1)
 	}
 
-	position := utils.ScpDir(filepath.Dir(cfg), p.spec.RemoteCfgPath)
+	position := utils.ScpDirFiles(filepath.Dir(cfg), p.spec.RemoteCfgPath)
 
 	return &executor.TransferCtx{
 		Target: p.spec.Host, Position: position,

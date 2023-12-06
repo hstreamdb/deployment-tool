@@ -488,6 +488,17 @@ prometheus:
     # remote_config_path: "/home/hstream/deploy/prometheus"
     # # Root directory of Prometheus data files
     # data_dir: "/home/hstream/data/prometheus"
+    # # BlackBox exporter related infos
+    # blackbox_exporter_configs:
+      # address: ""
+    # # HStream exporter related infos
+    # hstream_exporter_configs:
+      # - address: ""
+    # # Alertmanager related infos
+    # alertmanager_configs:
+      # - address: ""
+      #   auth_user: ""
+      #   auth_password: ""
     # # prometheus data retention time, default is 15 days.
     retention_time: "15d"
     # # Prometheus container configuration

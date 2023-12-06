@@ -8,6 +8,7 @@ import (
 	"golang.org/x/term"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -71,6 +72,39 @@ func ScpDir(originPath, remotePath string) []executor.Position {
 		os.Exit(1)
 	}
 	return position
+}
+
+func ScpDirFiles(originPath, remotePath string) []executor.Position {
+	position := []executor.Position{}
+
+	if err := filepath.WalkDir(originPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() {
+			position = append(position, executor.Position{LocalDir: path, RemoteDir: filepath.Join(remotePath, d.Name())})
+		}
+		return nil
+	}); err != nil {
+		log.Errorf("scp command error: %s", err.Error())
+		os.Exit(1)
+	}
+	return position
+}
+
+func CpDir(src, dst string) error {
+	cmd := exec.Command("rm", "-rf", dst)
+	log.Debugf("exec %s", cmd.String())
+	if err := cmd.Run(); err != nil {
+		log.Errorf("rm %s error: %s", dst, err.Error())
+		return err
+	}
+	cmd = exec.Command("cp", "-r", src, dst)
+	log.Debugf("exec %s", cmd.String())
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
 }
 
 var (

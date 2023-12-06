@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"sync"
+
 	"github.com/bramvdbogaerde/go-scp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
-	"os"
-	"sync"
 )
 
 type SSHExecutor struct {
@@ -82,6 +83,7 @@ func (s *SSHExecutor) Transfer(address, localPath, remotePath string) error {
 	defer f.Close()
 
 	if err = scpClient.CopyFromFile(context.Background(), *f, remotePath, "0755"); err != nil {
+		log.Errorf("scp file from %s to %s error: %v", localPath, remotePath, err)
 		return err
 	}
 

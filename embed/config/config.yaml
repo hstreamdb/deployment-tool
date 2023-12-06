@@ -513,6 +513,8 @@ grafana:
     # # Grafana configuration
     # option:
       # GF_SECURITY_ALLOW_EMBEDDING: "false"
+      # GF_SECURITY_ADMIN_USER: admin
+      # GF_SECURITY_ADMIN_PASSWORD: admin321
     # # Grafana container configuration
     # container_config:
       # cpu_limit: 2.00

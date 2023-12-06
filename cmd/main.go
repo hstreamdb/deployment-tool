@@ -57,6 +57,7 @@ func main() {
 	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
 	})
+	log.SetReportCaller(true)
 	log.SetOutput(rootCmd.OutOrStdout())
 	log.SetLevel(log.InfoLevel)
 

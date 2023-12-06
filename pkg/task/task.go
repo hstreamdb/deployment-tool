@@ -2,10 +2,11 @@ package task
 
 import (
 	"fmt"
-	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
-	"github.com/hstreamdb/deployment-tool/pkg/service"
 	"sync"
 	"sync/atomic"
+
+	ext "github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/service"
 )
 
 type Task interface {

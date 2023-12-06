@@ -531,6 +531,10 @@ alertmanager:
     # remote_config_path: "/home/hstream/deploy/alertmanager"
     # # Root directory of Alertmanager data files
     # data_dir: "/home/hstream/data/alertmanager"
+    # # Basic auth user
+    # auth_user: ""
+    # # Basic auth password
+    # auth_password: ""
     # # Alertmanager container configuration
     # container_config:
       # cpu_limit: 2.00

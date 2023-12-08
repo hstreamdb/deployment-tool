@@ -32,8 +32,8 @@ func newStop() *cobra.Command {
 				return err
 			}
 
-			config := spec.ComponentsSpec{}
-			if err = yaml.Unmarshal(contant, &config); err != nil {
+			config := &spec.ComponentsSpec{}
+			if err = yaml.Unmarshal(contant, config); err != nil {
 				return err
 			}
 			services, err = service.NewServices(config)

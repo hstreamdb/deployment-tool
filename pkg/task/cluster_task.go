@@ -31,7 +31,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 	ctx.run(SetUpHAdminCluster)
 	ctx.run(SetUpHStoreCluster)
 	ctx.run(Bootstrap)
-	ctx.run(SetUpServerCluster)
+	ctx.run(SetUpHServerCluster)
 	ctx.run(CheckClusterStatus)
 
 	if len(services.BlackBox) != 0 {
@@ -82,7 +82,7 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(RemoveBlackBoxService)
 	}
 
-	ctx.run(RemoveServerCluster)
+	ctx.run(RemoveHServerCluster)
 	ctx.run(RemoveHStoreCluster)
 	ctx.run(RemoveHAdminCluster)
 	ctx.run(RemoveMetaStoreCluster)
@@ -113,7 +113,7 @@ func StopCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(StopBlackBoxService)
 	}
 
-	ctx.run(StopServerCluster)
+	ctx.run(StopHServerCluster)
 	ctx.run(StopHStoreCluster)
 	ctx.run(StopHAdminCluster)
 	ctx.run(StopMetaStoreCluster)
@@ -209,49 +209,18 @@ func StopHStoreCluster(executor ext.Executor, services *service.Services) error 
 	return stopCluster(executor, services.Global, services.HStore)
 }
 
-func SetUpServerCluster(executor ext.Executor, services *service.Services) error {
-	if len(services.HServer) != 0 {
-		return setUpHServerCluster(executor, services)
-	} else if len(services.HServerKafka) != 0 {
-		return setUpKafkaServerCluster(executor, services)
-	} else {
-		return nil
-	}
-}
-
-func setUpKafkaServerCluster(executor ext.Executor, services *service.Services) error {
-	if len(services.HServerKafka) == 0 {
-		return nil
-	}
-
-	serverClusterCtx := ServerClusterCtx[*service.HServerKafka]{
-		ctx:     services.Global,
-		service: services.HServerKafka,
-	}
-	tasks := getStartServiceTask(serverClusterCtx.ctx, serverClusterCtx.service)
-	tasks = append(tasks, &WaitServerReady[*service.HServerKafka]{serverClusterCtx})
-	tasks = append(tasks, &HServerInit[*service.HServerKafka]{serverClusterCtx})
-	for _, task := range tasks {
-		fmt.Println(task)
-		if err := task.Run(executor); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func setUpHServerCluster(executor ext.Executor, services *service.Services) error {
+func SetUpHServerCluster(executor ext.Executor, services *service.Services) error {
 	if len(services.HServer) == 0 {
 		return nil
 	}
 
-	serverClusterCtx := ServerClusterCtx[*service.HServer]{
+	serverClusterCtx := HServerClusterCtx{
 		ctx:     services.Global,
 		service: services.HServer,
 	}
 	tasks := getStartServiceTask(serverClusterCtx.ctx, serverClusterCtx.service)
-	tasks = append(tasks, &WaitServerReady[*service.HServer]{serverClusterCtx})
-	tasks = append(tasks, &HServerInit[*service.HServer]{serverClusterCtx})
+	tasks = append(tasks, &WaitServerReady{serverClusterCtx})
+	tasks = append(tasks, &HServerInit{serverClusterCtx})
 	for _, task := range tasks {
 		fmt.Println(task)
 		if err := task.Run(executor); err != nil {
@@ -261,20 +230,12 @@ func setUpHServerCluster(executor ext.Executor, services *service.Services) erro
 	return nil
 }
 
-func RemoveServerCluster(executor ext.Executor, services *service.Services) error {
-	if len(services.HServer) != 0 {
-		return removeCluster(executor, services.Global, services.HServer)
-	} else {
-		return removeCluster(executor, services.Global, services.HServerKafka)
-	}
+func RemoveHServerCluster(executor ext.Executor, services *service.Services) error {
+	return removeCluster(executor, services.Global, services.HServer)
 }
 
-func StopServerCluster(executor ext.Executor, services *service.Services) error {
-	if len(services.HServer) != 0 {
-		return stopCluster(executor, services.Global, services.HServer)
-	} else {
-		return stopCluster(executor, services.Global, services.HServerKafka)
-	}
+func StopHServerCluster(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.HServer)
 }
 
 func SetUpHStreamConsole(executor ext.Executor, services *service.Services) error {
@@ -465,28 +426,15 @@ func stopCluster[S service.Service](executor ext.Executor, ctx *service.GlobalCt
 }
 
 func CheckClusterStatus(executor ext.Executor, services *service.Services) error {
-	if len(services.HServer) != 0 {
-		task := &CheckClusterStatusCtx[*service.HServer]{
-			ctx:            services.Global,
-			serverServices: services.HServer,
-		}
-		fmt.Println(task)
-		if err := task.Run(executor); err != nil {
-			return err
-		}
-		return nil
+	task := &CheckClusterStatusCtx{
+		ctx:            services.Global,
+		serverServices: services.HServer,
 	}
-	//else {
-	//	task := &CheckClusterStatusCtx[*service.HServerKafka]{
-	//		ctx:            services.Global,
-	//		serverServices: services.HServerKafka,
-	//	}
-	//	fmt.Println(task)
-	//	if err := task.Run(executor); err != nil {
-	//		return err
-	//	}
-	//	return nil
-	//}
+
+	fmt.Println(task)
+	if err := task.Run(executor); err != nil {
+		return err
+	}
 	return nil
 }
 

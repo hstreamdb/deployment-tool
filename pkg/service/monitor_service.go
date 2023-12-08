@@ -333,6 +333,11 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		blackBoxAddrs = p.spec.BlackBoxConfigs.Address
 	}
 
+	hstreamKafkaAddrs := []string{}
+	if globalCtx.EnableKafka {
+		hstreamKafkaAddrs = globalCtx.HServerKafkaMonitorEndPoints
+	}
+
 	prometheusCfg := config.PrometheusConfig{
 		ClusterId:              globalCtx.ClusterId,
 		PromHost:               p.spec.Host,
@@ -343,6 +348,7 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		BlackBoxAddress:        blackBoxAddrs,
 		BlackBoxTargets:        allServiceAddr,
 		MetaZkAddress:          metaZkAddress,
+		HStreamKafkaAddress:    hstreamKafkaAddrs,
 	}
 	cfg, err := prometheusCfg.GenConfig()
 	if err != nil {

@@ -20,7 +20,6 @@ type ComponentsSpec struct {
 	Global          GlobalCfg             `yaml:"global"`
 	Monitor         MonitorSpec           `yaml:"monitor"`
 	HServer         []HServerSpec         `yaml:"hserver"`
-	HServerKafka    []HServerKafkaSpec    `yaml:"hserver_kafka"`
 	HStore          []HStoreSpec          `yaml:"hstore"`
 	HAdmin          []HAdminSpec          `yaml:"hadmin"`
 	MetaStore       []MetaStoreSpec       `yaml:"meta_store"`
@@ -144,6 +143,19 @@ func (c *ComponentsSpec) GetHServerEndpoint() string {
 		}
 	}
 	return strings.Join(endpoints, ",")
+}
+
+func (c *ComponentsSpec) GetHServerMonitorEndpoint() []string {
+	if !c.Global.EnableKafka {
+		log.Errorf("Cannot get monitor endpoints when disable kafka")
+		os.Exit(1)
+	}
+
+	endpoints := make([]string, 0, len(c.HServer))
+	for _, v := range c.HServer {
+		endpoints = append(endpoints, fmt.Sprintf("%s:%d", v.Host, v.MonitorPort))
+	}
+	return endpoints
 }
 
 func (c *ComponentsSpec) GetHStreamExporterAddr() []string {

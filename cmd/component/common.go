@@ -62,8 +62,8 @@ func getServices(cmd *cobra.Command, opts commonOpts) (*service.Services, ext.Ex
 		return nil, nil, err
 	}
 
-	config := spec.ComponentsSpec{}
-	if err = yaml.Unmarshal(contents, &config); err != nil {
+	config := &spec.ComponentsSpec{}
+	if err = yaml.Unmarshal(contents, config); err != nil {
 		return nil, nil, err
 	}
 

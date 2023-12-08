@@ -18,6 +18,7 @@ type HServerSpec struct {
 	AdvertisedListener string            `yaml:"advertised_listener"`
 	Port               int               `yaml:"port" default:"6570"`
 	InternalPort       int               `yaml:"internal_port" default:"6571"`
+	MonitorPort        int               `yaml:"monitor_port" default:"9700"`
 	Image              string            `yaml:"image"`
 	SSHPort            int               `yaml:"ssh_port" default:"22"`
 	RemoteCfgPath      string            `yaml:"remote_config_path"`

@@ -41,6 +41,7 @@ func newInit() *cobra.Command {
 				filepath.Join("config/blackbox", "blackbox.yml"):                   "template/blackbox/blackbox.yml",
 				filepath.Join("config/grafana/dashboards", "dashboard.yml"):        "template/grafana/dashboards/dashboard.yml",
 				filepath.Join("config/grafana/dashboards", "hstream_monitor.json"): "template/grafana/dashboards/hstream_monitor.json",
+				filepath.Join("config/grafana/dashboards", "hstream_kafka.json"):   "template/grafana/dashboards/hstream_kafka.json",
 				filepath.Join("config/grafana/datasources", "datasource.yml"):      "template/grafana/datasources/datasource.yml",
 				filepath.Join("config/kibana", "export_7.6.0.ndjson"):              "template/kibana/export_7.6.0.ndjson",
 				filepath.Join("config/kibana", "export_8.0.0.ndjson"):              "template/kibana/export_8.0.0.ndjson",

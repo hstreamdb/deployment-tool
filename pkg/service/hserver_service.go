@@ -82,6 +82,18 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 		serverBinPath = spec.ServerGrpcHaskellBinPath
 	}
 	args = append(args, []string{h.spec.Image, serverBinPath}...)
+
+	if globalCtx.EnableKafka {
+		args = append(args, "kafka")
+	} else {
+		args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
+		if _, ok := h.spec.Opts["checkpoint-replica"]; !ok {
+			h.spec.Opts["checkpoint-replica"] = strconv.Itoa(globalCtx.MetaReplica)
+		}
+		admin := globalCtx.HAdminInfos[0]
+		args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", admin.Host, admin.Port))
+	}
+
 	_, version := parseImage(h.spec.Image)
 	if utils.CompareVersion(version, utils.Version0101) > 0 {
 		args = append(args, "--bind-address", "0.0.0.0")
@@ -95,7 +107,7 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 
 	args = append(args, fmt.Sprintf("--port %d", h.spec.Port))
-	args = append(args, fmt.Sprintf("--internal-port %d", h.spec.InternalPort))
+
 	if len(h.ServerConfigPath) != 0 {
 		args = append(args, "--config-path", h.ServerConfigPath)
 	}
@@ -129,11 +141,7 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	if _, ok := h.spec.Opts["server-id"]; !ok {
 		h.spec.Opts["server-id"] = strconv.Itoa(int(h.serverId))
 	}
-	if _, ok := h.spec.Opts["checkpoint-replica"]; !ok {
-		h.spec.Opts["checkpoint-replica"] = strconv.Itoa(globalCtx.MetaReplica)
-	}
-	admin := globalCtx.HAdminInfos[0]
-	args = append(args, fmt.Sprintf("--store-admin-host %s --store-admin-port %d", admin.Host, admin.Port))
+
 	for k, v := range h.spec.Opts {
 		if k == "enable-tls" {
 			args = append(args, "--enable-tls")
@@ -202,6 +210,9 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 }
 
 func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
+	if ctx.EnableKafka {
+		return nil
+	}
 	_, version := parseImage(h.spec.Image)
 	if utils.CompareVersion(version, utils.Version090) >= 0 {
 		args := []string{"docker exec -t", spec.ServerDefaultContainerName}
@@ -238,6 +249,10 @@ func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (h *HServer) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	if globalCtx.EnableKafka {
+		return nil
+	}
+
 	args := []string{"docker exec -t", spec.ServerDefaultContainerName}
 	if _, ok := h.spec.Opts["enable-tls"]; ok {
 		if _, ok = h.spec.Opts["tls-ca-path"]; !ok {

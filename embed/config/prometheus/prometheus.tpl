@@ -124,3 +124,16 @@ scrape_configs:
         group: 'hstream-exporter'
         hstream_cluster: '{{ .ClusterId }}'
 {{- end }}
+
+{{- if .HStreamKafkaAddress }}
+  - job_name: "hstream_kafka_metrics"
+    scrape_interval: 5s
+    static_configs:
+    - targets:
+      {{- range .HStreamKafkaAddress }}
+      - '{{.}}'
+      {{- end }}
+      labels:
+        group: 'hstream-kafka'
+        hstream_cluster: '{{ .ClusterId }}'
+{{- end }}

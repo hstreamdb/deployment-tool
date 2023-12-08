@@ -3,16 +3,17 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hstreamdb/deployment-tool/pkg/executor"
-	"github.com/hstreamdb/deployment-tool/pkg/spec"
-	"github.com/hstreamdb/deployment-tool/pkg/utils"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/exp/slices"
 	"os"
 	"reflect"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/hstreamdb/deployment-tool/pkg/executor"
+	"github.com/hstreamdb/deployment-tool/pkg/spec"
+	"github.com/hstreamdb/deployment-tool/pkg/utils"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/slices"
 )
 
 type Service interface {
@@ -32,6 +33,7 @@ type GlobalCtx struct {
 	MetaReplica          int
 	MetaReplicaAcross    string
 	EnableGrpcHs         bool
+	EnableKafka          bool
 	RemoteCfgPath        string
 	DataDir              string
 	EnableDscpReflection bool
@@ -53,18 +55,17 @@ type GlobalCtx struct {
 	LocalHStoreConfigFile string
 	// the origin server config file in local
 	LocalHServerConfigFile string
-	// the origin kafka server config file in local
-	LocalHServerKafkaConfigFile string
 	// the origin elastic search config file in local
-	LocalEsConfigFile string
-	HAdminInfos       []AdminInfo
-	HStreamServerUrls string
-	HServerEndPoints  string
-	PrometheusUrls    []string
-	ServiceAddr       map[string][]string
+	LocalEsConfigFile            string
+	HAdminInfos                  []AdminInfo
+	HStreamServerUrls            string
+	HServerEndPoints             string
+	HServerKafkaMonitorEndPoints []string
+	PrometheusUrls               []string
+	ServiceAddr                  map[string][]string
 }
 
-func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
+func newGlobalCtx(c *spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	metaStoreUrl, metaStoreTp, err := c.GetMetaStoreUrl()
 	if err != nil {
 		return nil, err
@@ -85,6 +86,11 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 	// all service address in `host:port` form, except cadvisor and node-exporter
 	serviceAddr := c.GetAddress()
 
+	var kafkaMonitorEndPoints []string
+	if c.Global.EnableKafka {
+		kafkaMonitorEndPoints = c.GetHServerMonitorEndpoint()
+	}
+
 	return &GlobalCtx{
 		User:                 c.Global.User,
 		KeyPath:              c.Global.KeyPath,
@@ -94,23 +100,24 @@ func newGlobalCtx(c spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		MetaReplicaAcross:    c.Global.MetaReplicaAcross,
 		EnableGrpcHs:         c.Global.EnableHsGrpc,
 		EnableDscpReflection: c.Global.EnableDscpReflection,
+		EnableKafka:          c.Global.EnableKafka,
 		containerCfg:         c.Global.ContainerCfg,
 
-		Hosts:                       hosts,
-		MetaStoreUrls:               metaStoreUrl,
-		MetaStoreType:               metaStoreTp,
-		MetaStoreCount:              len(c.MetaStore),
-		HStoreConfigInMetaStore:     cfgInMetaStore,
-		LocalMetaStoreConfigFile:    c.Global.MetaStoreConfigPath,
-		LocalHStoreConfigFile:       c.Global.HStoreConfigPath,
-		LocalHServerConfigFile:      c.Global.HServerConfigPath,
-		LocalHServerKafkaConfigFile: c.Global.HServerKafkaConfigPath,
-		LocalEsConfigFile:           c.Global.EsConfigPath,
-		HAdminInfos:                 admins,
-		HStreamServerUrls:           hserverUrl,
-		HServerEndPoints:            hserverEndpoints,
-		PrometheusUrls:              prometheusUrls,
-		ServiceAddr:                 serviceAddr,
+		Hosts:                        hosts,
+		MetaStoreUrls:                metaStoreUrl,
+		MetaStoreType:                metaStoreTp,
+		MetaStoreCount:               len(c.MetaStore),
+		HStoreConfigInMetaStore:      cfgInMetaStore,
+		LocalMetaStoreConfigFile:     c.Global.MetaStoreConfigPath,
+		LocalHStoreConfigFile:        c.Global.HStoreConfigPath,
+		LocalHServerConfigFile:       c.Global.HServerConfigPath,
+		LocalEsConfigFile:            c.Global.EsConfigPath,
+		HAdminInfos:                  admins,
+		HStreamServerUrls:            hserverUrl,
+		HServerEndPoints:             hserverEndpoints,
+		HServerKafkaMonitorEndPoints: kafkaMonitorEndPoints,
+		PrometheusUrls:               prometheusUrls,
+		ServiceAddr:                  serviceAddr,
 	}, nil
 }
 
@@ -118,7 +125,6 @@ type Services struct {
 	Global          *GlobalCtx
 	MonitorSuite    []*MonitorSuite
 	HServer         []*HServer
-	HServerKafka    []*HServerKafka
 	HStore          []*HStore
 	HAdmin          []*HAdmin
 	MetaStore       []*MetaStore
@@ -133,30 +139,16 @@ type Services struct {
 	Filebeat        []*Filebeat
 }
 
-func NewServices(c spec.ComponentsSpec) (*Services, error) {
-	var (
-		seedNodes   []string
-		hserver     []*HServer
-		kafkaServer []*HServerKafka
-	)
-
-	if c.Global.EnableKafka {
-		seedNodes = make([]string, 0, len(c.HServerKafka))
-		kafkaServer = make([]*HServerKafka, 0, len(c.HServerKafka))
-		for idx, v := range c.HServerKafka {
-			kafkaServer = append(kafkaServer, NewHServerKafka(uint32(idx+1), v))
-		}
-	} else {
-		seedNodes = make([]string, 0, len(c.HServer))
-		hserver = make([]*HServer, 0, len(c.HServer))
-		authToken := ""
-		if len(c.Global.AuthToken) != 0 {
-			authToken = c.Global.AuthToken
-		}
-		for idx, v := range c.HServer {
-			hserver = append(hserver, NewHServer(uint32(idx+1), authToken, v))
-			seedNodes = append(seedNodes, fmt.Sprintf("%s:%d", v.Host, v.InternalPort))
-		}
+func NewServices(c *spec.ComponentsSpec) (*Services, error) {
+	seedNodes := make([]string, 0, len(c.HServer))
+	hserver := make([]*HServer, 0, len(c.HServer))
+	authToken := ""
+	if len(c.Global.AuthToken) != 0 {
+		authToken = c.Global.AuthToken
+	}
+	for idx, v := range c.HServer {
+		hserver = append(hserver, NewHServer(uint32(idx+1), authToken, v))
+		seedNodes = append(seedNodes, fmt.Sprintf("%s:%d", v.Host, v.InternalPort))
 	}
 
 	hadmin := make([]*HAdmin, 0, len(c.HAdmin))
@@ -265,7 +257,6 @@ func NewServices(c spec.ComponentsSpec) (*Services, error) {
 		Global:          globalCtx,
 		MonitorSuite:    monitorSuites,
 		HServer:         hserver,
-		HServerKafka:    kafkaServer,
 		HAdmin:          hadmin,
 		HStore:          hstore,
 		MetaStore:       metaStore,
@@ -393,7 +384,7 @@ func (s *storeCfg) updateLogReplicate(replica int) {
 
 // getExcludedMonitorHosts get the hosts of all nodes which don't need to deploy
 // a monitoring stack.
-func getExcludedMonitorHosts(c spec.ComponentsSpec) []string {
+func getExcludedMonitorHosts(c *spec.ComponentsSpec) []string {
 	res := []string{}
 
 	for _, host := range c.Monitor.ExcludedHosts {
@@ -409,7 +400,7 @@ func getExcludedMonitorHosts(c spec.ComponentsSpec) []string {
 	return slices.Compact(res)
 }
 
-func getAdminInfos(c spec.ComponentsSpec) []AdminInfo {
+func getAdminInfos(c *spec.ComponentsSpec) []AdminInfo {
 	infos := []AdminInfo{}
 	for _, v := range c.HAdmin {
 		infos = append(infos, AdminInfo{

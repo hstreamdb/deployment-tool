@@ -7,29 +7,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type ServerType interface {
-	Init(ctx *service.GlobalCtx) *ext.ExecuteCtx
-	CheckReady(globalCtx *service.GlobalCtx) *ext.ExecuteCtx
-	GetStatus(globalCtx *service.GlobalCtx) *ext.ExecuteCtx
-	*service.HServer | *service.HServerKafka
-}
-
-type ServerClusterCtx[S ServerType] struct {
+type HServerClusterCtx struct {
 	ctx     *service.GlobalCtx
-	service []S
+	service []*service.HServer
 }
 
-type WaitServerReady[S ServerType] struct {
-	ServerClusterCtx[S]
+type WaitServerReady struct {
+	HServerClusterCtx
 }
 
-func (w *WaitServerReady[S]) String() string {
+func (w *WaitServerReady) String() string {
 	return "Task: wait server ready"
 }
 
-func (w *WaitServerReady[S]) Run(executor ext.Executor) error {
-	for _, server := range w.service {
-		executorCtx := server.CheckReady(w.ctx)
+func (w *WaitServerReady) Run(executor ext.Executor) error {
+	for _, store := range w.service {
+		executorCtx := store.CheckReady(w.ctx)
 		target := fmt.Sprintf("%s:%d", executorCtx.Target, w.ctx.SSHPort)
 		res, err := executor.Execute(target, executorCtx.Cmd)
 		if err != nil {
@@ -39,15 +32,15 @@ func (w *WaitServerReady[S]) Run(executor ext.Executor) error {
 	return nil
 }
 
-type HServerInit[S ServerType] struct {
-	ServerClusterCtx[S]
+type HServerInit struct {
+	HServerClusterCtx
 }
 
-func (s *HServerInit[S]) String() string {
+func (s *HServerInit) String() string {
 	return "Task: init server cluster"
 }
 
-func (s *HServerInit[S]) Run(executor ext.Executor) error {
+func (s *HServerInit) Run(executor ext.Executor) error {
 	server := s.service[0]
 	executorCtx := server.Init(s.ctx)
 	if executorCtx == nil {

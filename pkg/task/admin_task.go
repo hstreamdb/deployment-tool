@@ -29,16 +29,16 @@ func (b *BootstrapCtx) Run(executor ext.Executor) error {
 	return fmt.Errorf("bootstrap error")
 }
 
-type CheckClusterStatusCtx[S ServerType] struct {
+type CheckClusterStatusCtx struct {
 	ctx            *service.GlobalCtx
-	serverServices []S
+	serverServices []*service.HServer
 }
 
-func (c *CheckClusterStatusCtx[S]) String() string {
+func (c *CheckClusterStatusCtx) String() string {
 	return "Task: check cluster status"
 }
 
-func (c *CheckClusterStatusCtx[S]) Run(executor ext.Executor) error {
+func (c *CheckClusterStatusCtx) Run(executor ext.Executor) error {
 	success := false
 	for _, admin := range c.ctx.HAdminInfos {
 		executorCtx := service.AdminStoreCmd(c.ctx, admin, "status")
@@ -62,6 +62,9 @@ func (c *CheckClusterStatusCtx[S]) Run(executor ext.Executor) error {
 	}
 
 	executorCtx := c.serverServices[0].GetStatus(c.ctx)
+	if executorCtx == nil {
+		return nil
+	}
 	target := fmt.Sprintf("%s:%d", executorCtx.Target, c.ctx.SSHPort)
 	res, err := executor.Execute(target, executorCtx.Cmd)
 	if err != nil {

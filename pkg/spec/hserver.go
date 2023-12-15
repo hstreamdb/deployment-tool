@@ -1,13 +1,15 @@
 package spec
 
+import "path"
+
 const (
 	ServerBinConfigPath        = "/etc/hstream/config.yaml"
 	ServerDefaultImage         = "hstreamdb/hstream"
 	ServerDefaultContainerName = "deploy_hserver"
 	ServerDefaultBinPath       = "/usr/local/bin/hstream-server"
 	ServerGrpcHaskellBinPath   = "/usr/local/bin/hstream-server-old"
-	ServerDefaultCfgDir        = "/hstream/deploy/hserver"
-	ServerDefaultDataDir       = "/hstream/data/hserver"
+	ServerDefaultCfgDir        = "deploy/hserver"
+	ServerDefaultDataDir       = "data/hserver"
 )
 
 type HServerSpec struct {
@@ -27,16 +29,16 @@ type HServerSpec struct {
 	ContainerCfg       ContainerCfg      `yaml:"container_config"`
 }
 
-func (h *HServerSpec) SetDefaultDataDir() {
-	h.DataDir = ServerDefaultDataDir
+func (h *HServerSpec) SetDataDir(prefix string) {
+	h.DataDir = path.Join(prefix, ServerDefaultDataDir)
 }
 
 func (h *HServerSpec) SetDefaultImage() {
 	h.Image = ServerDefaultImage
 }
 
-func (h *HServerSpec) SetDefaultRemoteCfgPath() {
-	h.RemoteCfgPath = ServerDefaultCfgDir
+func (h *HServerSpec) SetRemoteCfgPath(prefix string) {
+	h.RemoteCfgPath = path.Join(prefix, ServerDefaultCfgDir)
 }
 
 type ServerOpts struct {

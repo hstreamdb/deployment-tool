@@ -1,5 +1,7 @@
 package spec
 
+import "path"
+
 const (
 	elasticDockerRegistry = "docker.elastic.co/"
 	elasticVersion        = ":7.10.2"
@@ -8,18 +10,18 @@ const (
 const (
 	ElasticSearchDefaultContainerName = "deploy_elastic_search"
 	ElasticSearchDefaultImage         = elasticDockerRegistry + "elasticsearch/elasticsearch-oss" + elasticVersion
-	ElasticSearchDefaultCfgDir        = "/hstream/deploy/elasticsearch"
-	ElasticSearchDefaultDataDir       = "/hstream/data/elasticsearch"
+	ElasticSearchDefaultCfgDir        = "deploy/elasticsearch"
+	ElasticSearchDefaultDataDir       = "data/elasticsearch"
 
 	KibanaDefaultContainerName = "deploy_kibana"
 	KibanaDefaultImage         = elasticDockerRegistry + "kibana/kibana-oss" + elasticVersion
-	KibanaDefaultCfgDir        = "/hstream/deploy/kibana"
-	KibanaDefaultDataDir       = "/hstream/data/kibana"
+	KibanaDefaultCfgDir        = "deploy/kibana"
+	KibanaDefaultDataDir       = "data/kibana"
 
 	FilebeatDefaultContainerName = "deploy_filebeat"
 	FilebeatDefaultImage         = elasticDockerRegistry + "beats/filebeat-oss" + elasticVersion
-	FilebeatDefaultCfgDir        = "/hstream/deploy/filebeat"
-	FilebeatDefaultDataDir       = "/hstream/data/filebeat"
+	FilebeatDefaultCfgDir        = "deploy/filebeat"
+	FilebeatDefaultDataDir       = "data/filebeat"
 )
 
 type ElasticSearchSpec struct {
@@ -33,12 +35,12 @@ type ElasticSearchSpec struct {
 	IsOss         *bool        `yaml:"is_oss,omitempty"`
 }
 
-func (es *ElasticSearchSpec) SetDefaultDataDir() {
-	es.DataDir = ElasticSearchDefaultDataDir
+func (es *ElasticSearchSpec) SetDataDir(prefix string) {
+	es.DataDir = path.Join(prefix, ElasticSearchDefaultDataDir)
 }
 
-func (es *ElasticSearchSpec) SetDefaultRemoteCfgPath() {
-	es.RemoteCfgPath = ElasticSearchDefaultCfgDir
+func (es *ElasticSearchSpec) SetRemoteCfgPath(prefix string) {
+	es.RemoteCfgPath = path.Join(prefix, ElasticSearchDefaultCfgDir)
 }
 
 func (es *ElasticSearchSpec) SetDefaultImage() {
@@ -57,16 +59,16 @@ type KibanaSpec struct {
 	IsOss *bool `yaml:"is_oss,omitempty"`
 }
 
-func (k *KibanaSpec) SetDefaultDataDir() {
-	k.DataDir = KibanaDefaultDataDir
+func (k *KibanaSpec) SetDataDir(prefix string) {
+	k.DataDir = path.Join(prefix, KibanaDefaultDataDir)
 }
 
 func (k *KibanaSpec) SetDefaultImage() {
 	k.Image = KibanaDefaultImage
 }
 
-func (k *KibanaSpec) SetDefaultRemoteCfgPath() {
-	k.RemoteCfgPath = KibanaDefaultCfgDir
+func (k *KibanaSpec) SetRemoteCfgPath(prefix string) {
+	k.RemoteCfgPath = path.Join(prefix, KibanaDefaultCfgDir)
 }
 
 type FilebeatSpec struct {
@@ -78,12 +80,12 @@ type FilebeatSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (fb *FilebeatSpec) SetDefaultRemoteCfgPath() {
-	fb.RemoteCfgPath = FilebeatDefaultCfgDir
+func (fb *FilebeatSpec) SetRemoteCfgPath(prefix string) {
+	fb.RemoteCfgPath = path.Join(prefix, FilebeatDefaultCfgDir)
 }
 
-func (fb *FilebeatSpec) SetDefaultDataDir() {
-	fb.DataDir = FilebeatDefaultDataDir
+func (fb *FilebeatSpec) SetDataDir(prefix string) {
+	fb.DataDir = path.Join(prefix, FilebeatDefaultDataDir)
 }
 
 func (fb *FilebeatSpec) SetDefaultImage() {

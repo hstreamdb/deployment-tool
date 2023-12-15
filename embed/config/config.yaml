@@ -9,6 +9,8 @@ global:
   cluster_id: "hstreamdb"
   # # Replication factors of store metadata
   # meta_replica: 1
+  # # Prefix path for hstream data and config
+  hstream_path_prefix: "/hstream"
   # # Define cross-domain replication for meta logs, the format is [LocationScope1:Replica1,LocationScope2:Replica2,...]
   # meta_replica_across: "node:1"
   # # Local path to MetaStore config file

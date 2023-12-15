@@ -1,17 +1,19 @@
 package spec
 
+import "path"
+
 const (
 	StoreDefaultContainerName = "deploy_hstore"
 	StoreDefaultImage         = "hstreamdb/hstream"
 	StoreDefaultBinPath       = "/usr/local/bin/logdeviced"
-	StoreDefaultCfgDir        = "/hstream/deploy/store"
-	StoreDefaultDataDir       = "/hstream/data/store"
+	StoreDefaultCfgDir        = "deploy/store"
+	StoreDefaultDataDir       = "data/store"
 
 	AdminDefaultContainerName = "deploy_hadmin"
 	AdminDefaultImage         = "hstreamdb/hstream"
 	AdminDefaultBinPath       = "/usr/local/bin/ld-admin-server"
-	AdminDefaultCfgDir        = "/hstream/deploy/admin"
-	AdminDefaultDataDir       = "/hstream/data/admin"
+	AdminDefaultCfgDir        = "deploy/admin"
+	AdminDefaultDataDir       = "data/admin"
 )
 
 type HStoreSpec struct {
@@ -28,16 +30,16 @@ type HStoreSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (h *HStoreSpec) SetDefaultDataDir() {
-	h.DataDir = StoreDefaultDataDir
+func (h *HStoreSpec) SetDataDir(prefix string) {
+	h.DataDir = path.Join(prefix, StoreDefaultDataDir)
 }
 
 func (h *HStoreSpec) SetDefaultImage() {
 	h.Image = StoreDefaultImage
 }
 
-func (h *HStoreSpec) SetDefaultRemoteCfgPath() {
-	h.RemoteCfgPath = StoreDefaultCfgDir
+func (h *HStoreSpec) SetRemoteCfgPath(prefix string) {
+	h.RemoteCfgPath = path.Join(prefix, StoreDefaultCfgDir)
 }
 
 type StoreOps struct {
@@ -55,14 +57,14 @@ type HAdminSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (h *HAdminSpec) SetDefaultDataDir() {
-	h.DataDir = AdminDefaultDataDir
+func (h *HAdminSpec) SetDataDir(prefix string) {
+	h.DataDir = path.Join(prefix, AdminDefaultDataDir)
 }
 
 func (h *HAdminSpec) SetDefaultImage() {
 	h.Image = AdminDefaultImage
 }
 
-func (h *HAdminSpec) SetDefaultRemoteCfgPath() {
-	h.RemoteCfgPath = AdminDefaultCfgDir
+func (h *HAdminSpec) SetRemoteCfgPath(prefix string) {
+	h.RemoteCfgPath = path.Join(prefix, AdminDefaultCfgDir)
 }

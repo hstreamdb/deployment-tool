@@ -1,10 +1,12 @@
 package spec
 
+import "path"
+
 const (
 	MetaStoreDefaultContainerName = "deploy_meta"
 	MetaStoreDefaultImage         = "docker.io/zookeeper:3.6"
-	MetaStoreDefaultCfgDir        = "/hstream/deploy/metastore"
-	MetaStoreDefaultDataDir       = "/hstream/data/metastore"
+	MetaStoreDefaultCfgDir        = "deploy/metastore"
+	MetaStoreDefaultDataDir       = "data/metastore"
 )
 
 type MetaStoreSpec struct {
@@ -18,14 +20,14 @@ type MetaStoreSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (m *MetaStoreSpec) SetDefaultDataDir() {
-	m.DataDir = MetaStoreDefaultDataDir
+func (m *MetaStoreSpec) SetDataDir(prefix string) {
+	m.DataDir = path.Join(prefix, MetaStoreDefaultDataDir)
 }
 
 func (m *MetaStoreSpec) SetDefaultImage() {
 	m.Image = MetaStoreDefaultImage
 }
 
-func (m *MetaStoreSpec) SetDefaultRemoteCfgPath() {
-	m.RemoteCfgPath = MetaStoreDefaultCfgDir
+func (m *MetaStoreSpec) SetRemoteCfgPath(prefix string) {
+	m.RemoteCfgPath = path.Join(prefix, MetaStoreDefaultCfgDir)
 }

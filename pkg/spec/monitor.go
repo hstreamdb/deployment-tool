@@ -1,37 +1,39 @@
 package spec
 
+import "path"
+
 const (
 	NodeExporterDefaultImage         = "prom/node-exporter"
 	NodeExporterDefaultContainerName = "deploy_node_exporter"
 	CadvisorDefaultImage             = "gcr.io/cadvisor/cadvisor:v0.39.3"
 	CadvisorDefaultContainerName     = "deploy_cadvisor"
-	MonitorDefaultCfgDir             = "/hstream/deploy/monitor"
-	MonitorDefaultDataDir            = "/hstream/data/monitor"
+	MonitorDefaultCfgDir             = "deploy/monitor"
+	MonitorDefaultDataDir            = "data/monitor"
 
 	BlackBoxDefaultContainerName = "deploy_blackbox"
 	BlackBoxDefaultImage         = "prom/blackbox-exporter"
-	BlackBoxDefaultCfgDir        = "/hstream/deploy/blackbox"
-	BlackBoxDefaultDataDir       = "/hstream/data/blackbox"
+	BlackBoxDefaultCfgDir        = "deploy/blackbox"
+	BlackBoxDefaultDataDir       = "data/blackbox"
 
 	PrometheusDefaultContainerName = "deploy_prom"
 	PrometheusDefaultImage         = "prom/prometheus"
-	PrometheusDefaultCfgDir        = "/hstream/deploy/prometheus"
-	PrometheusDefaultDataDir       = "/hstream/data/prometheus"
+	PrometheusDefaultCfgDir        = "deploy/prometheus"
+	PrometheusDefaultDataDir       = "data/prometheus"
 
 	GrafanaDefaultContainerName = "deploy_grafana"
 	GrafanaDefaultImage         = "grafana/grafana-oss:main"
-	GrafanaDefaultCfgDir        = "/hstream/deploy/grafana"
-	GrafanaDefaultDataDir       = "/hstream/data/grafana"
+	GrafanaDefaultCfgDir        = "deploy/grafana"
+	GrafanaDefaultDataDir       = "data/grafana"
 
 	AlertManagerDefaultContainerName = "deploy_alert_manager"
 	AlertManagerDefaultImage         = "prom/alertmanager"
-	AlertManagerDefaultCfgDir        = "/hstream/deploy/alertmanager"
-	AlertManagerDefaultDataDir       = "/hstream/data/alertmanager"
+	AlertManagerDefaultCfgDir        = "deploy/alertmanager"
+	AlertManagerDefaultDataDir       = "data/alertmanager"
 
 	HStreamExporterDefaultContainerName = "deploy_hstream_exporter"
 	HStreamExporterDefaultImage         = "hstreamdb/hstream-exporter"
-	HStreamExporterDefaultCfgDir        = "/hstream/deploy/hstream-exporter"
-	HStreamExporterDefaultDataDir       = "/hstream/data/hstream-exporter"
+	HStreamExporterDefaultCfgDir        = "deploy/hstream-exporter"
+	HStreamExporterDefaultDataDir       = "data/hstream-exporter"
 )
 
 // ================================================================================
@@ -48,8 +50,8 @@ type MonitorSpec struct {
 	ContainerCfg      ContainerCfg `yaml:"container_config"`
 }
 
-func (m *MonitorSpec) SetDefaultDataDir() {
-	m.DataDir = MonitorDefaultDataDir
+func (m *MonitorSpec) SetDataDir(prefix string) {
+	m.DataDir = path.Join(prefix, MonitorDefaultDataDir)
 }
 
 func (m *MonitorSpec) SetDefaultImage() {
@@ -57,8 +59,8 @@ func (m *MonitorSpec) SetDefaultImage() {
 	m.CadvisorImage = CadvisorDefaultImage
 }
 
-func (m *MonitorSpec) SetDefaultRemoteCfgPath() {
-	m.RemoteCfgPath = MonitorDefaultCfgDir
+func (m *MonitorSpec) SetRemoteCfgPath(prefix string) {
+	m.RemoteCfgPath = path.Join(prefix, MonitorDefaultCfgDir)
 }
 
 // ================================================================================
@@ -74,16 +76,16 @@ type BlackBoxSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (b *BlackBoxSpec) SetDefaultDataDir() {
-	b.DataDir = BlackBoxDefaultDataDir
+func (b *BlackBoxSpec) SetDataDir(prefix string) {
+	b.DataDir = path.Join(prefix, BlackBoxDefaultDataDir)
 }
 
 func (b *BlackBoxSpec) SetDefaultImage() {
 	b.Image = BlackBoxDefaultImage
 }
 
-func (b *BlackBoxSpec) SetDefaultRemoteCfgPath() {
-	b.RemoteCfgPath = BlackBoxDefaultCfgDir
+func (b *BlackBoxSpec) SetRemoteCfgPath(prefix string) {
+	b.RemoteCfgPath = path.Join(prefix, BlackBoxDefaultCfgDir)
 }
 
 // ================================================================================
@@ -111,16 +113,16 @@ type PrometheusSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (p *PrometheusSpec) SetDefaultDataDir() {
-	p.DataDir = PrometheusDefaultDataDir
+func (p *PrometheusSpec) SetDataDir(prefix string) {
+	p.DataDir = path.Join(prefix, PrometheusDefaultDataDir)
 }
 
 func (p *PrometheusSpec) SetDefaultImage() {
 	p.Image = PrometheusDefaultImage
 }
 
-func (p *PrometheusSpec) SetDefaultRemoteCfgPath() {
-	p.RemoteCfgPath = PrometheusDefaultCfgDir
+func (p *PrometheusSpec) SetRemoteCfgPath(prefix string) {
+	p.RemoteCfgPath = path.Join(prefix, PrometheusDefaultCfgDir)
 }
 
 // ================================================================================
@@ -138,16 +140,16 @@ type GrafanaSpec struct {
 	ContainerCfg  ContainerCfg      `yaml:"container_config"`
 }
 
-func (g *GrafanaSpec) SetDefaultDataDir() {
-	g.DataDir = GrafanaDefaultDataDir
+func (g *GrafanaSpec) SetDataDir(prefix string) {
+	g.DataDir = path.Join(prefix, GrafanaDefaultDataDir)
 }
 
 func (g *GrafanaSpec) SetDefaultImage() {
 	g.Image = GrafanaDefaultImage
 }
 
-func (g *GrafanaSpec) SetDefaultRemoteCfgPath() {
-	g.RemoteCfgPath = GrafanaDefaultCfgDir
+func (g *GrafanaSpec) SetRemoteCfgPath(prefix string) {
+	g.RemoteCfgPath = path.Join(prefix, GrafanaDefaultCfgDir)
 }
 
 // ================================================================================
@@ -165,16 +167,16 @@ type AlertManagerSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (a *AlertManagerSpec) SetDefaultDataDir() {
-	a.DataDir = AlertManagerDefaultDataDir
+func (a *AlertManagerSpec) SetDataDir(prefix string) {
+	a.DataDir = path.Join(prefix, AlertManagerDefaultDataDir)
 }
 
 func (a *AlertManagerSpec) SetDefaultImage() {
 	a.Image = AlertManagerDefaultImage
 }
 
-func (a *AlertManagerSpec) SetDefaultRemoteCfgPath() {
-	a.RemoteCfgPath = AlertManagerDefaultCfgDir
+func (a *AlertManagerSpec) SetRemoteCfgPath(prefix string) {
+	a.RemoteCfgPath = path.Join(prefix, AlertManagerDefaultCfgDir)
 }
 
 // ================================================================================
@@ -192,14 +194,14 @@ type HStreamExporterSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 }
 
-func (g *HStreamExporterSpec) SetDefaultDataDir() {
-	g.DataDir = HStreamExporterDefaultDataDir
+func (g *HStreamExporterSpec) SetDataDir(prefix string) {
+	g.DataDir = path.Join(prefix, HStreamExporterDefaultDataDir)
 }
 
 func (g *HStreamExporterSpec) SetDefaultImage() {
 	g.Image = HStreamExporterDefaultImage
 }
 
-func (g *HStreamExporterSpec) SetDefaultRemoteCfgPath() {
-	g.RemoteCfgPath = HStreamExporterDefaultCfgDir
+func (g *HStreamExporterSpec) SetRemoteCfgPath(prefix string) {
+	g.RemoteCfgPath = path.Join(prefix, HStreamExporterDefaultCfgDir)
 }

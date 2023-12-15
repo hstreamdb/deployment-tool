@@ -672,12 +672,12 @@
         "showHeader": true,
         "sortBy": [
           {
-            "desc": true,
-            "displayName": "cluster"
+            "desc": false,
+            "displayName": "Partition used%*"
           }
         ]
       },
-      "pluginVersion": "10.3.0-149877",
+      "pluginVersion": "10.3.0-150131",
       "targets": [
         {
           "datasource": {
@@ -1280,9 +1280,14 @@
         },
         "frameIndex": 0,
         "showHeader": true,
-        "sortBy": []
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "P99"
+          }
+        ]
       },
-      "pluginVersion": "10.3.0-149877",
+      "pluginVersion": "10.3.0-150131",
       "targets": [
         {
           "datasource": {
@@ -2490,7 +2495,7 @@
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "10.3.0-149877",
+      "pluginVersion": "10.3.0-150131",
       "targets": [
         {
           "datasource": {
@@ -2514,7 +2519,8 @@
               "instance",
               "partition",
               "topicName",
-              "exported_group"
+              "exported_group",
+              "consumer_group"
             ],
             "mode": "columns"
           }
@@ -2529,10 +2535,10 @@
             "include": {
               "names": [
                 "consumer_group_committed_offset",
-                "exported_group",
                 "instance",
                 "partition",
-                "topicName"
+                "topicName",
+                "consumer_group"
               ]
             }
           }
@@ -2541,6 +2547,10 @@
           "id": "groupBy",
           "options": {
             "fields": {
+              "consumer_group": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
               "consumer_group_committed_offset": {
                 "aggregations": [
                   "last"
@@ -2572,10 +2582,11 @@
             "excludeByName": {},
             "includeByName": {},
             "indexByName": {
-              "consumer_group_committed_offset (last)": 3,
-              "instance": 0,
-              "partition": 2,
-              "topicName": 1
+              "consumer_group": 0,
+              "consumer_group_committed_offset (last)": 4,
+              "instance": 1,
+              "partition": 3,
+              "topicName": 2
             },
             "renameByName": {}
           }
@@ -2640,8 +2651,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2776,8 +2786,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4925,12 +4934,13 @@
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "HStream Kafka Dashboard",
-  "version": 6,
+  "uid": "fa7e7b68-59a7-4df7-af3d-727aa1669ff4",
+  "version": 1,
   "weekStart": ""
 }

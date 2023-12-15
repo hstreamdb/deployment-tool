@@ -368,8 +368,8 @@ func updateComponent(cfg GlobalCfg, field reflect.Value) error {
 			}
 			ref := reflect.New(field.Type())
 			ref.Elem().Set(field)
-			fn := ref.MethodByName("SetDefaultDataDir")
-			fn.Call(nil)
+			fn := ref.MethodByName("SetDataDir")
+			fn.Call([]reflect.Value{reflect.ValueOf(cfg.HStreamPathPrefix)})
 			field.Field(j).Set(ref.Elem().FieldByName("DataDir"))
 		case "RemoteCfgPath":
 			if len(field.Field(j).String()) != 0 {
@@ -377,8 +377,8 @@ func updateComponent(cfg GlobalCfg, field reflect.Value) error {
 			}
 			ref := reflect.New(field.Type())
 			ref.Elem().Set(field)
-			fn := ref.MethodByName("SetDefaultRemoteCfgPath")
-			fn.Call(nil)
+			fn := ref.MethodByName("SetRemoteCfgPath")
+			fn.Call([]reflect.Value{reflect.ValueOf(cfg.HStreamPathPrefix)})
 			field.Field(j).Set(ref.Elem().FieldByName("RemoteCfgPath"))
 		case "Image":
 			if len(field.Field(j).String()) != 0 {

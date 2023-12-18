@@ -23,10 +23,10 @@ type HServerSpec struct {
 	MonitorPort        int               `yaml:"monitor_port" default:"9700"`
 	Image              string            `yaml:"image"`
 	SSHPort            int               `yaml:"ssh_port" default:"22"`
-	RemoteCfgPath      string            `yaml:"remote_config_path"`
-	DataDir            string            `yaml:"data_dir"`
 	Opts               map[string]string `yaml:"server_param"`
 	ContainerCfg       ContainerCfg      `yaml:"container_config"`
+	RemoteCfgPath      string
+	DataDir            string
 }
 
 func (h *HServerSpec) SetDataDir(prefix string) {

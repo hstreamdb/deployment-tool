@@ -56,10 +56,6 @@ monitor:
   # cadvisor_image: "gcr.io/cadvisor/cadvisor:v0.39.3"
   # # List of nodes that won't be monitored.
   # excluded_hosts: []
-  # # root directory for all monitor related config files.
-  # remote_config_path: "/home/hstream/deploy/monitor"
-  # # root directory for all monitor related data files.
-  # data_dir: "/home/hstream/data/monitor"
   # # Global container configuration for monitor stacks.
   # container_config:
     # cpu_limit: 2.00
@@ -96,10 +92,6 @@ hserver:
       # tls-ca-path: /path/to/the/ca.cert.pem
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
-    # # Root directory of HServer config files
-    # remote_config_path: "/home/hstream/deploy/hserver"
-    # # Root directory of HServer data files
-    # data_dir: "/home/hstream/data/hserver"
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -132,10 +124,6 @@ hserver:
       # tls-ca-path: /path/to/the/ca.cert.pem
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
-    # # Root directory of HServer config files
-    # remote_config_path: "/home/hstream/deploy/hserver"
-    # # Root directory of HServer data files
-    # data_dir: "/home/hstream/data/hserver"
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -168,10 +156,6 @@ hserver:
       # tls-ca-path: /path/to/the/ca.cert.pem
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
-    # # Root directory of HServer config files
-    # remote_config_path: "/home/hstream/deploy/hserver"
-    # # Root directory of HServer data files
-    # data_dir: "/home/hstream/data/hserver"
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -186,10 +170,6 @@ hadmin:
     # image: "hstreamdb/hstream"
     # # HAdmin listen port
     # port: 6440
-    # # Root directory of HStore config files
-    # remote_config_path: "/home/hstream/deploy/hadmin"
-    # # Root directory of HStore data files
-    # data_dir: "/home/hstream/data/hadmin"
     # # HStore container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -204,10 +184,6 @@ hstore:
     # image: "hstreamdb/hstream"
     # # HStore listen port
     # port: 6440
-    # # Root directory of HStore config files
-    # remote_config_path: "/home/hstream/deploy/hstore"
-    # # Root directory of HStore data files
-    # data_dir: "/home/hstream/data/hstore"
     # # Total used disks
     # disk: 1
     # # Total shards
@@ -231,10 +207,6 @@ hstore:
     # image: "hstreamdb/hstream"
     # # HStore listen port
     # port: 6440
-    # # Root directory of HStore config files
-    # remote_config_path: "/home/hstream/deploy/hstore"
-    # # Root directory of HStore data files
-    # data_dir: "/home/hstream/data/hstore"
     # # Total used disks
     # disk: 1
     # # Total shards
@@ -256,10 +228,6 @@ hstore:
     # image: "hstreamdb/hstream"
     # # HStore listen port
     # port: 6440
-    # # Root directory of HStore config files
-    # remote_config_path: "/home/hstream/deploy/hstore"
-    # # Root directory of HStore data files
-    # data_dir: "/home/hstream/data/hstore"
     # # Total used disks
     # disk: 1
     # # Total shards
@@ -285,10 +253,6 @@ meta_store:
     # port: 2181
     # # Raft port used by rqlite
     # raft_port: 4002
-    # # Root directory of Meta-Store config files
-    # remote_config_path: "/home/hstream/deploy/metastore"
-    # # Root directory of Meta-Store data files
-    # data_dir: "/home/hstream/data/metastore"
     # # Meta-Store container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -303,10 +267,6 @@ meta_store:
     # port: 2181
     # # Raft port used by rqlite
     # raft_port: 4002
-    # # Root directory of Meta-Store config files
-    # remote_config_path: "/home/hstream/deploy/metastore"
-    # # Root directory of Meta-Store data files
-    # data_dir: "/home/hstream/data/metastore"
     # # Meta-Store container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -321,10 +281,6 @@ meta_store:
     # port: 2181
     # # Raft port used by rqlite
     # raft_port: 4002
-    # # Root directory of Meta-Store config files
-    # remote_config_path: "/home/hstream/deploy/metastore"
-    # # Root directory of Meta-Store data files
-    # data_dir: "/home/hstream/data/metastore"
     # # Meta-Store container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -359,10 +315,6 @@ blackBox:
     # image: "prom/blackbox-exporter"
     # # BlackBox service monitor port
     # port: 9115
-    # # Root directory of BlackBox config files
-    # remote_config_path: "/home/hstream/deploy/blackbox"
-    # # Root directory of BlackBox data files
-    # data_dir: "/home/hstream/data/blackbox"
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G
@@ -376,10 +328,6 @@ prometheus:
     # image: "prom/prometheus"
     # # Prometheus service monitor port
     # port: 9090
-    # # Root directory of Prometheus config files
-    # remote_config_path: "/home/hstream/deploy/prometheus"
-    # # Root directory of Prometheus data files
-    # data_dir: "/home/hstream/data/prometheus"
     # # BlackBox exporter related infos
     # blackbox_exporter_configs:
       # address: ""
@@ -407,10 +355,6 @@ grafana:
     # image: "grafana/grafana-oss:main"
     # # Grafana service monitor port
     # port: 3000
-    # # Root directory of Grafana config files
-    # remote_config_path: "/home/hstream/deploy/grafana"
-    # # Root directory of Grafana data files
-    # data_dir: "/home/hstream/data/grafana"
     # # Set up grafana without login
     disable_login: true
     # # Grafana configuration
@@ -432,10 +376,6 @@ alertmanager:
     # image: "prom/alertmanager"
     # # Alertmanager service monitor port
     # port: 9093
-    # # Root directory of Alertmanager config files
-    # remote_config_path: "/home/hstream/deploy/alertmanager"
-    # # Root directory of Alertmanager data files
-    # data_dir: "/home/hstream/data/alertmanager"
     # # Basic auth user
     # auth_user: ""
     # # Basic auth password
@@ -458,10 +398,6 @@ hstream_exporter:
     # log_level: info
     # # HServer address
     # server_address: ""
-    # # Root directory of HStream_Exporter config files
-    # remote_config_path: "/home/hstream/deploy/hstream-exporter"
-    # # Root directory of HStream_Exporter data files
-    # data_dir: "/home/hstream/data/hstream-exporter"
     # container_config:
       # cpu_limit: 2.00
       # memory_limit: 8G
@@ -476,10 +412,6 @@ elasticsearch:
     # # Elasticsearch docker image
     # image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
     # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
-    # # Root directory of Elasticsearch config files
-    # remote_config_path: "/home/hstream/deploy/elasticsearch"
-    # # Root directory of Elasticsearch data files
-    # data_dir: "/home/hstream/data/elasticsearch"
     # # Elasticsearch container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -495,10 +427,6 @@ kibana:
     # # Kibana docker image
     # image: "docker.elastic.co/kibana/kibana-oss:7.10.2"
     # image: "docker.elastic.co/kibana/kibana:8.5.0"
-    # # Root directory of Kibana config files
-    # remote_config_path: "/home/hstream/deploy/kibana"
-    # # Root directory of Kibana data files
-    # data_dir: "/home/hstream/data/kibana"
     # # Kibana container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -513,10 +441,6 @@ filebeat:
     # # Filebeat docker image
     # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
     # image: "docker.elastic.co/beats/filebeat:8.5.0"
-    # # Root directory of Filebeat config files
-    # remote_config_path: "/home/hstream/deploy/filebeat"
-    # # Root directory of Filebeat data files
-    # data_dir: "/home/hstream/data/filebeat"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -528,10 +452,6 @@ filebeat:
     # # Filebeat docker image
     # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
     # image: "docker.elastic.co/beats/filebeat:8.5.0"
-    # # Root directory of Filebeat config files
-    # remote_config_path: "/home/hstream/deploy/filebeat"
-    # # Root directory of Filebeat data files
-    # data_dir: "/home/hstream/data/filebeat"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -543,10 +463,6 @@ filebeat:
     # # Filebeat docker image
     # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
     # image: "docker.elastic.co/beats/filebeat:8.5.0"
-    # # Root directory of Filebeat config files
-    # remote_config_path: "/home/hstream/deploy/filebeat"
-    # # Root directory of Filebeat data files
-    # data_dir: "/home/hstream/data/filebeat"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00

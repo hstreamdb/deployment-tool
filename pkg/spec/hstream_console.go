@@ -15,9 +15,9 @@ type HStreamConsoleSpec struct {
 	Image         string            `yaml:"image"`
 	SSHPort       int               `yaml:"ssh_port" default:"22"`
 	Option        map[string]string `yaml:"options"`
-	RemoteCfgPath string            `yaml:"remote_config_path"`
-	DataDir       string            `yaml:"data_dir"`
 	ContainerCfg  ContainerCfg      `yaml:"container_config"`
+	RemoteCfgPath string
+	DataDir       string
 }
 
 func (h *HStreamConsoleSpec) SetDataDir(prefix string) {

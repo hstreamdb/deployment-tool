@@ -20,14 +20,14 @@ type HStoreSpec struct {
 	Host          string       `yaml:"host"`
 	Image         string       `yaml:"image"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	DataDir       string       `yaml:"data_dir"`
 	Role          string       `yaml:"role" default:"Both"`
 	Location      string       `yaml:"location"`
 	EnableAdmin   bool         `yaml:"enable_admin"`
 	Port          int          `yaml:"port" default:"6440"`
 	StoreOps      StoreOps     `yaml:",inline"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath string
+	DataDir       string
 }
 
 func (h *HStoreSpec) SetDataDir(prefix string) {
@@ -52,9 +52,9 @@ type HAdminSpec struct {
 	Image         string       `yaml:"image"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"6440"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	DataDir       string       `yaml:"data_dir"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath string
+	DataDir       string
 }
 
 func (h *HAdminSpec) SetDataDir(prefix string) {

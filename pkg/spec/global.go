@@ -10,7 +10,7 @@ type GlobalCfg struct {
 	KeyPath                    string       `yaml:"key_path"`
 	SSHPort                    int          `yaml:"ssh_port" default:"22"`
 	ClusterId                  string       `yaml:"cluster_id"`
-	HStreamPathPrefix          string       `yaml:"hstream_path_prefix"`
+	HStreamPathPrefix          string       `yaml:"hstream_path_prefix" default:"/hstream"`
 	MetaReplica                int          `yaml:"meta_replica" default:"1"`
 	MetaReplicaAcross          string       `yaml:"meta_replica_across"`
 	MetaStoreConfigPath        string       `yaml:"meta_store_config_path"`

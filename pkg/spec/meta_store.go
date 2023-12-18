@@ -15,9 +15,9 @@ type MetaStoreSpec struct {
 	Port          int          `yaml:"port"`
 	RaftPort      int          `yaml:"raft_port" default:"4002"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	DataDir       string       `yaml:"data_dir"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath string
+	DataDir       string
 }
 
 func (m *MetaStoreSpec) SetDataDir(prefix string) {

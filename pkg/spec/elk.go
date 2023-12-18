@@ -29,10 +29,10 @@ type ElasticSearchSpec struct {
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"9200"`
 	Image         string       `yaml:"image"`
-	DataDir       string       `yaml:"data_dir"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 	IsOss         *bool        `yaml:"is_oss,omitempty"`
+	DataDir       string
+	RemoteCfgPath string
 }
 
 func (es *ElasticSearchSpec) SetDataDir(prefix string) {
@@ -52,9 +52,9 @@ type KibanaSpec struct {
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Port          int          `yaml:"port" default:"5601"`
 	Image         string       `yaml:"image"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	DataDir       string       `yaml:"data_dir"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath string
+	DataDir       string
 
 	IsOss *bool `yaml:"is_oss,omitempty"`
 }
@@ -75,9 +75,9 @@ type FilebeatSpec struct {
 	Host          string       `yaml:"host"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Image         string       `yaml:"image"`
-	RemoteCfgPath string       `yaml:"remote_config_path"`
-	DataDir       string       `yaml:"data_dir"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath string
+	DataDir       string
 }
 
 func (fb *FilebeatSpec) SetRemoteCfgPath(prefix string) {

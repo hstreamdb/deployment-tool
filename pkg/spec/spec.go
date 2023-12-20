@@ -41,6 +41,14 @@ func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error 
 		return err
 	}
 
+	if c.Global.EnableKafka {
+		for i := 0; i < len(c.HServer); i++ {
+			if defaults.CanUpdate(c.HServer[i].Port) {
+				c.HServer[i].Port = 9092
+			}
+		}
+	}
+
 	// defaults.Set will initialize a list to an empty list, so if the default value is set first,
 	// none of the list fields in the componentsSpec will be set correctly. that's why we have to
 	// unmarshal first and then set the default value

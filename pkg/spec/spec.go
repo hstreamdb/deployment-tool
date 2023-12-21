@@ -47,6 +47,10 @@ func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error 
 				c.HServer[i].Port = 9092
 			}
 		}
+
+		for i := 0; i < len(c.HStreamConsole); i++ {
+			c.HStreamConsole[i].UseKafkaConsole = true
+		}
 	}
 
 	// defaults.Set will initialize a list to an empty list, so if the default value is set first,

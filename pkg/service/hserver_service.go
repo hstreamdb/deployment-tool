@@ -210,9 +210,13 @@ func (h *HServer) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 }
 
 func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
+	cli := "/usr/local/bin/hstream"
+	initCmd := "init"
 	if ctx.EnableKafka {
-		return nil
+		cli = "/usr/local/bin/hstream-kafka-cli"
+		initCmd = "node init"
 	}
+
 	_, version := parseImage(h.spec.Image)
 	if utils.CompareVersion(version, utils.Version090) >= 0 {
 		args := []string{"docker exec -t", spec.ServerDefaultContainerName}
@@ -222,15 +226,15 @@ func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
 				os.Exit(1)
 			}
 
-			args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+			args = append(args, cli, "--host", h.spec.Host)
 			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port))
-			args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "init")
+			args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], initCmd)
 		} else {
-			args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+			args = append(args, cli, "--host", h.spec.Host)
 			if len(h.AuthToken) != 0 {
 				args = append(args, "--token", h.AuthToken)
 			}
-			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), "init")
+			args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port), initCmd)
 		}
 		return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 	}
@@ -249,8 +253,9 @@ func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (h *HServer) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	cli := "/usr/local/bin/hstream"
 	if globalCtx.EnableKafka {
-		return nil
+		cli = "/usr/local/bin/hstream-kafka-cli"
 	}
 
 	args := []string{"docker exec -t", spec.ServerDefaultContainerName}
@@ -260,11 +265,11 @@ func (h *HServer) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 			os.Exit(1)
 		}
 
-		args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+		args = append(args, cli, "--host", h.spec.Host)
 		args = append(args, "--port", fmt.Sprintf("%d", h.spec.Port))
 		args = append(args, "--tls-ca", h.spec.Opts["tls-ca-path"], "node status")
 	} else {
-		args = append(args, "/usr/local/bin/hstream", "--host", h.spec.Host)
+		args = append(args, cli, "--host", h.spec.Host)
 		if len(h.AuthToken) != 0 {
 			args = append(args, "--token", h.AuthToken)
 		}

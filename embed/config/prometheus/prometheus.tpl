@@ -37,13 +37,16 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'node_exporter'
-        hstream_cluster: '{{ .ClusterId }}'
+        cluster_id: '{{ .ClusterId }}'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
         separator: ':'
         regex: '(.*):.*'
         replacement: "${1}"
+      - source_labels: []
+        target_label: source
+        replacement: hstream
 {{- end }}
 
 {{- if .CadVisorAddress }}
@@ -56,13 +59,16 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'cadvisor'
-        hstream_cluster: '{{ .ClusterId }}'
+        cluster_id: '{{ .ClusterId }}'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
         separator: ':'
         regex: '(.*):.*'
         replacement: "${1}"
+      - source_labels: []
+        target_label: source
+        replacement: hstream
 {{- end }}
 
 {{- if .MetaZkAddress }}
@@ -75,13 +81,16 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'meta_store'
-        hstream_cluster: '{{ .ClusterId }}'
+        cluster_id: '{{ .ClusterId }}'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
         separator: ':'
         regex: '(.*):.*'
         replacement: "${1}"
+      - source_labels: []
+        target_label: source
+        replacement: hstream
 {{- end }}
 
 {{- if .BlackBoxAddress }}
@@ -100,7 +109,7 @@ scrape_configs:
         {{- end }}
         labels:
           group: '{{ $key }}'
-          hstream_cluster: '{{ $clusterId }}'
+          cluster_id: '{{ $clusterId }}'
     {{- end }}
     {{- end }}
     relabel_configs:
@@ -110,6 +119,9 @@ scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: {{ .BlackBoxAddress }}
+      - source_labels: []
+        target_label: source
+        replacement: hstream
 {{- end }}
 
 {{- if .HStreamExporterAddress }}
@@ -122,7 +134,11 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'hstream-exporter'
-        hstream_cluster: '{{ .ClusterId }}'
+        cluster_id: '{{ .ClusterId }}'
+    relabel_configs:
+      - source_labels: []
+        target_label: source
+        replacement: hstream
 {{- end }}
 
 {{- if .HStreamKafkaAddress }}
@@ -135,5 +151,9 @@ scrape_configs:
       {{- end }}
       labels:
         group: 'hstream-kafka'
-        hstream_cluster: '{{ .ClusterId }}'
+        cluster_id: '{{ .ClusterId }}'
+    relabel_configs:
+      - source_labels: []
+        target_label: source
+        replacement: hstream
 {{- end }}

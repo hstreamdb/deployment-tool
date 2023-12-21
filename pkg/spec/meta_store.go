@@ -4,7 +4,7 @@ import "path"
 
 const (
 	MetaStoreDefaultContainerName = "deploy_meta"
-	MetaStoreDefaultImage         = "docker.io/zookeeper:3.6"
+	MetaStoreDefaultImage         = "docker.io/zookeeper:3.8"
 	MetaStoreDefaultCfgDir        = "deploy/metastore"
 	MetaStoreDefaultDataDir       = "data/metastore"
 )

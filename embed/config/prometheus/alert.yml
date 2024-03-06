@@ -16,6 +16,7 @@ groups:
         labels:
           alert_level: 0
           severity: warning
+          source: hstream
         for: 1m
         annotations:
           description: '{{ $labels.instance }} cpu usage is above 80%, current value: {{ $value }}'
@@ -25,6 +26,7 @@ groups:
         labels:
           alert_level: 0
           severity: warning
+          source: hstream
         for: 1m
         annotations:
           description: '{{ $labels.instance }} memory usage is above 80%, current value: {{ $value }}'
@@ -34,6 +36,7 @@ groups:
         labels:
           alert_level: 0
           severity: warning
+          source: hstream
         for: 1m
         annotations:
           description: '{{ $labels.instance }} disk usage is above 70%, mount point {{ $labels.mountpoint }}, device {{ $labels.device }}, current value: {{ $value }}'

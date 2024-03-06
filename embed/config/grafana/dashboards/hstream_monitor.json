@@ -944,8 +944,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1964,7 +1963,6 @@
               "tooltip": false,
               "viz": false
             },
-            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2069,7 +2067,6 @@
               "tooltip": false,
               "viz": false
             },
-            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2174,7 +2171,6 @@
               "tooltip": false,
               "viz": false
             },
-            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2310,8 +2306,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2327,7 +2322,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 11
+            "y": 59
           },
           "id": 17,
           "options": {
@@ -2444,8 +2439,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2461,7 +2455,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 11
+            "y": 59
           },
           "id": 8,
           "options": {
@@ -2554,8 +2548,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2571,7 +2564,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 19
+            "y": 67
           },
           "id": 55,
           "links": [],
@@ -2659,8 +2652,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2676,7 +2668,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 19
+            "y": 67
           },
           "id": 54,
           "links": [],
@@ -2825,8 +2817,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2855,7 +2846,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 27
+            "y": 75
           },
           "id": 15,
           "options": {
@@ -2992,23 +2983,8 @@
             "overrides": [
               {
                 "matcher": {
-                  "id": "byName",
-                  "options": "vda_write"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#6ED0E0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
                   "id": "byRegexp",
-                  "options": "/.*_Reads completed$/"
+                  "options": "/.*_reads.*$/"
                 },
                 "properties": [
                   {
@@ -3065,7 +3041,7 @@
             "x": 0,
             "y": 12
           },
-          "id": 62,
+          "id": 67,
           "links": [],
           "options": {
             "legend": {
@@ -3130,7 +3106,7 @@
             "type": "prometheus",
             "uid": "TNX2D3rnk"
           },
-          "description": "",
+          "description": "The number of kilobytes read/write from the device per second.",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -3186,7 +3162,7 @@
               {
                 "matcher": {
                   "id": "byRegexp",
-                  "options": "/.*-read$/"
+                  "options": "/.*-read.*$/"
                 },
                 "properties": [
                   {
@@ -3203,7 +3179,7 @@
             "x": 12,
             "y": 12
           },
-          "id": 63,
+          "id": 68,
           "options": {
             "legend": {
               "calcs": [
@@ -3627,7 +3603,7 @@
             "x": 0,
             "y": 21
           },
-          "id": 64,
+          "id": 69,
           "links": [],
           "options": {
             "legend": {
@@ -3670,7 +3646,7 @@
             "type": "prometheus",
             "uid": "TNX2D3rnk"
           },
-          "description": "Time spent on each read/write operation",
+          "description": "Percentage of elapsed time during which I/O requests were issued to the device ",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -3679,207 +3655,7 @@
               "custom": {
                 "axisCenteredZero": false,
                 "axisColorMode": "text",
-                "axisLabel": "Time read (-) / write (+)",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 13,
-                "gradientMode": "opacity",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "links": [],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "s"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "vda"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#6ED0E0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/,*_read time$/"
-                },
-                "properties": [
-                  {
-                    "id": "custom.transform",
-                    "value": "negative-Y"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byValue",
-                  "options": {
-                    "op": "gte",
-                    "reducer": "allIsZero",
-                    "value": 0
-                  }
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": true,
-                      "tooltip": true,
-                      "viz": false
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byValue",
-                  "options": {
-                    "op": "gte",
-                    "reducer": "allIsNull",
-                    "value": 0
-                  }
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": true,
-                      "tooltip": true,
-                      "viz": false
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 21
-          },
-          "id": 65,
-          "links": [],
-          "options": {
-            "legend": {
-              "calcs": [
-                "mean",
-                "max",
-                "min"
-              ],
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          },
-          "pluginVersion": "10.2.0-128927pre",
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "TNX2D3rnk"
-              },
-              "editorMode": "code",
-              "expr": "(sum(rate(node_disk_read_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) + sum(rate(node_disk_write_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance)) / (sum(rate(node_disk_reads_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) +sum(rate(node_disk_writes_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance))",
-              "hide": false,
-              "legendFormat": "{{instance}}_total(await)",
-              "range": true,
-              "refId": "C"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "TNX2D3rnk"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(node_disk_write_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) / sum(rate(node_disk_writes_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance)",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 1,
-              "legendFormat": "{{instance}}_write(w_await)",
-              "refId": "B"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "TNX2D3rnk"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(node_disk_read_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) / sum(rate(node_disk_reads_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance)",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 1,
-              "legendFormat": "{{instance}}_read(r_await)",
-              "refId": "A"
-            }
-          ],
-          "title": "Disk R/W Latency",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "TNX2D3rnk"
-          },
-          "description": "The average queue length of the requests that were issued to the device",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "Average Queue Size",
+                "axisLabel": "%Util",
                 "axisPlacement": "auto",
                 "barAlignment": 0,
                 "drawStyle": "line",
@@ -4230,10 +4006,10 @@
           "gridPos": {
             "h": 9,
             "w": 12,
-            "x": 0,
-            "y": 30
+            "x": 12,
+            "y": 21
           },
-          "id": 66,
+          "id": 70,
           "links": [],
           "options": {
             "legend": {
@@ -4269,6 +4045,284 @@
             }
           ],
           "title": "Disk Util Percentage(%util)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "description": "w_await + r_await",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Time",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 13,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 30
+          },
+          "id": 71,
+          "links": [],
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.2.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "TNX2D3rnk"
+              },
+              "editorMode": "code",
+              "expr": "(sum(rate(node_disk_read_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) + sum(rate(node_disk_write_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance)) / (sum(rate(node_disk_reads_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) +sum(rate(node_disk_writes_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance))",
+              "interval": "",
+              "intervalFactor": 4,
+              "legendFormat": "{{instance}}",
+              "range": true,
+              "refId": "A",
+              "step": 240
+            }
+          ],
+          "title": "Disk Total Latency(await)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "description": "The average time for read/write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Time read (-) / write (+)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 13,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/,*_read.*$/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.transform",
+                    "value": "negative-Y"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byValue",
+                  "options": {
+                    "op": "gte",
+                    "reducer": "allIsZero",
+                    "value": 0
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": true,
+                      "viz": false
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byValue",
+                  "options": {
+                    "op": "gte",
+                    "reducer": "allIsNull",
+                    "value": 0
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": true,
+                      "viz": false
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 30
+          },
+          "id": 72,
+          "links": [],
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "10.2.0-128927pre",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "TNX2D3rnk"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(node_disk_write_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) / sum(rate(node_disk_writes_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{instance}}_write(w_await)",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "TNX2D3rnk"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(node_disk_read_time_seconds_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance) / sum(rate(node_disk_reads_completed_total{instance=~\"$host\", cluster_id=~\"$clusterId\"}[$interval])) by (instance)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{instance}}_read(r_await)",
+              "refId": "A"
+            }
+          ],
+          "title": "Disk R/W Latency",
           "type": "timeseries"
         }
       ],
@@ -4330,8 +4384,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4347,7 +4400,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 93
+            "y": 141
           },
           "id": 18,
           "options": {
@@ -4476,8 +4529,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4493,7 +4545,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 93
+            "y": 141
           },
           "id": 12,
           "options": {

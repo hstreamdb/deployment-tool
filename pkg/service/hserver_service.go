@@ -213,7 +213,7 @@ func (h *HServer) Init(ctx *GlobalCtx) *executor.ExecuteCtx {
 	cli := "/usr/local/bin/hstream"
 	initCmd := "init"
 	if ctx.EnableKafka {
-		cli = "/usr/local/bin/hstream-kafka-cli"
+		cli = "/usr/local/bin/hstream-kafka"
 		initCmd = "node init"
 	}
 
@@ -255,7 +255,7 @@ func (h *HServer) CheckReady(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 func (h *HServer) GetStatus(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cli := "/usr/local/bin/hstream"
 	if globalCtx.EnableKafka {
-		cli = "/usr/local/bin/hstream-kafka-cli"
+		cli = "/usr/local/bin/hstream-kafka"
 	}
 
 	args := []string{"docker exec -t", spec.ServerDefaultContainerName}

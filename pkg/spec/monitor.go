@@ -45,6 +45,7 @@ type MonitorSpec struct {
 	CadvisorImage     string       `yaml:"cadvisor_image"`
 	CadvisorPort      int          `yaml:"cadvisor_port" default:"7000"`
 	ExcludedHosts     []string     `yaml:"excluded_hosts"`
+	ExtendHosts       []string     `yaml:"extend_hosts"`
 	ContainerCfg      ContainerCfg `yaml:"container_config"`
 	RemoteCfgPath     string
 	DataDir           string

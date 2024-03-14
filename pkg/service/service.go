@@ -172,6 +172,10 @@ func NewServices(c *spec.ComponentsSpec) (*Services, error) {
 	}
 
 	hosts := c.GetHosts()
+	extendHosts := getExtendMonitorHosts(c)
+	if len(extendHosts) != 0 {
+		hosts = append(hosts, extendHosts...)
+	}
 	sort.Strings(hosts)
 	hosts = slices.Compact(hosts)
 	monitorSuites := make([]*MonitorSuite, 0, len(hosts))
@@ -396,6 +400,18 @@ func getExcludedMonitorHosts(c *spec.ComponentsSpec) []string {
 	//for _, sp := range c.Grafana {
 	//	res = append(res, sp.Host)
 	//}
+	sort.Strings(res)
+	return slices.Compact(res)
+}
+
+// getExtendMonitorHosts get the hosts of all extend nodes which need to deploy
+// a monitoring stack.
+func getExtendMonitorHosts(c *spec.ComponentsSpec) []string {
+	res := []string{}
+
+	for _, host := range c.Monitor.ExtendHosts {
+		res = append(res, host)
+	}
 	sort.Strings(res)
 	return slices.Compact(res)
 }

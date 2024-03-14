@@ -56,6 +56,8 @@ monitor:
   # cadvisor_image: "gcr.io/cadvisor/cadvisor:v0.39.3"
   # # List of nodes that won't be monitored.
   # excluded_hosts: []
+  # # List of nodes that require additional deployment monitoring components.
+  # extend_hosts: []
   # # Global container configuration for monitor stacks.
   # container_config:
     # cpu_limit: 2.00

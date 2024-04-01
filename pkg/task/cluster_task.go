@@ -10,20 +10,25 @@ import (
 )
 
 type runCtx struct {
-	executor ext.Executor
-	services *service.Services
-	err      error
+	executor  ext.Executor
+	services  *service.Services
+	ignoreErr bool
+	err       error
 }
 
 func (r *runCtx) run(f func(executor ext.Executor, services *service.Services) error) {
 	if r.err != nil {
-		return
+		if !r.ignoreErr {
+			return
+		}
+
+		fmt.Printf("ignore error: %s\n", r.err.Error())
 	}
 	r.err = f(r.executor, r.services)
 }
 
 func SetUpCluster(executor ext.Executor, services *service.Services) error {
-	ctx := runCtx{executor: executor, services: services}
+	ctx := runCtx{executor: executor, services: services, ignoreErr: false}
 	fmt.Println("============ Set up cluster with components ============")
 	services.ShowAllServices()
 
@@ -59,7 +64,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 }
 
 func RemoveCluster(executor ext.Executor, services *service.Services) error {
-	ctx := runCtx{executor: executor, services: services}
+	ctx := runCtx{executor: executor, services: services, ignoreErr: true}
 	if len(services.ElasticSearch) != 0 {
 		ctx.run(RemoveFilebeat)
 		ctx.run(RemoveKibana)

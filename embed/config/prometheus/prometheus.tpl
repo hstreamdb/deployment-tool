@@ -153,6 +153,33 @@ scrape_configs:
         group: 'hstream-kafka'
         cluster_id: '{{ .ClusterId }}'
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        separator: ':'
+        regex: '(.*):.*'
+        replacement: "${1}"
+      - source_labels: []
+        target_label: source
+        replacement: hstream
+{{- end }}
+
+{{- if .HStoreMonitorAddress }}
+  - job_name: "hstore_metrics"
+    scrape_interval: 5s
+    static_configs:
+    - targets:
+      {{- range .HStoreMonitorAddress }}
+      - '{{.}}'
+      {{- end }}
+      labels:
+        group: 'hstore'
+        cluster_id: '{{ .ClusterId }}'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        separator: ':'
+        regex: '(.*):.*'
+        replacement: "${1}"
       - source_labels: []
         target_label: source
         replacement: hstream

@@ -172,6 +172,10 @@ hadmin:
     # image: "hstreamdb/hstream"
     # # HAdmin listen port
     # port: 6440
+    # # When Enable_prometheus is turned on, the instance can expose prometheus metrics
+    # enable_prometheus: false
+    # # HAdmin prometheus listen address
+    # prometheus_listen_addr: 0.0.0.0:6300
     # # HStore container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -197,6 +201,10 @@ hstore:
     # role: "Both" # [Storage|Sequencer|Both]
     # # When Enable_admin is turned on, the instance can receive and process admin requests
     enable_admin: true
+    # # When Enable_prometheus is turned on, the instance can expose prometheus metrics
+    # enable_prometheus: false
+    # # HStore prometheus listen address
+    # prometheus_listen_addr: 0.0.0.0:6300
     # # HStore container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -218,6 +226,10 @@ hstore:
     # location: ""
     # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
+    # # When Enable_prometheus is turned on, the instance can expose prometheus metrics
+    # enable_prometheus: false
+    # # HStore prometheus listen address
+    # prometheus_listen_addr: 0.0.0.0:6300
     # # HStore container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -239,6 +251,10 @@ hstore:
     # location: ""
     # # The role of the HStore instance.
     # role: "Both" # [Storage|Sequencer|Both]
+    # # When Enable_prometheus is turned on, the instance can expose prometheus metrics
+    # enable_prometheus: false
+    # # HStore prometheus listen address
+    # prometheus_listen_addr: 0.0.0.0:6300
     # # HStore container configuration
     # container_config:
       # cpu_limit: 2.00

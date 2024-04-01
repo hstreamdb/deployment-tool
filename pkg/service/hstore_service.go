@@ -113,6 +113,10 @@ func (h *HStore) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	if !globalCtx.EnableDscpReflection {
 		args = append(args, "--enable-dscp-reflection false")
 	}
+	if h.spec.EnablePrometheus {
+		args = append(args, "--enable-prometheus true")
+		args = append(args, fmt.Sprintf("--prometheus-listen-addr %s", h.spec.PromListenAddr))
+	}
 	return &executor.ExecuteCtx{Target: h.spec.Host, Cmd: strings.Join(args, " ")}
 }
 

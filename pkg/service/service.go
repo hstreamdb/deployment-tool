@@ -61,6 +61,7 @@ type GlobalCtx struct {
 	HStreamServerUrls            string
 	HServerEndPoints             string
 	HServerKafkaMonitorEndPoints []string
+	HStoreMonitorEndPoints       []string
 	PrometheusUrls               []string
 	ServiceAddr                  map[string][]string
 }
@@ -91,6 +92,13 @@ func newGlobalCtx(c *spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		kafkaMonitorEndPoints = c.GetHServerMonitorEndpoint()
 	}
 
+	var hstoreMonitorEndPoints []string
+	for _, store := range c.HStore {
+		if store.EnablePrometheus {
+			hstoreMonitorEndPoints = append(hstoreMonitorEndPoints, store.PromListenAddr)
+		}
+	}
+
 	return &GlobalCtx{
 		User:                 c.Global.User,
 		KeyPath:              c.Global.KeyPath,
@@ -116,6 +124,7 @@ func newGlobalCtx(c *spec.ComponentsSpec, hosts []string) (*GlobalCtx, error) {
 		HStreamServerUrls:            hserverUrl,
 		HServerEndPoints:             hserverEndpoints,
 		HServerKafkaMonitorEndPoints: kafkaMonitorEndPoints,
+		HStoreMonitorEndPoints:       hstoreMonitorEndPoints,
 		PrometheusUrls:               prometheusUrls,
 		ServiceAddr:                  serviceAddr,
 	}, nil

@@ -28,6 +28,7 @@ type PrometheusConfig struct {
 	BlackBoxTargets        map[string][]string
 	MetaZkAddress          []string
 	HStreamKafkaAddress    []string
+	HStoreMonitorAddress   []string
 }
 
 func (p *PrometheusConfig) GenConfig() (string, error) {

@@ -349,6 +349,7 @@ func (p *Prometheus) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		BlackBoxTargets:        allServiceAddr,
 		MetaZkAddress:          metaZkAddress,
 		HStreamKafkaAddress:    hstreamKafkaAddrs,
+		HStoreMonitorAddress:   globalCtx.HStoreMonitorEndPoints,
 	}
 	cfg, err := prometheusCfg.GenConfig()
 	if err != nil {

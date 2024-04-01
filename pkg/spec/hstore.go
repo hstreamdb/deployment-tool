@@ -17,17 +17,19 @@ const (
 )
 
 type HStoreSpec struct {
-	Host          string       `yaml:"host"`
-	Image         string       `yaml:"image"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Role          string       `yaml:"role" default:"Both"`
-	Location      string       `yaml:"location"`
-	EnableAdmin   bool         `yaml:"enable_admin"`
-	Port          int          `yaml:"port" default:"6440"`
-	StoreOps      StoreOps     `yaml:",inline"`
-	ContainerCfg  ContainerCfg `yaml:"container_config"`
-	RemoteCfgPath string
-	DataDir       string
+	Host             string       `yaml:"host"`
+	Image            string       `yaml:"image"`
+	SSHPort          int          `yaml:"ssh_port" default:"22"`
+	Role             string       `yaml:"role" default:"Both"`
+	Location         string       `yaml:"location"`
+	EnableAdmin      bool         `yaml:"enable_admin"`
+	Port             int          `yaml:"port" default:"6440"`
+	EnablePrometheus bool         `yaml:"enable_prometheus"`
+	PromListenAddr   string       `yaml:"prometheus_listen_addr" default:"0.0.0.0:6300"`
+	StoreOps         StoreOps     `yaml:",inline"`
+	ContainerCfg     ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath    string
+	DataDir          string
 }
 
 func (h *HStoreSpec) SetDataDir(prefix string) {
@@ -48,13 +50,15 @@ type StoreOps struct {
 }
 
 type HAdminSpec struct {
-	Host          string       `yaml:"host"`
-	Image         string       `yaml:"image"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Port          int          `yaml:"port" default:"6440"`
-	ContainerCfg  ContainerCfg `yaml:"container_config"`
-	RemoteCfgPath string
-	DataDir       string
+	Host             string       `yaml:"host"`
+	Image            string       `yaml:"image"`
+	SSHPort          int          `yaml:"ssh_port" default:"22"`
+	Port             int          `yaml:"port" default:"6440"`
+	EnablePrometheus bool         `yaml:"enable_prometheus"`
+	PromListenAddr   string       `yaml:"prometheus_listen_addr" default:"0.0.0.0:6300"`
+	ContainerCfg     ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath    string
+	DataDir          string
 }
 
 func (h *HAdminSpec) SetDataDir(prefix string) {

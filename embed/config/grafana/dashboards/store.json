@@ -1,0 +1,969 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "TNX2D3rnk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "10.0.0.134-ACK",
+                  "10.0.0.134-APPEND",
+                  "10.0.0.134-APPENDED",
+                  "10.0.0.134-APPEND_PROBE",
+                  "10.0.0.134-APPEND_PROBE_REPLY",
+                  "10.0.0.134-CHECK_NODE_HEALTH",
+                  "10.0.0.134-CHECK_NODE_HEALTH_REPLY",
+                  "10.0.0.134-CHECK_SEAL",
+                  "10.0.0.134-CHECK_SEAL_REPLY",
+                  "10.0.0.134-CLEAN",
+                  "10.0.0.134-CLEANED",
+                  "10.0.0.134-CONFIG_CHANGED",
+                  "10.0.0.134-CONFIG_FETCH",
+                  "10.0.0.134-DATA_SIZE",
+                  "10.0.0.134-DATA_SIZE_REPLY",
+                  "10.0.0.134-DELETE",
+                  "10.0.0.134-DELETE_LOG_METADATA",
+                  "10.0.0.134-DELETE_LOG_METADATA_REPLY",
+                  "10.0.0.134-FINDKEY",
+                  "10.0.0.134-FINDKEY_REPLY",
+                  "10.0.0.134-GAP",
+                  "10.0.0.134-GET_CLUSTER_STATE",
+                  "10.0.0.134-GET_EPOCH_RECOVERY_METADATA",
+                  "10.0.0.134-GET_EPOCH_RECOVERY_METADATA_REPLY",
+                  "10.0.0.134-GET_HEAD_ATTRIBUTES",
+                  "10.0.0.134-GET_HEAD_ATTRIBUTES_REPLY",
+                  "10.0.0.134-GET_RSM_SNAPSHOT",
+                  "10.0.0.134-GET_RSM_SNAPSHOT_REPLY",
+                  "10.0.0.134-GET_SEQ_STATE",
+                  "10.0.0.134-GET_SEQ_STATE_REPLY",
+                  "10.0.0.134-GET_TRIM_POINT",
+                  "10.0.0.134-GET_TRIM_POINT_REPLY",
+                  "10.0.0.134-GOSSIP",
+                  "10.0.0.134-HELLO",
+                  "10.0.0.134-LOGS_CONFIG_API",
+                  "10.0.0.134-LOGS_CONFIG_API_REPLY",
+                  "10.0.0.134-MEMTABLE_FLUSHED",
+                  "10.0.0.134-MUTATED",
+                  "10.0.0.134-NODE_STATS",
+                  "10.0.0.134-NODE_STATS_AGGREGATE",
+                  "10.0.0.134-NODE_STATS_AGGREGATE_REPLY",
+                  "10.0.0.134-NODE_STATS_REPLY",
+                  "10.0.0.134-RECORD",
+                  "10.0.0.134-RELEASE",
+                  "10.0.0.134-SEAL",
+                  "10.0.0.134-SEALED",
+                  "10.0.0.134-SHARD_STATUS_UPDATE",
+                  "10.0.0.134-SHUTDOWN",
+                  "10.0.0.134-START",
+                  "10.0.0.134-STARTED",
+                  "10.0.0.134-STOP",
+                  "10.0.0.134-STORE",
+                  "10.0.0.134-STORED",
+                  "10.0.0.134-TEST",
+                  "10.0.0.134-TRIM",
+                  "10.0.0.134-TRIMMED",
+                  "10.0.0.134-WINDOW",
+                  "10.0.0.48-ACK",
+                  "10.0.0.48-APPEND",
+                  "10.0.0.48-APPENDED",
+                  "10.0.0.48-APPEND_PROBE",
+                  "10.0.0.48-APPEND_PROBE_REPLY",
+                  "10.0.0.48-CHECK_NODE_HEALTH",
+                  "10.0.0.48-CHECK_NODE_HEALTH_REPLY",
+                  "10.0.0.48-CHECK_SEAL",
+                  "10.0.0.48-CHECK_SEAL_REPLY",
+                  "10.0.0.48-CLEAN",
+                  "10.0.0.48-CLEANED",
+                  "10.0.0.48-CONFIG_CHANGED",
+                  "10.0.0.48-CONFIG_FETCH",
+                  "10.0.0.48-DATA_SIZE",
+                  "10.0.0.48-DATA_SIZE_REPLY",
+                  "10.0.0.48-DELETE",
+                  "10.0.0.48-DELETE_LOG_METADATA",
+                  "10.0.0.48-DELETE_LOG_METADATA_REPLY",
+                  "10.0.0.48-FINDKEY",
+                  "10.0.0.48-FINDKEY_REPLY",
+                  "10.0.0.48-GAP",
+                  "10.0.0.48-GET_CLUSTER_STATE",
+                  "10.0.0.48-GET_EPOCH_RECOVERY_METADATA",
+                  "10.0.0.48-GET_EPOCH_RECOVERY_METADATA_REPLY",
+                  "10.0.0.48-GET_HEAD_ATTRIBUTES",
+                  "10.0.0.48-GET_HEAD_ATTRIBUTES_REPLY",
+                  "10.0.0.48-GET_RSM_SNAPSHOT",
+                  "10.0.0.48-GET_RSM_SNAPSHOT_REPLY",
+                  "10.0.0.48-GET_SEQ_STATE",
+                  "10.0.0.48-GET_SEQ_STATE_REPLY",
+                  "10.0.0.48-GET_TRIM_POINT",
+                  "10.0.0.48-GET_TRIM_POINT_REPLY",
+                  "10.0.0.48-GOSSIP",
+                  "10.0.0.48-HELLO",
+                  "10.0.0.48-LOGS_CONFIG_API",
+                  "10.0.0.48-LOGS_CONFIG_API_REPLY",
+                  "10.0.0.48-MEMTABLE_FLUSHED",
+                  "10.0.0.48-MUTATED",
+                  "10.0.0.48-NODE_STATS",
+                  "10.0.0.48-NODE_STATS_AGGREGATE",
+                  "10.0.0.48-NODE_STATS_AGGREGATE_REPLY",
+                  "10.0.0.48-NODE_STATS_REPLY",
+                  "10.0.0.48-RECORD",
+                  "10.0.0.48-RELEASE",
+                  "10.0.0.48-SEAL",
+                  "10.0.0.48-SEALED",
+                  "10.0.0.48-SHARD_STATUS_UPDATE",
+                  "10.0.0.48-SHUTDOWN",
+                  "10.0.0.48-START",
+                  "10.0.0.48-STARTED",
+                  "10.0.0.48-STOP",
+                  "10.0.0.48-STORE",
+                  "10.0.0.48-STORED",
+                  "10.0.0.48-TEST",
+                  "10.0.0.48-TRIM",
+                  "10.0.0.48-TRIMMED",
+                  "10.0.0.48-WINDOW",
+                  "10.0.0.89-ACK",
+                  "10.0.0.89-APPEND",
+                  "10.0.0.89-APPENDED",
+                  "10.0.0.89-APPEND_PROBE",
+                  "10.0.0.89-APPEND_PROBE_REPLY",
+                  "10.0.0.89-CHECK_NODE_HEALTH",
+                  "10.0.0.89-CHECK_NODE_HEALTH_REPLY",
+                  "10.0.0.89-CHECK_SEAL",
+                  "10.0.0.89-CHECK_SEAL_REPLY",
+                  "10.0.0.89-CLEAN",
+                  "10.0.0.89-CLEANED",
+                  "10.0.0.89-CONFIG_CHANGED",
+                  "10.0.0.89-CONFIG_FETCH",
+                  "10.0.0.89-DATA_SIZE",
+                  "10.0.0.89-DATA_SIZE_REPLY",
+                  "10.0.0.89-DELETE",
+                  "10.0.0.89-DELETE_LOG_METADATA",
+                  "10.0.0.89-DELETE_LOG_METADATA_REPLY",
+                  "10.0.0.89-FINDKEY",
+                  "10.0.0.89-FINDKEY_REPLY",
+                  "10.0.0.89-GAP",
+                  "10.0.0.89-GET_CLUSTER_STATE",
+                  "10.0.0.89-GET_EPOCH_RECOVERY_METADATA",
+                  "10.0.0.89-GET_EPOCH_RECOVERY_METADATA_REPLY",
+                  "10.0.0.89-GET_HEAD_ATTRIBUTES",
+                  "10.0.0.89-GET_HEAD_ATTRIBUTES_REPLY",
+                  "10.0.0.89-GET_RSM_SNAPSHOT",
+                  "10.0.0.89-GET_RSM_SNAPSHOT_REPLY",
+                  "10.0.0.89-GET_SEQ_STATE",
+                  "10.0.0.89-GET_SEQ_STATE_REPLY",
+                  "10.0.0.89-GET_TRIM_POINT",
+                  "10.0.0.89-GET_TRIM_POINT_REPLY",
+                  "10.0.0.89-GOSSIP",
+                  "10.0.0.89-HELLO",
+                  "10.0.0.89-LOGS_CONFIG_API",
+                  "10.0.0.89-LOGS_CONFIG_API_REPLY",
+                  "10.0.0.89-MEMTABLE_FLUSHED",
+                  "10.0.0.89-MUTATED",
+                  "10.0.0.89-NODE_STATS",
+                  "10.0.0.89-NODE_STATS_AGGREGATE",
+                  "10.0.0.89-NODE_STATS_AGGREGATE_REPLY",
+                  "10.0.0.89-NODE_STATS_REPLY",
+                  "10.0.0.89-RECORD",
+                  "10.0.0.89-RELEASE",
+                  "10.0.0.89-SEAL",
+                  "10.0.0.89-SEALED",
+                  "10.0.0.89-SHARD_STATUS_UPDATE",
+                  "10.0.0.89-SHUTDOWN",
+                  "10.0.0.89-START",
+                  "10.0.0.89-STARTED",
+                  "10.0.0.89-STOP",
+                  "10.0.0.89-STORE",
+                  "10.0.0.89-STORED",
+                  "10.0.0.89-TEST",
+                  "10.0.0.89-TRIM",
+                  "10.0.0.89-TRIMMED",
+                  "10.0.0.89-WINDOW"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "ld_message_worker_usec / ld_message_received",
+          "instant": false,
+          "legendFormat": "{{instance}}-{{message_type}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Time usage for processing request",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "TNX2D3rnk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "ld_request_worker_usec / ld_post_request",
+          "instant": false,
+          "legendFormat": "{{instance}}-{{request_type}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Time for processing message callback",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "TNX2D3rnk"
+      },
+      "description": "Latency of appends as seen by the sequencer",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Pmax"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Pmax/"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "editorMode": "code",
+          "expr": "ld_append_latency",
+          "instant": false,
+          "legendFormat": "{{instance}}-P{{percentile}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "append latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "TNX2D3rnk"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Pmax"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Pmax/"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "editorMode": "code",
+          "expr": "ld_write_to_read_latency",
+          "instant": false,
+          "legendFormat": "{{instance}}-P{{percentile}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "write to read latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "TNX2D3rnk"
+      },
+      "description": "Latency of posting a request",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Pmax"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Pmax/"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "editorMode": "code",
+          "expr": "ld_requests_queue_latency",
+          "instant": false,
+          "legendFormat": "{{instance}}-P{{percentile}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "request queue latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "TNX2D3rnk"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Pmax"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Pmax/"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "TNX2D3rnk"
+          },
+          "editorMode": "code",
+          "expr": "avg by(instance, percentile)(ld_store_latency)",
+          "instant": false,
+          "legendFormat": "{{instance}}-P{{percentile}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "avg store latency",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timeRangeUpdatedDuringEditOrView": false,
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "store",
+  "uid": "ddfm9gfk4s5q8b",
+  "version": 2,
+  "weekStart": ""
+}

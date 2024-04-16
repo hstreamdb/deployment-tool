@@ -79,7 +79,7 @@ func (s *SSHExecutor) Transfer(address, localPath, remotePath string) error {
 	if err != nil {
 		return err
 	}
-	defer scpClient.Session.Close()
+	defer scpClient.Close()
 	defer f.Close()
 
 	if err = scpClient.CopyFromFile(context.Background(), *f, remotePath, "0755"); err != nil {

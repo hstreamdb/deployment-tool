@@ -94,6 +94,7 @@ hserver:
       # tls-ca-path: /path/to/the/ca.cert.pem
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
+      # checkpoint-replica: 1
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -126,6 +127,7 @@ hserver:
       # tls-ca-path: /path/to/the/ca.cert.pem
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
+      # checkpoint-replica: 1
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -158,6 +160,7 @@ hserver:
       # tls-ca-path: /path/to/the/ca.cert.pem
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
+      # checkpoint-replica: 1
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00

@@ -331,7 +331,23 @@ func StopAlertService(executor ext.Executor, services *service.Services) error {
 }
 
 func SetUpElasticSearch(executor ext.Executor, services *service.Services) error {
-	return startCluster(executor, services.Global, services.ElasticSearch)
+	if len(services.ElasticSearch) == 0 {
+		return nil
+	}
+
+	esClusterCtx := EsClusterCtx{
+		ctx:     services.Global,
+		service: services.ElasticSearch,
+	}
+	tasks := getStartServiceTask(esClusterCtx.ctx, esClusterCtx.service)
+	tasks = append(tasks, &ConfigLogIndex{esClusterCtx})
+	for _, task := range tasks {
+		fmt.Println(task)
+		if err := task.Run(executor); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func RemoveElasticSearch(executor ext.Executor, services *service.Services) error {

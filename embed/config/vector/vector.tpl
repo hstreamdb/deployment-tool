@@ -56,12 +56,12 @@
 [transforms.filter]
   type = "filter"
   inputs = ["remap_fields"]
-  condition = '.CONTAINER_NAME != "vector"'  
+  condition = '.CONTAINER_NAME != "deploy_vector"'
 
 [sinks.elasticsearch]
   type = "elasticsearch"
   inputs = ["filter"]
   endpoint = "http://{{ .ElasticsearchHost }}:{{ .ElasticsearchPort }}"
 #  bulk.action = "create"
-  bulk.index = "vector-%Y-%m-%d"
-  compression = "zstd"
+  bulk.index = "hstream-log-%Y-%m-%d"
+#  compression = "zstd"

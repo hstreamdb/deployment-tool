@@ -24,7 +24,7 @@ processors:
 output.elasticsearch:
   hosts: ["{{ .ElasticsearchHost }}:{{ .ElasticsearchPort }}"]
   indices:
-    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+    - index: "hstream-log-%{+yyyy.MM.dd}"
 
 logging.json: true
 logging.metrics.enabled: false

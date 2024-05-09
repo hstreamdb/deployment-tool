@@ -2,6 +2,11 @@ filebeat.inputs:
   - type: container
     paths:
       - "/var/lib/docker/containers/*/*.log"
+#  - type: journald
+#    paths:
+#      - "/var/log/journal/"
+#    seek: cursor
+#    cursor_seek_fallback: tail
 
 processors:
   - add_docker_metadata:

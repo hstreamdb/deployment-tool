@@ -59,6 +59,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 		ctx.run(SetUpElasticSearch)
 		ctx.run(SetUpKibana)
 		ctx.run(SetUpFilebeat)
+		ctx.run(SetUpVector)
 	}
 	return ctx.err
 }
@@ -66,6 +67,7 @@ func SetUpCluster(executor ext.Executor, services *service.Services) error {
 func RemoveCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services, ignoreErr: true}
 	if len(services.ElasticSearch) != 0 {
+		ctx.run(RemoveVector)
 		ctx.run(RemoveFilebeat)
 		ctx.run(RemoveKibana)
 		ctx.run(RemoveElasticSearch)
@@ -97,6 +99,7 @@ func RemoveCluster(executor ext.Executor, services *service.Services) error {
 func StopCluster(executor ext.Executor, services *service.Services) error {
 	ctx := runCtx{executor: executor, services: services}
 	if len(services.ElasticSearch) != 0 {
+		ctx.run(StopVector)
 		ctx.run(StopFilebeat)
 		ctx.run(StopKibana)
 		ctx.run(StopElasticSearch)
@@ -377,6 +380,18 @@ func RemoveFilebeat(executor ext.Executor, services *service.Services) error {
 
 func StopFilebeat(executor ext.Executor, services *service.Services) error {
 	return stopCluster(executor, services.Global, services.Filebeat)
+}
+
+func SetUpVector(executor ext.Executor, services *service.Services) error {
+	return startCluster(executor, services.Global, services.Vector)
+}
+
+func RemoveVector(executor ext.Executor, services *service.Services) error {
+	return removeCluster(executor, services.Global, services.Vector)
+}
+
+func StopVector(executor ext.Executor, services *service.Services) error {
+	return stopCluster(executor, services.Global, services.Vector)
 }
 
 func startCluster[S service.Service](executor ext.Executor, ctx *service.GlobalCtx, services []S) error {

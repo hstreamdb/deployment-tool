@@ -17,6 +17,11 @@ const (
 	FilebeatDefaultImage         = "docker.elastic.co/beats/filebeat-oss:8.13.3"
 	FilebeatDefaultCfgDir        = "deploy/filebeat"
 	FilebeatDefaultDataDir       = "data/filebeat"
+
+	VectorDefaultContainerName = "deploy_vector"
+	VectorDefaultImage         = "timberio/vector:latest-debian"
+	VectorDefaultCfgDir        = "deploy/vector"
+	VectorDefaultDataDir       = "data/vector"
 )
 
 type ElasticSearchSpec struct {
@@ -84,4 +89,25 @@ func (fb *FilebeatSpec) SetDataDir(prefix string) {
 
 func (fb *FilebeatSpec) SetDefaultImage() {
 	fb.Image = FilebeatDefaultImage
+}
+
+type VectorSpec struct {
+	Host          string       `yaml:"host"`
+	SSHPort       int          `yaml:"ssh_port" default:"22"`
+	Image         string       `yaml:"image"`
+	ContainerCfg  ContainerCfg `yaml:"container_config"`
+	RemoteCfgPath string
+	DataDir       string
+}
+
+func (v *VectorSpec) SetRemoteCfgPath(prefix string) {
+	v.RemoteCfgPath = path.Join(prefix, VectorDefaultCfgDir)
+}
+
+func (v *VectorSpec) SetDataDir(prefix string) {
+	v.DataDir = path.Join(prefix, VectorDefaultDataDir)
+}
+
+func (v *VectorSpec) SetDefaultImage() {
+	v.Image = VectorDefaultImage
 }

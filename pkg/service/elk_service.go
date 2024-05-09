@@ -68,6 +68,7 @@ func (es *ElasticSearch) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	args = append(args, fmt.Sprintf("-e http.port=%d", es.spec.Port))
 	args = append(args, "-e discovery.type=single-node")
 	args = append(args, "--group-add 0")
+	args = append(args, "--ulimit nofile=65536:65536")
 	if len(es.spec.JavaOpts) != 0 {
 		args = append(args, fmt.Sprintf("-e ES_JAVA_OPTS=\"%s\"", es.spec.JavaOpts))
 	}
@@ -189,8 +190,7 @@ func (k *Kibana) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 	remotePath := filepath.Join(k.spec.RemoteCfgPath, "export.ndjson")
 
-	localDir := fmt.Sprintf("template/kibana/export_%s.ndjson", "8.0.0")
-	//localDir := "template/kibana/export.ndjson"
+	localDir := "template/kibana/export.ndjson"
 
 	positions = append(positions, executor.Position{
 		LocalDir:  localDir,
@@ -245,14 +245,12 @@ type Filebeat struct {
 	KibanaPort        string
 }
 
-func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort, kibanaHost, kibanaPort string) *Filebeat {
+func NewFilebeat(fbSpec spec.FilebeatSpec, elasticsearchHost, elasticsearchPort string) *Filebeat {
 	return &Filebeat{
 		spec:              fbSpec,
 		ContainerName:     spec.FilebeatDefaultContainerName,
 		ElasticsearchHost: elasticsearchHost,
 		ElasticsearchPort: elasticsearchPort,
-		KibanaHost:        kibanaHost,
-		KibanaPort:        kibanaPort,
 	}
 }
 func (f *Filebeat) GetServiceName() string {
@@ -261,7 +259,7 @@ func (f *Filebeat) GetServiceName() string {
 
 func (f *Filebeat) Display() map[string]utils.DisplayedComponent {
 	cfgDir := f.spec.RemoteCfgPath
-	kibana := utils.DisplayedComponent{
+	filebeat := utils.DisplayedComponent{
 		Name:          "Filebeat",
 		Host:          f.spec.Host,
 		Ports:         "",
@@ -269,7 +267,7 @@ func (f *Filebeat) Display() map[string]utils.DisplayedComponent {
 		Image:         f.spec.Image,
 		Paths:         strings.Join([]string{cfgDir}, ","),
 	}
-	return map[string]utils.DisplayedComponent{"filebeat": kibana}
+	return map[string]utils.DisplayedComponent{"filebeat": filebeat}
 }
 
 func (f *Filebeat) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
@@ -333,4 +331,100 @@ func (f *Filebeat) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 
 func (f *Filebeat) getDirs() (string, string) {
 	return f.spec.RemoteCfgPath, f.spec.DataDir
+}
+
+// ===================================================================================================
+// Vector
+
+type Vector struct {
+	spec              spec.VectorSpec
+	ContainerName     string
+	ElasticsearchHost string
+	ElasticsearchPort string
+}
+
+func NewVector(vectorSpec spec.VectorSpec, elasticsearchHost, elasticsearchPort string) *Vector {
+	return &Vector{
+		spec:              vectorSpec,
+		ContainerName:     spec.VectorDefaultContainerName,
+		ElasticsearchHost: elasticsearchHost,
+		ElasticsearchPort: elasticsearchPort,
+	}
+}
+func (v *Vector) GetServiceName() string {
+	return "filebeat"
+}
+
+func (v *Vector) Display() map[string]utils.DisplayedComponent {
+	cfgDir := v.spec.RemoteCfgPath
+	vector := utils.DisplayedComponent{
+		Name:          "Vector",
+		Host:          v.spec.Host,
+		Ports:         "",
+		ContainerName: v.ContainerName,
+		Image:         v.spec.Image,
+		Paths:         strings.Join([]string{cfgDir}, ","),
+	}
+	return map[string]utils.DisplayedComponent{"vector": vector}
+}
+
+func (v *Vector) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	cfgDir, dataDir := v.getDirs()
+	args := append([]string{}, "mkdir -p", cfgDir, dataDir, "-m 0775")
+	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
+	return &executor.ExecuteCtx{Target: v.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (v *Vector) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	mountPoints := []spec.MountPoints{
+		{Local: "/var/lib/docker/containers", Remote: "/var/lib/docker/containers:ro"},
+		{Local: "/var/run/docker.sock", Remote: "/var/run/docker.sock:ro"},
+		{Local: "/var/log/journal", Remote: "/var/log/journal:ro"},
+		{Local: "/run/systemd", Remote: "/run/systemd:ro"},
+		// Don't remove machine-id
+		{Local: "/etc/machine-id", Remote: "/etc/machine-id:ro"},
+		{Local: filepath.Join(v.spec.RemoteCfgPath, "vector.toml"), Remote: "/etc/vector/vector.toml"},
+	}
+
+	args := spec.GetDockerExecCmd(globalCtx.containerCfg, v.spec.ContainerCfg, v.ContainerName, true, mountPoints...)
+	args = append(args, "--user=root")
+	args = append(args, "-e VECTOR_CONFIG=/etc/vector/vector.toml")
+	args = append(args, "-e VECTOR_MACHINE_IP=$(hostname -I | awk '{print $1}')")
+	args = append(args, v.spec.Image)
+	return &executor.ExecuteCtx{Target: v.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (v *Vector) Stop(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", v.ContainerName}
+	return &executor.ExecuteCtx{Target: v.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (v *Vector) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	args := []string{"docker rm -f", v.ContainerName}
+	args = append(args, "&&", "rm -rf", v.spec.RemoteCfgPath, v.spec.DataDir)
+	return &executor.ExecuteCtx{Target: v.spec.Host, Cmd: strings.Join(args, " ")}
+}
+
+func (v *Vector) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
+	cfg := config.VectorConfig{
+		VectorHost:        v.spec.Host,
+		ElasticsearchHost: v.ElasticsearchHost,
+		ElasticsearchPort: v.ElasticsearchPort,
+	}
+	genCfg, err := cfg.GenConfig()
+	if err != nil {
+		log.Errorf("gen VectorConfig error: %s", err.Error())
+		os.Exit(1)
+	}
+	position := []executor.Position{
+		{LocalDir: genCfg, RemoteDir: filepath.Join(v.spec.RemoteCfgPath, "vector.toml")},
+	}
+
+	return &executor.TransferCtx{
+		Target: v.spec.Host, Position: position,
+	}
+}
+
+func (v *Vector) getDirs() (string, string) {
+	return v.spec.RemoteCfgPath, v.spec.DataDir
 }

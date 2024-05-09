@@ -491,3 +491,36 @@ filebeat:
       # disable_restart: true
       # remove_when_exit: true
       # options: ""
+
+vector:
+  # # The ip address of Vectors
+  - host: 10.1.0.10
+    # # Vector docker image
+    # image: "timberio/vector:latest-debian"
+    # # Vector container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
+  - host: 10.1.0.11
+    # # Vector docker image
+    # image: "timberio/vector:latest-debian"
+    # # Vector container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""
+  - host: 10.1.0.12
+    # # Vector docker image
+    # image: "timberio/vector:latest-debian"
+    # # Vector container configuration
+    # container_config:
+      # cpu_limit: 2.00
+      # memory_limit: 8G
+      # disable_restart: true
+      # remove_when_exit: true
+      # options: ""

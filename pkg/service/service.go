@@ -146,6 +146,7 @@ type Services struct {
 	ElasticSearch   []*ElasticSearch
 	Kibana          []*Kibana
 	Filebeat        []*Filebeat
+	Vector          []*Vector
 }
 
 func NewServices(c *spec.ComponentsSpec) (*Services, error) {
@@ -248,7 +249,15 @@ func NewServices(c *spec.ComponentsSpec) (*Services, error) {
 		for _, v := range c.Filebeat {
 			filebeat = append(filebeat, NewFilebeat(v,
 				elasticSearch[0].spec.Host, strconv.Itoa(elasticSearch[0].spec.Port),
-				kibana[0].spec.Host, strconv.Itoa(kibana[0].spec.Port),
+			))
+		}
+	}
+
+	vector := make([]*Vector, 0, len(c.Vector))
+	if len(elasticSearch) != 0 {
+		for _, v := range c.Vector {
+			vector = append(vector, NewVector(v,
+				elasticSearch[0].spec.Host, strconv.Itoa(elasticSearch[0].spec.Port),
 			))
 		}
 	}
@@ -282,6 +291,7 @@ func NewServices(c *spec.ComponentsSpec) (*Services, error) {
 		ElasticSearch:   elasticSearch,
 		Kibana:          kibana,
 		Filebeat:        filebeat,
+		Vector:          vector,
 	}, nil
 }
 

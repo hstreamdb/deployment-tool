@@ -29,6 +29,7 @@ func newInit() *cobra.Command {
 				{Path: "template/alertmanager", Perm: 0755},
 				{Path: "template/filebeat", Perm: 0755},
 				{Path: "template/kibana", Perm: 0755},
+				{Path: "template/vector", Perm: 0755},
 				{Path: "template/hstream_console", Perm: 0755},
 			}); err != nil {
 				return err
@@ -46,6 +47,7 @@ func newInit() *cobra.Command {
 				filepath.Join("config/grafana/datasources", "datasource.yml"):      "template/grafana/datasources/datasource.yml",
 				filepath.Join("config/kibana", "export_7.6.0.ndjson"):              "template/kibana/export_7.6.0.ndjson",
 				filepath.Join("config/kibana", "export_8.0.0.ndjson"):              "template/kibana/export_8.0.0.ndjson",
+				filepath.Join("config/kibana", "export.ndjson"):                    "template/kibana/export.ndjson",
 				filepath.Join("config/prometheus", "alert.yml"):                    "template/prometheus_common/alert.yml",
 				filepath.Join("config/prometheus", "cluster.yml"):                  "template/prometheus_common/cluster.yml",
 				filepath.Join("config/prometheus", "disks.yml"):                    "template/prometheus_common/disks.yml",

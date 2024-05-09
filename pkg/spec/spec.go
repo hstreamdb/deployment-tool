@@ -32,6 +32,7 @@ type ComponentsSpec struct {
 	ElasticSearch   []ElasticSearchSpec   `yaml:"elasticsearch"`
 	Kibana          []KibanaSpec          `yaml:"kibana"`
 	Filebeat        []FilebeatSpec        `yaml:"filebeat"`
+	Vector          []VectorSpec          `yaml:"vector"`
 }
 
 func (c *ComponentsSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {

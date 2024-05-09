@@ -15,9 +15,10 @@ import (
 )
 
 type ElasticSearch struct {
-	spec            spec.ElasticSearchSpec
-	ContainerName   string
-	DisableSecurity bool
+	spec               spec.ElasticSearchSpec
+	ContainerName      string
+	DisableSecurity    bool
+	SetIndexScriptPath string
 }
 
 func NewElasticSearch(esSpec spec.ElasticSearchSpec) *ElasticSearch {
@@ -48,7 +49,7 @@ func (es *ElasticSearch) Display() map[string]utils.DisplayedComponent {
 
 func (es *ElasticSearch) InitEnv(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	cfgDir, dataDir := es.getDirs()
-	args := append([]string{}, "mkdir -p", cfgDir, dataDir+"/data", "-m 0775")
+	args := append([]string{}, "mkdir -p", dataDir+"/data", cfgDir+"/script", "-m 0775")
 	args = append(args, fmt.Sprintf("&& chown -R %[1]s:$(id -gn %[1]s) %[2]s %[3]s", globalCtx.User, cfgDir, dataDir))
 	args = append(args, fmt.Sprintf("&& chgrp -R 0 %s %s", cfgDir, dataDir))
 	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
@@ -91,13 +92,41 @@ func (es *ElasticSearch) Remove(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 }
 
 func (es *ElasticSearch) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
-	if len(globalCtx.LocalEsConfigFile) != 0 {
-		position := []executor.Position{
-			{LocalDir: globalCtx.LocalEsConfigFile, RemoteDir: es.spec.RemoteCfgPath},
-		}
-		return &executor.TransferCtx{Target: es.spec.Host, Position: position}
+	cfgDir, _ := es.getDirs()
+
+	indexScript := script.EsIndexScript{
+		Host: es.spec.Host,
+		Port: es.spec.Port,
 	}
-	return nil
+	indexScriptPath, err := indexScript.GenScript()
+	if err != nil {
+		log.Errorf("gen EsIndexScript error: %s", err.Error())
+		os.Exit(1)
+	}
+	scriptName := filepath.Base(indexScriptPath)
+	remoteScriptPath := filepath.Join(cfgDir, "script", scriptName)
+	es.SetIndexScriptPath = remoteScriptPath
+	position := []executor.Position{
+		{LocalDir: indexScriptPath, RemoteDir: remoteScriptPath, Opts: fmt.Sprintf("chmod +x %s", remoteScriptPath)},
+	}
+
+	if len(globalCtx.LocalEsConfigFile) != 0 {
+		position = append(position, executor.Position{
+			LocalDir: globalCtx.LocalEsConfigFile, RemoteDir: es.spec.RemoteCfgPath,
+		})
+	}
+
+	return &executor.TransferCtx{Target: es.spec.Host, Position: position}
+}
+
+func (es *ElasticSearch) ConfigLogIndex(globalCtx *GlobalCtx) *executor.ExecuteCtx {
+	if len(es.SetIndexScriptPath) == 0 {
+		log.Error("elasticsearch set index script path is empty")
+		os.Exit(1)
+	}
+
+	args := []string{"/usr/bin/env bash", es.SetIndexScriptPath}
+	return &executor.ExecuteCtx{Target: es.spec.Host, Cmd: strings.Join(args, " ")}
 }
 
 func (es *ElasticSearch) getDirs() (string, string) {

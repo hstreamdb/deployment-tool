@@ -3,34 +3,30 @@ package spec
 import "path"
 
 const (
-	elasticDockerRegistry = "docker.elastic.co/"
-	elasticVersion        = ":7.10.2"
-)
-
-const (
 	ElasticSearchDefaultContainerName = "deploy_elastic_search"
-	ElasticSearchDefaultImage         = elasticDockerRegistry + "elasticsearch/elasticsearch-oss" + elasticVersion
+	ElasticSearchDefaultImage         = "docker.elastic.co/elasticsearch/elasticsearch:8.13.3"
 	ElasticSearchDefaultCfgDir        = "deploy/elasticsearch"
 	ElasticSearchDefaultDataDir       = "data/elasticsearch"
 
 	KibanaDefaultContainerName = "deploy_kibana"
-	KibanaDefaultImage         = elasticDockerRegistry + "kibana/kibana-oss" + elasticVersion
+	KibanaDefaultImage         = "docker.elastic.co/kibana/kibana:8.13.3"
 	KibanaDefaultCfgDir        = "deploy/kibana"
 	KibanaDefaultDataDir       = "data/kibana"
 
 	FilebeatDefaultContainerName = "deploy_filebeat"
-	FilebeatDefaultImage         = elasticDockerRegistry + "beats/filebeat-oss" + elasticVersion
+	FilebeatDefaultImage         = "docker.elastic.co/beats/filebeat-oss:8.13.3"
 	FilebeatDefaultCfgDir        = "deploy/filebeat"
 	FilebeatDefaultDataDir       = "data/filebeat"
 )
 
 type ElasticSearchSpec struct {
-	Host          string       `yaml:"host"`
-	SSHPort       int          `yaml:"ssh_port" default:"22"`
-	Port          int          `yaml:"port" default:"9200"`
-	Image         string       `yaml:"image"`
-	ContainerCfg  ContainerCfg `yaml:"container_config"`
-	IsOss         *bool        `yaml:"is_oss,omitempty"`
+	Host          string            `yaml:"host"`
+	SSHPort       int               `yaml:"ssh_port" default:"22"`
+	Port          int               `yaml:"port" default:"9200"`
+	Image         string            `yaml:"image"`
+	ContainerCfg  ContainerCfg      `yaml:"container_config"`
+	JavaOpts      string            `yaml:"es_java_opts"`
+	ESConfigs     map[string]string `yaml:"es_configs"`
 	DataDir       string
 	RemoteCfgPath string
 }
@@ -55,8 +51,6 @@ type KibanaSpec struct {
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 	RemoteCfgPath string
 	DataDir       string
-
-	IsOss *bool `yaml:"is_oss,omitempty"`
 }
 
 func (k *KibanaSpec) SetDataDir(prefix string) {

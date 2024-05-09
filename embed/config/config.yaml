@@ -431,8 +431,12 @@ elasticsearch:
     # # Elasticsearch service monitor port
     # port: 9200
     # # Elasticsearch docker image
-    # image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
-    # image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.0"
+    # image: "docker.elastic.co/elasticsearch/elasticsearch:8.13.3"
+    # # Config java runtime options for elasticsearch
+    es_java_opts: "-Xms1g -Xmx1g"
+    # # Elasticsearch configs
+    es_configs:
+      bootstrap.memory_lock: true
     # # Elasticsearch container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -446,8 +450,7 @@ kibana:
     # # Kibana service monitor port
     # port: 5601
     # # Kibana docker image
-    # image: "docker.elastic.co/kibana/kibana-oss:7.10.2"
-    # image: "docker.elastic.co/kibana/kibana:8.5.0"
+    # image: "docker.elastic.co/kibana/kibana:8.13.3"
     # # Kibana container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -460,8 +463,7 @@ filebeat:
   # # The ip address of Filebeats
   - host: 10.1.0.10
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
-    # image: "docker.elastic.co/beats/filebeat:8.5.0"
+    # image: "docker.elastic.co/beats/filebeat-oss:8.13.3"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -471,8 +473,7 @@ filebeat:
       # options: ""
   - host: 10.1.0.11
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
-    # image: "docker.elastic.co/beats/filebeat:8.5.0"
+    # image: "docker.elastic.co/beats/filebeat-oss:8.13.3"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -482,8 +483,7 @@ filebeat:
       # options: ""
   - host: 10.1.0.12
     # # Filebeat docker image
-    # image: "docker.elastic.co/beats/filebeat-oss:7.10.2"
-    # image: "docker.elastic.co/beats/filebeat:8.5.0"
+    # image: "docker.elastic.co/beats/filebeat-oss:8.13.3"
     # # Filebeat container configuration
     # container_config:
       # cpu_limit: 2.00

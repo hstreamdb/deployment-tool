@@ -95,6 +95,7 @@ type VectorSpec struct {
 	Host          string       `yaml:"host"`
 	SSHPort       int          `yaml:"ssh_port" default:"22"`
 	Image         string       `yaml:"image"`
+	SinceNow      bool         `yaml:"since_now"`
 	ContainerCfg  ContainerCfg `yaml:"container_config"`
 	RemoteCfgPath string
 	DataDir       string

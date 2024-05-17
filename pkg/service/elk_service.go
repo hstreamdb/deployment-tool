@@ -439,6 +439,7 @@ func (v *Vector) SyncConfig(globalCtx *GlobalCtx) *executor.TransferCtx {
 		VectorHost:        v.spec.Host,
 		ElasticsearchHost: v.ElasticsearchHost,
 		ElasticsearchPort: v.ElasticsearchPort,
+		SinceNow:          v.spec.SinceNow,
 	}
 	genCfg, err := cfg.GenConfig()
 	if err != nil {

@@ -13,6 +13,7 @@ type VectorConfig struct {
 	VectorHost        string
 	ElasticsearchHost string
 	ElasticsearchPort string
+	SinceNow          bool
 }
 
 func (v *VectorConfig) GenConfig() (string, error) {

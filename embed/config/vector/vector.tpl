@@ -27,6 +27,7 @@
 [transforms.remap_fields]
   type = "remap"
   inputs = ["journald"]
+  since_now = {{ .SinceNow }}
   source = '''
     del(.CONTAINER_ID)
     del(.CONTAINER_LOG_EPOCH)

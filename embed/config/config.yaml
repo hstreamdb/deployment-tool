@@ -503,6 +503,8 @@ vector:
   - host: 10.1.0.10
     # # Vector docker image
     # image: "timberio/vector:latest-debian"
+    # # dump journal logs since now
+    since_now: true
     # # Vector container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -513,6 +515,8 @@ vector:
   - host: 10.1.0.11
     # # Vector docker image
     # image: "timberio/vector:latest-debian"
+    # # dump journal logs since now
+    since_now: true
     # # Vector container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -523,6 +527,8 @@ vector:
   - host: 10.1.0.12
     # # Vector docker image
     # image: "timberio/vector:latest-debian"
+    # # dump journal logs since now
+    since_now: true
     # # Vector container configuration
     # container_config:
       # cpu_limit: 2.00

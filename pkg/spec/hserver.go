@@ -24,6 +24,7 @@ type HServerSpec struct {
 	Image              string            `yaml:"image"`
 	SSHPort            int               `yaml:"ssh_port" default:"22"`
 	Opts               map[string]string `yaml:"server_param"`
+	Rts                string            `yaml:"rts"`
 	ContainerCfg       ContainerCfg      `yaml:"container_config"`
 	RemoteCfgPath      string
 	DataDir            string

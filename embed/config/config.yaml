@@ -95,6 +95,8 @@ hserver:
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
       # checkpoint-replica: 1
+    # # # RTS options for HServer
+    # rts: ""
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -128,6 +130,8 @@ hserver:
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
       # checkpoint-replica: 1
+    # # # RTS options for HServer
+    # rts: ""
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00
@@ -161,6 +165,8 @@ hserver:
       # listeners-security-protocol-map: "public_ip:tls"
       # enable-tls: true
       # checkpoint-replica: 1
+    # # # RTS options for HServer
+    # rts: ""
     # # HServer container configuration
     # container_config:
       # cpu_limit: 2.00

@@ -83,6 +83,10 @@ func (h *HServer) Deploy(globalCtx *GlobalCtx) *executor.ExecuteCtx {
 	}
 	args = append(args, []string{h.spec.Image, serverBinPath}...)
 
+	if len(h.spec.Rts) != 0 {
+		args = append(args, fmt.Sprintf("+RTS %s -RTS", h.spec.Rts))
+	}
+
 	if globalCtx.EnableKafka {
 		args = append(args, "kafka")
 	} else {
